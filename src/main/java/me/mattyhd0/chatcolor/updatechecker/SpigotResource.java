@@ -49,7 +49,7 @@ public class SpigotResource {
         private int downloads;
         private int updates;
         private Reviews reviews;
-        private int rating;
+        private double rating;
 
         public int getDownloads() {
             return downloads;
@@ -63,7 +63,7 @@ public class SpigotResource {
             return reviews;
         }
 
-        public int getRating() {
+        public double getRating() {
             return rating;
         }
 
