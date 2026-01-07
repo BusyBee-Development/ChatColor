@@ -13,7 +13,7 @@ import org.mineacademy.chatcontrol.lib.model.SimpleComponent;
 
 public class ChatControlHook implements Listener {
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onChatControlMessage(ChannelPostChatEvent event) {
 
         if (!(event.getSender() instanceof Player)) {
@@ -31,12 +31,10 @@ public class ChatControlHook implements Listener {
                 String originalMessage = event.getMessage();
                 String coloredMessage = pattern.getText(ChatColor.stripColor(originalMessage));
 
-                // Convert the colored message to SimpleComponent
-                SimpleComponent coloredComponent = SimpleComponent.fromSection(coloredMessage);
+                String searchTarget = ": " + originalMessage;
+                SimpleComponent coloredComponent = SimpleComponent.fromSection(": " + coloredMessage);
+                SimpleComponent updatedFormat = event.getFormat().replaceLiteral(searchTarget, coloredComponent);
 
-                // Simply replace the literal message text - this will replace all occurrences
-                // but in practice, the message text usually only appears once in the actual message part
-                SimpleComponent updatedFormat = event.getFormat().replaceLiteral(originalMessage, coloredComponent);
                 event.setFormat(updatedFormat);
             }
         }
