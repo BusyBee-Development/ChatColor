@@ -6,6 +6,7 @@ import me.mattyhd0.chatcolor.command.ChatColorAdminCommand;
 import me.mattyhd0.chatcolor.configuration.ConfigurationManager;
 import me.mattyhd0.chatcolor.configuration.SimpleYMLConfiguration;
 import me.mattyhd0.chatcolor.gui.GuiListener;
+import me.mattyhd0.chatcolor.hook.ChatControlHook;
 import me.mattyhd0.chatcolor.pattern.manager.PatternManager;
 import me.mattyhd0.chatcolor.updatechecker.UpdateChecker;
 import me.mattyhd0.chatcolor.util.Util;
@@ -47,11 +48,13 @@ public class ChatColorPlugin extends JavaPlugin {
         Bukkit.getConsoleSender().sendMessage(Util.color(prefix+" &7Enabling ChatColor v" + this.getDescription().getVersion()));
         metrics = new Metrics(this, 11648);
         saySupport("PlaceholderAPI");
+        saySupport("ChatControl");
         reload();
         setupListeners();
         setupCommands();
         updateChecker(this, 93186);
         setupPlaceholderAPI();
+        setupChatControl();
     }
 
     public void reload(){
@@ -107,6 +110,12 @@ public class ChatColorPlugin extends JavaPlugin {
     public void setupPlaceholderAPI() {
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new ChatColorPlaceholders().register();
+        }
+    }
+
+    public void setupChatControl() {
+        if (Bukkit.getPluginManager().getPlugin("ChatControl") != null) {
+            getServer().getPluginManager().registerEvents(new ChatControlHook(), this);
         }
     }
 

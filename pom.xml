@@ -29,6 +29,10 @@
             <name>Minecraft Libraries</name>
             <url>https://libraries.minecraft.net/</url>
         </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -47,7 +51,7 @@
         <dependency>
             <groupId>me.clip</groupId>
             <artifactId>placeholderapi</artifactId>
-            <version>2.11.5</version>
+            <version>2.11.6</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -57,31 +61,21 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.mojang</groupId>
-            <artifactId>authlib</artifactId>
-            <version>6.0.54</version>
-            <scope>provided</scope>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.11.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>33.2.1-jre</version>
-            <scope>provided</scope>
-        </dependency>
-        <!-- HikariCP -->
-        <!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP -->
-        <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
             <version>5.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mineacademy</groupId>
+            <artifactId>chatcontrol</artifactId>
+            <version>11.6.5</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/ChatControl-11.6.5.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.github.kangarko</groupId>
+            <artifactId>Foundation</artifactId>
+            <version>6.9.22</version>
         </dependency>
     </dependencies>
 
@@ -93,20 +87,18 @@
             </resource>
         </resources>
         <plugins>
-            <!--<plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.3.1</version>
-                <configuration>
-                    <outputDirectory>C:\Users\Matias\Desktop\paper-1.20.6\plugins</outputDirectory>
-                </configuration>
-            </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.6.0</version>
                 <configuration>
-                    <!-- <minimizeJar>true</minimizeJar> -->
+                    <minimizeJar>true</minimizeJar>
+                    <artifactSet>
+                        <excludes>
+                            <exclude>me.clip:placeholderapi</exclude>
+                            <exclude>org.mineacademy.plugin:PlaceholderAPI</exclude>
+                        </excludes>
+                    </artifactSet>
                     <relocations>
                         <relocation>
                             <pattern>com.cryptomorin.xseries</pattern>
@@ -120,12 +112,17 @@
                             <pattern>com.zaxxer.hikari</pattern>
                             <shadedPattern>me.mattyhd0.chatcolor.lib.hikaricp</shadedPattern>
                         </relocation>
-
-                        <!--<relocation>
-                            <pattern>com.mojang.authlib</pattern>
-                            <shadedPattern>me.mattyhd0.chatcolor.mojang-authlib</shadedPattern>
-                        </relocation>-->
                     </relocations>
+                    <filters>
+                        <filter>
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <exclude>META-INF/*.SF</exclude>
+                                <exclude>META-INF/*.DSA</exclude>
+                                <exclude>META-INF/*.RSA</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
                 </configuration>
                 <executions>
                     <execution>
@@ -138,5 +135,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
