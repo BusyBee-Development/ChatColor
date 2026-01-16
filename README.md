@@ -1,6 +1,6 @@
 # ChatColor
 Plugin for Spigot that allows you to create patterns and colors for the chat.
-
+-
 ## Features
 - **Pattern Modes:** Create unique chat styles with various pattern modes.
 - **GUI Support:** Easy to use GUI for players to select their chat color.
