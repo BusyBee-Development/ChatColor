@@ -52,7 +52,7 @@ public class ChatColorPlugin extends JavaPlugin {
         reload();
         setupListeners();
         setupCommands();
-        updateChecker(this, 93186);
+        updateChecker(this, "chatcolors");
         setupPlaceholderAPI();
         setupChatControl();
     }
@@ -119,10 +119,10 @@ public class ChatColorPlugin extends JavaPlugin {
         }
     }
 
-    private void updateChecker(Plugin plugin, int spigotId) {
+    private void updateChecker(Plugin plugin, String slug) {
         if (ChatColorPlugin.getInstance().getConfigurationManager().getConfig().getBoolean("config.update-checker")) {
             Bukkit.getScheduler().runTaskTimerAsynchronously(this,()-> {
-                UpdateChecker updateChecker = new UpdateChecker(plugin, spigotId);
+                UpdateChecker updateChecker = new UpdateChecker(plugin, slug);
                 ConsoleCommandSender console = Bukkit.getConsoleSender();
                 if (updateChecker.requestIsValid()) {
                     if (updateChecker.isRunningLatestVersion()) {
@@ -130,7 +130,7 @@ public class ChatColorPlugin extends JavaPlugin {
                         console.sendMessage(message);
                     } else {
                         String message = Util.color(prefix+" &7You are using version &a" + updateChecker.getVersion() + "&7 and the latest version is &a" + updateChecker.getLatestVersion());
-                        String message2 = Util.color(prefix+" &7You can download the latest version at: &a" + updateChecker.getSpigotResource().getDownloadUrl());
+                        String message2 = Util.color(prefix+" &7You can download the latest version at: &ahttps://modrinth.com/plugin/chatcolors/versions");
                         console.sendMessage(message);
                         console.sendMessage(message2);
                     }

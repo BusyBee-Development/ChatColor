@@ -6,6 +6,8 @@ import me.mattyhd0.chatcolor.configuration.SimpleYMLConfiguration;
 import me.mattyhd0.chatcolor.pattern.api.BasePattern;
 import me.mattyhd0.chatcolor.updatechecker.UpdateChecker;
 import me.mattyhd0.chatcolor.util.Util;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.entity.Player;
@@ -39,7 +41,7 @@ public class ConnectionListener implements Listener {
 
         if (player.hasPermission("chatcolor.updatenotify") && ChatColorPlugin.getInstance().getConfigurationManager().getConfig().getBoolean("config.update-checker")) {
             Bukkit.getScheduler().runTaskAsynchronously(ChatColorPlugin.getInstance(), () -> {
-                UpdateChecker updateChecker = new UpdateChecker(ChatColorPlugin.getInstance(), 93186);
+                UpdateChecker updateChecker = new UpdateChecker(ChatColorPlugin.getInstance(), "chatcolors");
 
                 if (!player.isOnline()) return;
 
@@ -47,9 +49,13 @@ public class ConnectionListener implements Listener {
 
                     if (!updateChecker.isRunningLatestVersion()) {
                         String message = ChatColor.translateAlternateColorCodes('&', "&8[&4&lC&c&lh&6&la&e&lt&2&lC&a&lo&b&ll&3&lo&1&lr&8] &7You are using version &a" + updateChecker.getVersion() + "&7 and the latest version is &a" + updateChecker.getLatestVersion());
-                        String message2 = ChatColor.translateAlternateColorCodes('&', "&8[&4&lC&c&lh&6&la&e&lt&2&lC&a&lo&b&ll&3&lo&1&lr&8] &7You can download the latest version at: &a" + updateChecker.getSpigotResource().getDownloadUrl());
+                        String message2 = ChatColor.translateAlternateColorCodes('&', "&8[&4&lC&c&lh&6&la&e&lt&2&lC&a&lo&b&ll&3&lo&1&lr&8] &7You can download the latest version at: &ahttps://modrinth.com/plugin/chatcolors/versions");
+                        
                         player.sendMessage(message);
-                        player.sendMessage(message2);
+                        
+                        TextComponent downloadMessage = new TextComponent(message2);
+                        downloadMessage.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://modrinth.com/plugin/chatcolors/versions"));
+                        player.spigot().sendMessage(downloadMessage);
                     }
 
                 } else {

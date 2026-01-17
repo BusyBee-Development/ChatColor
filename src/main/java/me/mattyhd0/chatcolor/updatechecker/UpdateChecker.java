@@ -5,17 +5,17 @@ import org.bukkit.plugin.Plugin;
 public class UpdateChecker {
 
     private String version;
-    private SpigotResource spigotResource;
+    private ModrinthVersion modrinthVersion;
 
-    public UpdateChecker(Plugin plugin, int spigotResourceId){
+    public UpdateChecker(Plugin plugin, String slug){
 
         version = plugin.getDescription().getVersion();
-        spigotResource = SpigotAPI.getSpigotResource(spigotResourceId);
+        modrinthVersion = ModrinthAPI.getLatestVersion(slug);
 
     }
 
     public boolean isRunningLatestVersion() {
-        return version.equals(spigotResource.getCurrentVersion());
+        return version.equals(modrinthVersion.getVersionNumber());
     }
 
     public String getVersion() {
@@ -23,15 +23,15 @@ public class UpdateChecker {
     }
     
     public String getLatestVersion() {
-        return spigotResource.getCurrentVersion();
+        return modrinthVersion.getVersionNumber();
     }
 
-    public SpigotResource getSpigotResource() {
-        return spigotResource;
+    public ModrinthVersion getModrinthVersion() {
+        return modrinthVersion;
     }
 
     public boolean requestIsValid() {
-        return spigotResource != null;
+        return modrinthVersion != null;
     }
 
 }
