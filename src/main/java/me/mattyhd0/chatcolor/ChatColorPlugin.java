@@ -125,10 +125,7 @@ public class ChatColorPlugin extends JavaPlugin {
                 UpdateChecker updateChecker = new UpdateChecker(plugin, slug);
                 ConsoleCommandSender console = Bukkit.getConsoleSender();
                 if (updateChecker.requestIsValid()) {
-                    if (updateChecker.isRunningLatestVersion()) {
-                        String message = Util.color(prefix+" &7You are using the latest version of ChatColor!");
-                        console.sendMessage(message);
-                    } else {
+                    if (!updateChecker.isRunningLatestVersion()) {
                         String message = Util.color(prefix+" &7You are using version &a" + updateChecker.getVersion() + "&7 and the latest version is &a" + updateChecker.getLatestVersion());
                         String message2 = Util.color(prefix+" &7You can download the latest version at: &ahttps://modrinth.com/plugin/chatcolors/versions");
                         console.sendMessage(message);
