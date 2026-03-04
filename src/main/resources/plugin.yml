@@ -1,9 +1,9 @@
-main: me.mattyhd0.chatcolor.ChatColorPlugin
+main: net.busybee.chatcolor.ChatColorPlugin
 name: 'ChatColor'
 version: '${project.version}'
 api-version: 1.21
 description: 'A plugin that allows you to create color patterns for the chat'
-author: MattyHD0
+author: MattyHD0, djtmk
 softdepend: [PlaceholderAPI, ChatControl]
 commands:
   chatcolor:
