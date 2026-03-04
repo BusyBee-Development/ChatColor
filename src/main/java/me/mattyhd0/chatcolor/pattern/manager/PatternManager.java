@@ -40,12 +40,13 @@ public class PatternManager {
         }
 
         String permission = configurationSection.getString("permission");
+        String category = configurationSection.getString("category", "Regular");
         ChatColor[] colors = getColors(configurationSection.getStringList("colors"));
 
         try {
 
             TextFormatOptions textFormatOptions = TextFormatOptions.fromConfigurationSection(configurationSection);
-            BasePattern pattern = type.buildPattern(configurationSection.getName(), permission, textFormatOptions, colors);
+            BasePattern pattern = type.buildPattern(configurationSection.getName(), category, permission, textFormatOptions, colors);
 
             if(pattern != null){
                 loadedPatternsMap.put(configurationSection.getName(), pattern);
@@ -99,6 +100,14 @@ public class PatternManager {
 
     public List<BasePattern> getAllPatterns(){
         return new ArrayList<>(loadedPatternsMap.values());
+    }
+
+    public Map<String, List<BasePattern>> getPatternsByCategory() {
+        Map<String, List<BasePattern>> categories = new TreeMap<>();
+        for (BasePattern pattern : loadedPatternsMap.values()) {
+            categories.computeIfAbsent(pattern.getCategory(), k -> new ArrayList<>()).add(pattern);
+        }
+        return categories;
     }
 
 }

@@ -9,6 +9,7 @@ import java.util.List;
 public abstract class BasePattern {
 
     private String name;
+    private String category;
     private List<ChatColor> colors;
     private TextFormatOptions textFormatOptions;
     private String permission;
@@ -22,12 +23,34 @@ public abstract class BasePattern {
 
     public BasePattern(String name, String permission, TextFormatOptions formatOptions, ChatColor... colors){
         this.name = name;
+        this.category = "Regular";
+        this.permission = permission;
+        this.colors = Arrays.asList(colors);
+        textFormatOptions = formatOptions;
+    }
+
+    public BasePattern(String name, String category, String permission, TextFormatOptions formatOptions, ChatColor... colors){
+        this.name = name;
+        this.category = category;
         this.permission = permission;
         this.colors = Arrays.asList(colors);
         textFormatOptions = formatOptions;
     }
 
     public abstract String getText(String text);
+
+    public String getRawColorCode() {
+        StringBuilder sb = new StringBuilder();
+        if (colors != null && !colors.isEmpty()) {
+            sb.append(colors.get(0).toString());
+        }
+        if (textFormatOptions != null) {
+            for (ChatColor format : textFormatOptions.getFormats()) {
+                sb.append(format.toString());
+            }
+        }
+        return sb.toString();
+    }
 
     public void setName(String name) {
         this.name = name;
@@ -38,6 +61,14 @@ public abstract class BasePattern {
             return getText(name);
         }
         return name;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public void setPermission(String permission) {

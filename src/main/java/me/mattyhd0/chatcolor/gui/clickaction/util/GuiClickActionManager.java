@@ -49,6 +49,19 @@ public class GuiClickActionManager {
 
             return new CloseInventoryAction();
 
+        } else if (splitted[0].equals("OPEN-CATEGORY")){
+
+            return new OpenCategoryAction(splitted[1]);
+
+        } else if (splitted[0].equals("OPEN-PAGE")){
+
+            String[] arg = splitted[1].split(" ");
+            return new OpenPageAction(arg[0], Integer.parseInt(arg[1]));
+
+        } else if (splitted[0].equals("BACK-TO-CATEGORIES")){
+
+            return new BackToCategoriesAction();
+
         } else if (splitted[0].equals("SOUND")){
 
             String[] arg = splitted[1].split(" ");

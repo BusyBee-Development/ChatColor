@@ -15,6 +15,7 @@ messages:
         selected-pattern: "%prefix% &7You have selected the pattern &a%pattern%&7."
         pattern-not-exist: "%prefix% &7The pattern &c%pattern% &7does not exist."
         already-in-use: "%prefix% &7You already have the color &a%pattern%&7 equipped."
+        set-command-disabled: "%prefix% &cThis command is disabled. Use the GUI instead!"
       list:
         no-patterns: "%prefix% &7There is no pattern or you do not have permissions to see any."
         header: '&4--&c--&6--&e--&2--&a--&b--&8[ &7Patterns List &8]&b--&3--&b--&a--&2--&e--&6--&c--&4--'

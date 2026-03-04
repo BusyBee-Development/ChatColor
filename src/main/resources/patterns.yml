@@ -803,6 +803,7 @@ rainbow_random:
 
 
 rainbow_gradient:
+  category: 'Exclusive'
   permission: 'chatcolor.color.rainbow_gradient'
   mode: 'GRADIENT'
   bold: true

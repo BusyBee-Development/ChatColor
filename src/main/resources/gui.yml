@@ -1,116 +1,53 @@
 gui:
   colored-example-text: "this is just a sample text"
-  open-sound: LEVEL_UP
-  gui:
-    title: "&8Pick a ChatColor"
+  open-sound: ENTITY_PLAYER_LEVELUP
+  
+  categories:
+    title: "&8Select Category"
+    rows: 3
+    content-slots: [10, 11, 12, 13, 14, 15, 16]
+    items:
+      decoration:
+        material: GRAY_STAINED_GLASS_PANE
+        name: " "
+        slots: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26]
+
+  patterns:
+    title: "&8Select Pattern - %category% (Page %page%)"
     rows: 6
-  items:
-    decoration1:
-      material: GRAY_STAINED_GLASS_PANE
-      name: " "
-      amount: 1
-      slots:
-        - 0
-        - 1
-        - 2
-        - 3
-        - 4
-        - 5
-        - 6
-        - 7
-        - 8
-        - 9
-        - 10
-        - 11
-        - 12
-        - 13
-        - 14
-        - 15
-        - 16
-        - 17
-        - 18
-        - 19
-        - 20
-        - 21
-        - 22
-        - 23
-        - 24
-        - 25
-        - 26
-        - 27
-        - 28
-        - 29
-        - 30
-        - 31
-        - 32
-        - 33
-        - 34
-        - 35
-        - 36
-        - 37
-        - 38
-        - 39
-        - 40
-        - 41
-        - 42
-        - 43
-        - 44
-        - 45
-        - 46
-        - 47
-        - 48
-        - 49
-        - 50
-        - 51
-        - 52
-        - 53
-    decoration2:
-      material: BLACK_STAINED_GLASS_PANE
-      name: " "
-      amount: 1
-      slots:
-        - 0
-        - 1
-        - 2
-        - 3
-        - 4
-        - 5
-        - 6
-        - 7
-        - 8
-        - 9
-        - 17
-        - 18
-        - 26
-        - 27
-        - 35
-        - 36
-        - 44
-        - 45
-        - 46
-        - 47
-        - 48
-        - 49
-        - 50
-        - 51
-        - 52
-        - 53
-    example-item:
+    content-slots: [10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43]
+    prev-page-slot: 45
+    next-page-slot: 53
+    back-slot: 49
+    
+    prev-page-item:
+      material: ARROW
+      name: "&aPrevious Page"
+    
+    next-page-item:
+      material: ARROW
+      name: "&aNext Page"
+    
+    back-item:
       material: BARRIER
-      name: "&cUnequip"
-      amount: 1
-      lore:
-        - "&7Click to unequip your current pattern."
-      #You can use as actions:
-      #
-      # MESSAGE:your message
-      # CONSOLE-COMMAND:your command %player%
-      # PLAYER-COMMAND:your command
-      # SET-PATTERN:your pattern
-      # CLOSE-INVENTORY
-      # SOUND:sound pitch yaw
-      actions:
-        - "PLAYER-COMMAND:chatcolor disable"
-        - "SOUND:ENTITY_PLAYER_LEVELUP 1 1"
-        - "CLOSE-INVENTORY"
-      slot: 49
+      name: "&cBack to Categories"
+      
+    items:
+      decoration1:
+        material: GRAY_STAINED_GLASS_PANE
+        name: " "
+        slots: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 17, 18, 26, 27, 35, 36, 44, 45, 46, 47, 48, 50, 51, 52, 53]
+      decoration2:
+        material: BLACK_STAINED_GLASS_PANE
+        name: " "
+        slots: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 17, 18, 26, 27, 35, 36, 44, 45, 46, 47, 48, 50, 51, 52, 53]
+      unequip:
+        material: BARRIER
+        name: "&cUnequip"
+        lore:
+          - "&7Click to unequip your current pattern."
+        actions:
+          - "PLAYER-COMMAND:chatcolor disable"
+          - "SOUND:ENTITY_PLAYER_LEVELUP 1 1"
+          - "CLOSE-INVENTORY"
+        slot: 49

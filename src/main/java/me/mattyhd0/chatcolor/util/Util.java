@@ -6,6 +6,8 @@ import com.cryptomorin.xseries.profiles.objects.ProfileInputType;
 import com.cryptomorin.xseries.profiles.objects.Profileable;
 import com.google.common.collect.Multimap;
 import org.bukkit.*;
+import org.bukkit.configuration.ConfigurationSection;
+import me.mattyhd0.chatcolor.ChatColorPlugin;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.banner.PatternType;
@@ -143,6 +145,32 @@ public class Util {
                     itemMeta.setCustomModelData(config.getInt(key+".custom_model_data"));
                 } catch (NoSuchMethodError e){
                     error.addError("The setCustomModelData method does not exist in this version of Spigot");
+                }
+            }
+
+            if (config.getBoolean(key + ".glow")) {
+                try {
+                    itemMeta.addEnchant(Enchantment.LURE, 1, true);
+                    itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                } catch (Exception ignored) {}
+            }
+
+            if (config.contains(key + ".nbt")) {
+                ConfigurationSection nbtSection = config.getConfigurationSection(key + ".nbt");
+                if (nbtSection != null) {
+                    for (String nbtKey : nbtSection.getKeys(false)) {
+                        try {
+                            NamespacedKey namespacedKey = new NamespacedKey(ChatColorPlugin.getInstance(), nbtKey);
+                            Object value = nbtSection.get(nbtKey);
+                            if (value instanceof String) {
+                                itemMeta.getPersistentDataContainer().set(namespacedKey, org.bukkit.persistence.PersistentDataType.STRING, (String) value);
+                            } else if (value instanceof Integer) {
+                                itemMeta.getPersistentDataContainer().set(namespacedKey, org.bukkit.persistence.PersistentDataType.INTEGER, (Integer) value);
+                            } else if (value instanceof Double) {
+                                itemMeta.getPersistentDataContainer().set(namespacedKey, org.bukkit.persistence.PersistentDataType.DOUBLE, (Double) value);
+                            }
+                        } catch (Exception ignored) {}
+                    }
                 }
             }
 

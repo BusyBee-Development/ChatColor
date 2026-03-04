@@ -1,7 +1,30 @@
-### Maven template
+# Java
+*.class
+*.log
+*.ctxt
 *.jar
-/target/
-/out/
-.idea
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+
+# IntelliJ
+.idea/
 *.iml
-/libs/
+*.ipr
+*.iws
+out/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project-specific
+lib/

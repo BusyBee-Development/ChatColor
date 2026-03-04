@@ -52,4 +52,7 @@ config:
   # Should config update when a new option is added? Suggested to leave it enabled.
   auto-update-config: true
 
+  # Toggle to disable /chatcolor set <color> command
+  disable-set-command: false
+
 config-version: 1

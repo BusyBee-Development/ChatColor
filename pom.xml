@@ -63,9 +63,9 @@
         <dependency>
             <groupId>org.mineacademy</groupId>
             <artifactId>chatcontrol</artifactId>
-            <version>11.6.5</version>
+            <version>11.6.12</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/libs/ChatControl-11.6.5.jar</systemPath>
+            <systemPath>${project.basedir}/lib/ChatControl-11.6.12.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.github.kangarko</groupId>

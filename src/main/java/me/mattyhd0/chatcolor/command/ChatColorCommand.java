@@ -72,6 +72,11 @@ public class ChatColorCommand implements CommandExecutor, TabCompleter {
         ConfigurationManager configurationManager = plugin.getConfigurationManager();
         MessagesYMLFile messagesYMLFile = configurationManager.getMessages();
 
+        if (ChatColorPlugin.getInstance().getConfig().getBoolean("config.disable-set-command")) {
+            player.sendMessage(Util.color(messagesYMLFile.getString("messages.commands.chatcolor.set.set-command-disabled")));
+            return;
+        }
+
         if (player.hasPermission("chatcolor.set")) {
 
             if (arg.length == 2) {

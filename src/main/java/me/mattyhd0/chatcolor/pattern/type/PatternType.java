@@ -21,12 +21,14 @@ public enum PatternType {
         this.clazz = clazz;
     }
 
-    public <T extends BasePattern > T buildPattern(String name, String permission, TextFormatOptions formatOptions, ChatColor... colors) {
+    public <T extends BasePattern > T buildPattern(String name, String category, String permission, TextFormatOptions formatOptions, ChatColor... colors) {
 
         try {
             Constructor<T>[] constructors = clazz.getDeclaredConstructors();
             Constructor<T> constructor = constructors[0];
-            return constructor.newInstance(name, permission, formatOptions, colors);
+            T pattern = constructor.newInstance(name, permission, formatOptions, colors);
+            pattern.setCategory(category);
+            return pattern;
         } catch (Exception e){
             e.printStackTrace();
             return null;

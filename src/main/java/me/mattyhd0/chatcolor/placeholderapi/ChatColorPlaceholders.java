@@ -42,6 +42,13 @@ public class ChatColorPlaceholders extends PlaceholderExpansion
                 CPlayer cPlayer = ChatColorPlugin.getInstance().getDataMap().get(player.getUniqueId());
                 return cPlayer == null ? "" : cPlayer.getLastMessages();
             }
+            case "code": {
+                CPlayer cPlayer = ChatColorPlugin.getInstance().getDataMap().get(player.getUniqueId());
+                if (cPlayer == null || cPlayer.getPattern() == null) {
+                    return "";
+                }
+                return cPlayer.getPattern().getRawColorCode();
+            }
             case "pattern_name": {
                 CPlayer cPlayer = ChatColorPlugin.getInstance().getDataMap().get(player.getUniqueId());
                 if(cPlayer == null) {
