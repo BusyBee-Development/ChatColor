@@ -31,10 +31,14 @@ public class ChatListener implements EventExecutor {
     public void onChat(AsyncPlayerChatEvent event) {
 
         SimpleYMLConfiguration config = ChatColorPlugin.getInstance().getConfigurationManager().getConfig();
-
         Player player = event.getPlayer();
-
         CPlayer cPlayer = plugin.getDataMap().get(player.getUniqueId());
+
+        String format = event.getFormat();
+        if (format != null && format.contains("<gradient:")) {
+            format = MyChatColor.translateAlternateColorCodes(format, player);
+            event.setFormat(format);
+        }
 
         if(config.getBoolean("config.translate-chat-colors")){
             event.setMessage(

@@ -59,6 +59,10 @@ public class GuiClickActionManager {
             String[] arg = splitted[1].split(" ");
             return new OpenPageAction(arg[0], Integer.parseInt(arg[1]));
 
+        } else if (splitted[0].equals("OPEN-ALL-PAGE")){
+
+            return new OpenAllPatternsPageAction(Integer.parseInt(splitted[1]));
+
         } else if (splitted[0].equals("BACK-TO-CATEGORIES")){
 
             return new BackToCategoriesAction();

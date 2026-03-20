@@ -3,6 +3,7 @@ package net.busybee.chatcolor;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 
+import java.awt.Color;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,7 +27,10 @@ public class MyChatColor {
             }
         }
 
-        return applyHex(new String(b), player).replace(String.valueOf(Character.MIN_VALUE), "");
+        String result = new String(b).replace(String.valueOf(Character.MIN_VALUE), "");
+        result = applyHex(result, player);
+        result = applyGradient(result, player);
+        return result;
     }
 
     public static String applyHex(String textToTranslate, Player player){
@@ -63,11 +67,9 @@ public class MyChatColor {
     public static boolean isHex(ChatColor color){
         return (isColor(color) && color.getName().startsWith("#"));
     }
-
     public static boolean isFormat(ChatColor color){
         return (color.getColor() == null);
     }
-
     public static boolean isColor(ChatColor color){
         return (color.getColor() != null);
     }
@@ -99,6 +101,71 @@ public class MyChatColor {
 
         return new String[]{"chatcolor.unknown"};
 
+    }
+
+    public static String applyGradient(String textToTranslate, Player player) {
+        Pattern pattern = Pattern.compile("<gradient:(#[a-fA-F0-9]{6}):(#[a-fA-F0-9]{6})>([^<]+)</gradient>");
+        Matcher matcher = pattern.matcher(textToTranslate);
+
+        StringBuffer result = new StringBuffer();
+
+        while (matcher.find()) {
+            String startColorHex = matcher.group(1);
+            String endColorHex = matcher.group(2);
+            String text = matcher.group(3);
+
+            try {
+                if (player.hasPermission("chatcolor.*") || player.hasPermission("chatcolor.gradient")) {
+                    String gradientText = createGradient(text, startColorHex, endColorHex);
+                    matcher.appendReplacement(result, Matcher.quoteReplacement(gradientText));
+                } else {
+                    matcher.appendReplacement(result, Matcher.quoteReplacement(text));
+                }
+            } catch (Exception e) {
+                matcher.appendReplacement(result, Matcher.quoteReplacement(text));
+            }
+        }
+
+        matcher.appendTail(result);
+        return result.toString();
+    }
+
+    private static String createGradient(String text, String startHex, String endHex) {
+        try {
+            Color startColor = Color.decode(startHex);
+            Color endColor = Color.decode(endHex);
+
+            float rStart = startColor.getRed();
+            float gStart = startColor.getGreen();
+            float bStart = startColor.getBlue();
+
+            float rEnd = endColor.getRed();
+            float gEnd = endColor.getGreen();
+            float bEnd = endColor.getBlue();
+
+            int length = text.length();
+            if (length == 0) return text;
+
+            float rStep = (rEnd - rStart) / length;
+            float gStep = (gEnd - gStart) / length;
+            float bStep = (bEnd - bStart) / length;
+
+            StringBuilder gradientText = new StringBuilder();
+
+            for (int i = 0; i < length; i++) {
+                float r = rStart + (rStep * i);
+                float g = gStart + (gStep * i);
+                float b = bStart + (bStep * i);
+
+                Color color = new Color(r / 255f, g / 255f, b / 255f);
+                ChatColor chatColor = ChatColor.of(color);
+                gradientText.append(chatColor).append(text.charAt(i));
+            }
+
+            return gradientText.toString();
+        } catch (Exception e) {
+            return text;
+        }
     }
 
 }
