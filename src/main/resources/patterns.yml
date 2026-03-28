@@ -851,3 +851,37 @@ rainbow_gradient:
       actions:
         - 'MESSAGE:&cYou do not have permission to use this pattern!'
         - 'CLOSE-INVENTORY'
+
+SineWave:
+  mode: SINE_WAVE
+  category: 'Animated'
+  permission: 'chatcolor.pattern.sinewave'
+  frequency: 0.5
+  phase: 0.0
+  colors:
+    - '#FF0000'
+    - '#0000FF'
+  gui-item:
+    has-permission:
+      material: RED_STAINED_GLASS_PANE
+      name: '&c&lSine Wave'
+      lore:
+        - '&7A beautiful animated sine wave pattern!'
+        - ''
+        - '{example_text}'
+        - ''
+        - '&eClick to select!'
+      actions:
+        - 'SET-PATTERN:SineWave'
+        - 'CLOSE-INVENTORY'
+        - 'PLAY-SOUND:BLOCK_NOTE_BLOCK_PLING'
+    has-not-permission:
+      material: GRAY_STAINED_GLASS_PANE
+      name: '&c&lSine Wave'
+      lore:
+        - '&7A beautiful animated sine wave pattern!'
+        - ''
+        - '&cYou do not have permission!'
+      actions:
+        - 'SEND-MESSAGE:&cYou do not have permission for this pattern!'
+        - 'PLAY-SOUND:ENTITY_VILLAGER_NO'

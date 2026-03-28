@@ -46,7 +46,7 @@ public class PatternManager {
         try {
 
             TextFormatOptions textFormatOptions = TextFormatOptions.fromConfigurationSection(configurationSection);
-            BasePattern pattern = type.buildPattern(configurationSection.getName(), category, permission, textFormatOptions, colors);
+            BasePattern pattern = type.buildPattern(configurationSection.getName(), category, permission, textFormatOptions, configurationSection, colors);
 
             if(pattern != null){
                 loadedPatternsMap.put(configurationSection.getName(), pattern);

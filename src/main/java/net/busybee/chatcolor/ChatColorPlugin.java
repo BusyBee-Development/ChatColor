@@ -22,6 +22,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import net.busybee.chatcolor.listener.ConnectionListener;
 import net.busybee.chatcolor.listener.ChatListener;
+import net.busybee.chatcolor.listener.PaperChatListener;
 import net.busybee.chatcolor.command.ChatColorCommand;
 
 import org.bukkit.event.EventPriority;
@@ -55,6 +56,8 @@ public class ChatColorPlugin extends JavaPlugin {
         updateChecker(this, "chatcolors");
         setupPlaceholderAPI();
         setupChatControl();
+        setupZelChat();
+        setupPaperChat();
     }
 
     public void reload(){
@@ -81,19 +84,21 @@ public class ChatColorPlugin extends JavaPlugin {
 
         EventPriority priority = configurationManager.getConfig().contains("config.listener-priority") ?
                 EventPriority.valueOf(configurationManager.getConfig().getString("config.listener-priority")) :
-                EventPriority.LOW;
+                EventPriority.HIGHEST;
 
 
 
-        getServer().getPluginManager().registerEvent(
-                AsyncPlayerChatEvent.class,
-                new Listener() {},
-                priority,
-                new ChatListener(this),
-                this
-
-        );
-       //getServer().getPluginManager().registerEvents(new ChatListener(), this);
+        try {
+            Class.forName("io.papermc.paper.event.player.AsyncChatEvent");
+        } catch (ClassNotFoundException e) {
+            getServer().getPluginManager().registerEvent(
+                    AsyncPlayerChatEvent.class,
+                    new Listener() {},
+                    priority,
+                    new ChatListener(this),
+                    this
+            );
+        }
         getServer().getPluginManager().registerEvents(new ConnectionListener(this), this);
         getServer().getPluginManager().registerEvents(new GuiListener(), this);
     }
@@ -117,6 +122,36 @@ public class ChatColorPlugin extends JavaPlugin {
         if (Bukkit.getPluginManager().getPlugin("ChatControl") != null) {
             getServer().getPluginManager().registerEvents(new ChatControlHook(), this);
         }
+    }
+
+    public void setupZelChat() {
+        if (Bukkit.getPluginManager().getPlugin("zelchat") != null) {
+            saySupport("ZelChat");
+        }
+    }
+
+    public void setupPaperChat() {
+        try {
+            Class<?> asyncChatEventClass = Class.forName("io.papermc.paper.event.player.AsyncChatEvent");
+
+            EventPriority priority = configurationManager.getConfig().contains("config.listener-priority") ?
+                    EventPriority.valueOf(configurationManager.getConfig().getString("config.listener-priority")) :
+                    EventPriority.HIGHEST;
+
+            PaperChatListener paperChatListener = new PaperChatListener(this);
+            getServer().getPluginManager().registerEvent(
+                    (Class<? extends org.bukkit.event.Event>) asyncChatEventClass,
+                    new Listener() {},
+                    priority,
+                    (listener, event) -> {
+                        if (asyncChatEventClass.isInstance(event)) {
+                            paperChatListener.onChat((io.papermc.paper.event.player.AsyncChatEvent) event);
+                        }
+                    },
+                    this
+            );
+            saySupport("PaperChat");
+        } catch (ClassNotFoundException ignored) {}
     }
 
     private void updateChecker(Plugin plugin, String slug) {
@@ -199,19 +234,15 @@ public class ChatColorPlugin extends JavaPlugin {
     public boolean supportPlugin(String plugin){
         return supportedPlugins.contains(plugin);
     }
-
     public static ChatColorPlugin getInstance() {
         return INSTANCE;
     }
-
     public HikariDataSource getConnectionPool() {
         return this.hikariConnectionPool;
     }
-
     public ConfigurationManager getConfigurationManager() {
         return configurationManager;
     }
-
     public PatternManager getPatternManager() {
         return patternManager;
     }
@@ -223,7 +254,6 @@ public class ChatColorPlugin extends JavaPlugin {
     public String getPrefix() {
         return prefix;
     }
-
     public HashMap<UUID, CPlayer> getDataMap() {
         return dataMap;
     }

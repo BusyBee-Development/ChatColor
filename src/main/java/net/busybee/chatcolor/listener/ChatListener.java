@@ -35,8 +35,11 @@ public class ChatListener implements EventExecutor {
         CPlayer cPlayer = plugin.getDataMap().get(player.getUniqueId());
 
         String format = event.getFormat();
-        if (format != null && format.contains("<gradient:")) {
-            format = MyChatColor.translateAlternateColorCodes(format, player);
+        if (format != null && cPlayer != null) {
+            format = cPlayer.getTranslatedFormat(format);
+            event.setFormat(format);
+        } else if (format != null) {
+            format = MyChatColor.translateAlternateColorCodes(format, player, false);
             event.setFormat(format);
         }
 

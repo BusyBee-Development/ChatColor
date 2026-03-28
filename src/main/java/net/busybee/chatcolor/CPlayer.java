@@ -16,18 +16,33 @@ public class CPlayer {
     private boolean modified = false;
     private String lastMessage = null;
     private BasePattern basePattern;
+    private String cachedFormat = null;
+    private String originalFormat = null;
 
     public CPlayer(Player player, BasePattern basePattern){
         this.player = player;
         this.basePattern = basePattern;
     }
+    
+    public String getTranslatedFormat(String format) {
+        if (format.equals(originalFormat) && cachedFormat != null) {
+            return cachedFormat;
+        }
+        this.originalFormat = format;
+        this.cachedFormat = MyChatColor.translateAlternateColorCodes(format, player, false);
+        return cachedFormat;
+    }
+
+    public void invalidateCache() {
+        this.cachedFormat = null;
+    }
+
     public BasePattern getPattern() {
         return basePattern;
     }
     public void setPattern(BasePattern pattern){
         this.basePattern = pattern;
     }
-
     public void disablePattern(){
         this.basePattern = null;
     }

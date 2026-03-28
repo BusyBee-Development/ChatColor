@@ -2,6 +2,7 @@ package net.busybee.chatcolor.util;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.busybee.chatcolor.ChatColorPlugin;
+import net.busybee.chatcolor.MyChatColor;
 import net.busybee.chatcolor.pattern.api.BasePattern;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -33,9 +34,10 @@ public class Placeholders {
 
         }
 
+        // Apply MiniMessage/Adventure colors to the final string
+        text = MyChatColor.translateAlternateColorCodes(text, player, false);
+
         return text;
-
-
     }
 
     public static List<String> setPlaceholders(List<String> texts, BasePattern pattern, Player player){

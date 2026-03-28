@@ -5,7 +5,7 @@ config:
   # Don't change this if you don't know what you're doing
   # Note: Requires you to restart the server
   # Valid values: LOWEST, LOW, NORMAL, HIGH, HIGHEST, MONITOR
-  listener-priority: LOW
+  listener-priority: HIGHEST
 
   # By enabling this option you will be able to open the GUI with /chatcolor instead of /chatcolor gui (/chacolor gui will still work too)
   use-main-command-as-gui: false

@@ -17,6 +17,10 @@
 
     <repositories>
         <repository>
+            <id>papermc</id>
+            <url>https://repo.papermc.io/repository/maven-public/</url>
+        </repository>
+        <repository>
             <id>central</id>
             <url>https://repo.maven.apache.org/maven2</url>
         </repository>
@@ -35,6 +39,12 @@
     </repositories>
 
     <dependencies>
+        <dependency>
+            <groupId>io.papermc.paper</groupId>
+            <artifactId>paper-api</artifactId>
+            <version>1.21.4-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
@@ -70,6 +80,13 @@
             <version>11.6.12</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/ChatControl-11.6.12.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>it.pino.zelchat</groupId>
+            <artifactId>zelchat</artifactId>
+            <version>2.0.0-pre-12</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/zelchat-2.0.0-pre-12.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.github.kangarko</groupId>
