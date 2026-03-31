@@ -1,58 +1,194 @@
-config:
-  # The plugin will check if there is a new version available
-  update-checker: true
+gui:
+  main-menu-title: "<gradient:blue:aqua><bold>LuminaColor"
+  color-selector-title: "<aqua><bold>Solid Colors"
+  gradient-selector-title: "<gradient:red:blue><bold>Gradients"
+  pattern-selector-title: "<rainbow><bold>Patterns"
 
-  # Don't change this if you don't know what you're doing
-  # Note: Requires you to restart the server
-  # Valid values: LOWEST, LOW, NORMAL, HIGH, HIGHEST, MONITOR
-  listener-priority: HIGHEST
+settings:
+  apply-to-message: true
+  apply-to-name: true
+  default-color: "NONE"
 
-  # By enabling this option you will be able to open the GUI with /chatcolor instead of /chatcolor gui (/chacolor gui will still work too)
-  use-main-command-as-gui: false
+colors:
+  red:
+    display-name: "Red"
+    tag: "<red>"
+    permission: "luminacolor.color.red"
+    icon: "RED_WOOL"
+  dark-red:
+    display-name: "Dark Red"
+    tag: "<dark_red>"
+    permission: "luminacolor.color.dark_red"
+    icon: "RED_CONCRETE"
+  gold:
+    display-name: "Gold"
+    tag: "<gold>"
+    permission: "luminacolor.color.gold"
+    icon: "GOLD_BLOCK"
+  yellow:
+    display-name: "Yellow"
+    tag: "<yellow>"
+    permission: "luminacolor.color.yellow"
+    icon: "YELLOW_WOOL"
+  green:
+    display-name: "Green"
+    tag: "<green>"
+    permission: "luminacolor.color.green"
+    icon: "GREEN_WOOL"
+  dark-green:
+    display-name: "Dark Green"
+    tag: "<dark_green>"
+    permission: "luminacolor.color.dark_green"
+    icon: "GREEN_CONCRETE"
+  aqua:
+    display-name: "Aqua"
+    tag: "<aqua>"
+    permission: "luminacolor.color.aqua"
+    icon: "CYAN_WOOL"
+  dark-aqua:
+    display-name: "Dark Aqua"
+    tag: "<dark_aqua>"
+    permission: "luminacolor.color.dark_aqua"
+    icon: "CYAN_CONCRETE"
+  blue:
+    display-name: "Blue"
+    tag: "<blue>"
+    permission: "luminacolor.color.blue"
+    icon: "BLUE_WOOL"
+  dark-blue:
+    display-name: "Dark Blue"
+    tag: "<dark_blue>"
+    permission: "luminacolor.color.dark_blue"
+    icon: "BLUE_CONCRETE"
+  light-purple:
+    display-name: "Light Purple"
+    tag: "<light_purple>"
+    permission: "luminacolor.color.light_purple"
+    icon: "MAGENTA_WOOL"
+  dark-purple:
+    display-name: "Dark Purple"
+    tag: "<dark_purple>"
+    permission: "luminacolor.color.dark_purple"
+    icon: "PURPLE_WOOL"
+  white:
+    display-name: "White"
+    tag: "<white>"
+    permission: "luminacolor.color.white"
+    icon: "WHITE_WOOL"
+  gray:
+    display-name: "Gray"
+    tag: "<gray>"
+    permission: "luminacolor.color.gray"
+    icon: "GRAY_WOOL"
+  dark-gray:
+    display-name: "Dark Gray"
+    tag: "<dark_gray>"
+    permission: "luminacolor.color.dark_gray"
+    icon: "GRAY_CONCRETE"
+  black:
+    display-name: "Black"
+    tag: "<black>"
+    permission: "luminacolor.color.black"
+    icon: "BLACK_WOOL"
+  hot-pink:
+    display-name: "Hot Pink"
+    tag: "<#FF69B4>"
+    permission: "luminacolor.color.hot_pink"
+    icon: "PINK_WOOL"
+  orange:
+    display-name: "Orange"
+    tag: "<#FF8C00>"
+    permission: "luminacolor.color.orange"
+    icon: "ORANGE_WOOL"
+  coral:
+    display-name: "Coral"
+    tag: "<#FF6B6B>"
+    permission: "luminacolor.color.coral"
+    icon: "RED_CONCRETE_POWDER"
+  lime:
+    display-name: "Lime"
+    tag: "<#00FF7F>"
+    permission: "luminacolor.color.lime"
+    icon: "LIME_WOOL"
+  sky:
+    display-name: "Sky Blue"
+    tag: "<#87CEEB>"
+    permission: "luminacolor.color.sky"
+    icon: "LIGHT_BLUE_WOOL"
+  mint:
+    display-name: "Mint"
+    tag: "<#98FF98>"
+    permission: "luminacolor.color.mint"
+    icon: "LIME_CONCRETE_POWDER"
+  lavender:
+    display-name: "Lavender"
+    tag: "<#E6E6FA>"
+    permission: "luminacolor.color.lavender"
+    icon: "PURPLE_CONCRETE_POWDER"
+  teal:
+    display-name: "Teal"
+    tag: "<#008080>"
+    permission: "luminacolor.color.teal"
+    icon: "CYAN_CONCRETE"
 
-  # The patterns shown in /chatcolor list will only be the ones that the player can use
-  show-pattern-in-list-only-if-has-permissions: true
-
-  # When writing in the chat it will only show the pattern if the player has the permission of that pattern
-  show-pattern-only-if-has-permissions: false
-
-  # When a player write a message like "&6&lHelo World!" this message was colored if the player has the required permission
-  translate-chat-colors: true
-
-  mysql:
-    enable: false
-    database: 'chatcolor'
-    host: 'localhost'
-    port: '3306'
-    username: 'root'
-    password: ''
-    # Important if you need to modify connection url.
-    additional-url: "&useSSL=false&autoReconnect=true"
-
-  show-pattern-on:
-    list: true
-    selected-message: true
-    already-in-use-message: true
-    pattern-disabled-message: true
-  custom-pattern-list:
-    enable: false
-    list:
-      - '&4--&c--&6--&e--&2--&a--&b--&8[ &7Custom List &8]&b--&3--&b--&a--&2--&e--&6--&c--&4--'
-      - '&7This list is a custom list,'
-      - '&7you can use it if you want more customization'
-      - ''
-      - '&7Example:'
-      - '&8> &7/chatcolor color3 &8- &b[MVP]'
-      - '&8> &7/chatcolor color2 &8- &a[VIP]'
-      - '&8> &7/chatcolor color &8- &a[VIP]'
-      - '&4---&c---&6---&e---&2---&a---&b---&3----&b---&a---&2---&e---&6---&c---&4---'
-
-  # Delay to load players. Recommended to leave it in 30 ticks so player data is saved correctly if it's switching servers.
-  data-delay: 30
-  # Should config update when a new option is added? Suggested to leave it enabled.
-  auto-update-config: true
-
-  # Toggle to disable /chatcolor set <color> command
-  disable-set-command: false
-
-config-version: 1
+gradients:
+  sunset:
+    display-name: "Sunset"
+    tag: "<gradient:#FF4500:#FF8C00:#FFD700>"
+    permission: "luminacolor.gradient.sunset"
+    icon: "ORANGE_WOOL"
+  ocean:
+    display-name: "Ocean"
+    tag: "<gradient:#0077B6:#00B4D8:#ADE8F4>"
+    permission: "luminacolor.gradient.ocean"
+    icon: "CYAN_WOOL"
+  forest:
+    display-name: "Forest"
+    tag: "<gradient:#1B5E20:#4CAF50:#A5D6A7>"
+    permission: "luminacolor.gradient.forest"
+    icon: "GREEN_WOOL"
+  candy:
+    display-name: "Candy"
+    tag: "<gradient:#FF69B4:#FF1493:#C71585>"
+    permission: "luminacolor.gradient.candy"
+    icon: "PINK_CONCRETE"
+  twilight:
+    display-name: "Twilight"
+    tag: "<gradient:#3F0071:#9C27B0:#CE93D8>"
+    permission: "luminacolor.gradient.twilight"
+    icon: "PURPLE_WOOL"
+  arctic:
+    display-name: "Arctic"
+    tag: "<gradient:#E0F7FA:#B2EBF2:#80DEEA>"
+    permission: "luminacolor.gradient.arctic"
+    icon: "LIGHT_BLUE_WOOL"
+  volcanic:
+    display-name: "Volcanic"
+    tag: "<gradient:#B71C1C:#FF5722:#FF9800>"
+    permission: "luminacolor.gradient.volcanic"
+    icon: "RED_WOOL"
+  cosmic:
+    display-name: "Cosmic"
+    tag: "<gradient:#0D47A1:#7B1FA2:#F06292>"
+    permission: "luminacolor.gradient.cosmic"
+    icon: "BLUE_WOOL"
+  neon:
+    display-name: "Neon"
+    tag: "<gradient:#39FF14:#00FFFF>"
+    permission: "luminacolor.gradient.neon"
+    icon: "LIME_WOOL"
+  rose-gold:
+    display-name: "Rose Gold"
+    tag: "<gradient:#B76E79:#E8A0BF:#FFD700>"
+    permission: "luminacolor.gradient.rose_gold"
+    icon: "PINK_WOOL"
+  midnight:
+    display-name: "Midnight"
+    tag: "<gradient:#000428:#004e92>"
+    permission: "luminacolor.gradient.midnight"
+    icon: "BLUE_CONCRETE"
+  lava:
+    display-name: "Lava"
+    tag: "<gradient:#FF0000:#FF4500:#FFA500>"
+    permission: "luminacolor.gradient.lava"
+    icon: "MAGMA_BLOCK"

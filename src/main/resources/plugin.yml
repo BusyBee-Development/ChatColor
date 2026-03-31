@@ -1,14 +1,33 @@
-main: net.busybee.chatcolor.ChatColorPlugin
-name: 'ChatColor'
-version: '${project.version}'
-api-version: 1.21
-description: 'A plugin that allows you to create color patterns for the chat'
-author: MattyHD0, djtmk
-softdepend: [PlaceholderAPI, ChatControl]
+name: ChatColor
+version: ${project.version}
+main: net.busybee.chatcolor.LuminaColor
+api-version: '1.20'
+author: BusyBee
+description: Advanced chat color plugin with gradient and pattern support.
+
 commands:
-  chatcolor:
-    description: ChatColor main command
-    usage: /<command>
-  chatcoloradmin:
-    description: ChatColor admin command
-    usage: /<command>
+  color:
+    description: Open the color selector GUI or manage your chat color.
+    usage: /color [set <key> | reset | reload]
+    permission: chatcolor.use
+    aliases:
+      - chatcolor
+      - cc
+      - luminacolor
+
+permissions:
+  chatcolor.use:
+    description: Allows the player to use the color GUI.
+    default: true
+  chatcolor.reload:
+    description: Allows reloading the plugin configuration.
+    default: op
+  chatcolor.color.*:
+    description: Access to all solid colors.
+    default: op
+  chatcolor.gradient.*:
+    description: Access to all gradients.
+    default: op
+  chatcolor.pattern.*:
+    description: Access to all patterns.
+    default: op
