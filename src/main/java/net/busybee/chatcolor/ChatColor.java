@@ -75,17 +75,20 @@ public class ChatColor extends JavaPlugin {
         try {
             priority = EventPriority.valueOf(configManager.getEventPriority());
         } catch (IllegalArgumentException e) {
-            priority = EventPriority.HIGHEST;
-            getLogger().warning("Invalid event-priority in config.yml, defaulting to HIGHEST");
+            priority = EventPriority.LOWEST;
+            getLogger().warning("Invalid event-priority in config.yml, defaulting to LOWEST");
         }
 
-        Bukkit.getPluginManager().registerEvent(AsyncChatEvent.class, new ChatListener(this), priority, (listener, event) -> {
-            if (event instanceof AsyncChatEvent chatEvent) {
-                ((ChatListener) listener).onChat(chatEvent);
-            }
-        }, this, true);
+        ChatListener chatListener = new ChatListener(this);
+        if (isPaper()) {
+            Bukkit.getPluginManager().registerEvent(AsyncChatEvent.class, chatListener, priority, (listener, event) -> {
+                if (event instanceof AsyncChatEvent chatEvent) {
+                    ((ChatListener) listener).onChat(chatEvent);
+                }
+            }, this, true);
+        }
 
-        Bukkit.getPluginManager().registerEvent(AsyncPlayerChatEvent.class, new ChatListener(this), priority, (listener, event) -> {
+        Bukkit.getPluginManager().registerEvent(AsyncPlayerChatEvent.class, chatListener, priority, (listener, event) -> {
             if (event instanceof AsyncPlayerChatEvent chatEvent) {
                 ((ChatListener) listener).onLegacyChat(chatEvent);
             }
@@ -116,6 +119,15 @@ public class ChatColor extends JavaPlugin {
         this.patternManager.load();
         this.playerDataManager.saveAll();
         this.playerDataManager.load();
+    }
+
+    public boolean isPaper() {
+        try {
+            Class.forName("io.papermc.paper.event.player.AsyncChatEvent");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
     }
 
     public static ChatColor getInstance() {

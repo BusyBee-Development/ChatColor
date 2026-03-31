@@ -5,6 +5,7 @@ import net.busybee.chatcolor.data.PlayerColorData;
 import net.busybee.chatcolor.models.PatternEntry;
 import net.busybee.chatcolor.utils.ColorUtil;
 import net.busybee.chatcolor.utils.PatternApplier;
+import net.busybee.chatcolor.listeners.ChatListener;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -61,7 +62,10 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
 
         if (params.equalsIgnoreCase("message")) {
             if (!plugin.getConfigManager().isPapiIntegration()) return null;
-            return "%message%"; // PlaceholderAPI will replace this after we process it
+            String message = ChatListener.getLastMessage(player.getUniqueId());
+            if (message.isEmpty()) return "%message%";
+            Component colored = buildColored(data, message);
+            return LegacyComponentSerializer.legacySection().serialize(colored);
         }
 
         if (params.startsWith("message_")) {

@@ -11,4 +11,4 @@ player-only: "<prefix><red>This command can only be used by players."
 update-notifier:
   - "<prefix><green>Update available!</green>"
   - "<gray>Current: <red><current_version> <gray>| New: <green><new_version>"
-  - "<aqua><u>Click here to download the latest version</u>"
+  - "<aqua>Click here to download the latest version"

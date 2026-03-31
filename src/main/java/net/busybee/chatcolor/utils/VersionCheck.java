@@ -104,7 +104,7 @@ public final class VersionCheck implements Listener {
 
             if (lines == null || lines.isEmpty()) {
                 Component fallback = mm.deserialize(
-                        prefix + "<green>Update available!</green> <gray>(Current: <red><current></red>, New: <green><latest></green>) <aqua><u>Click to open</u></aqua>",
+                        prefix + "<green>Update available!</green> <gray>(Current: <red><current></red>, New: <green><latest></green>) <aqua>Click to open</aqua>",
                         Placeholder.unparsed("current", currentVersion),
                         Placeholder.unparsed("latest", latestVersion)
                 ).clickEvent(ClickEvent.openUrl(MODRINTH_PROJECT_URL));

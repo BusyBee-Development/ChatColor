@@ -8,6 +8,6 @@ settings:
   apply-to-message: true
   apply-to-name: false
   default-color: "NONE"
-  event-priority: "HIGHEST"
+  event-priority: "LOWEST"
   papi-integration: true
   late-bind: false

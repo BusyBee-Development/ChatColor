@@ -32,7 +32,7 @@ public class ConfigManager {
         this.patternSelectorTitle = plugin.getConfig().getString("gui.pattern-selector-title", "<rainbow><bold>Patterns");
         this.applyToMessage = plugin.getConfig().getBoolean("settings.apply-to-message", true);
         this.applyToName = plugin.getConfig().getBoolean("settings.apply-to-name", true);
-        this.eventPriority = plugin.getConfig().getString("settings.event-priority", "HIGHEST");
+        this.eventPriority = plugin.getConfig().getString("settings.event-priority", "LOWEST");
         this.papiIntegration = plugin.getConfig().getBoolean("settings.papi-integration", true);
         this.lateBind = plugin.getConfig().getBoolean("settings.late-bind", false);
     }

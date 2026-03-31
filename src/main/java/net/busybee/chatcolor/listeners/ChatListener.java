@@ -1,5 +1,8 @@
 package net.busybee.chatcolor.listeners;
 
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import net.busybee.chatcolor.ChatColor;
 import net.busybee.chatcolor.data.PlayerColorData;
 import net.busybee.chatcolor.models.PatternEntry;
@@ -18,6 +21,7 @@ public class ChatListener implements Listener {
 
     private final ChatColor plugin;
     private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacySection();
+    private static final Map<UUID, String> lastMessages = new ConcurrentHashMap<>();
 
     public ChatListener(ChatColor plugin) {
         this.plugin = plugin;
@@ -25,16 +29,18 @@ public class ChatListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onChat(AsyncChatEvent event) {
+        Player player = event.getPlayer();
+        Component originalMessage = event.message();
+        String rawMessage = PlainTextComponentSerializer.plainText().serialize(originalMessage);
+
+        lastMessages.put(player.getUniqueId(), rawMessage);
+
         if (plugin.getConfigManager().isLateBind()) return;
 
-        Player player = event.getPlayer();
         PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
 
         if (!data.hasColor()) return;
         if (!plugin.getConfigManager().isApplyToMessage()) return;
-
-        Component originalMessage = event.message();
-        String rawMessage = PlainTextComponentSerializer.plainText().serialize(originalMessage);
 
         Component colored = buildColoredMessage(data, rawMessage);
         event.message(colored);
@@ -42,18 +48,27 @@ public class ChatListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onLegacyChat(AsyncPlayerChatEvent event) {
-        if (plugin.getConfigManager().isLateBind()) return;
+        if (plugin.isPaper()) return;
 
         Player player = event.getPlayer();
+        String rawMessage = event.getMessage();
+
+        lastMessages.put(player.getUniqueId(), rawMessage);
+
+        if (plugin.getConfigManager().isLateBind()) return;
+
         PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
 
         if (!data.hasColor()) return;
         if (!plugin.getConfigManager().isApplyToMessage()) return;
 
-        String rawMessage = event.getMessage();
         Component colored = buildColoredMessage(data, rawMessage);
         String legacyColored = LEGACY.serialize(colored);
         event.setMessage(legacyColored);
+    }
+
+    public static String getLastMessage(UUID uuid) {
+        return lastMessages.getOrDefault(uuid, "");
     }
 
     private Component buildColoredMessage(PlayerColorData data, String rawText) {
