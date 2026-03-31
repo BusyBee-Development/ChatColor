@@ -11,7 +11,9 @@ import net.busybee.chatcolor.hooks.PlaceholderAPIHook;
 import net.busybee.chatcolor.inventory.gui.GUIListener;
 import net.busybee.chatcolor.inventory.gui.GUIManager;
 import net.busybee.chatcolor.listeners.ChatListener;
+import net.busybee.chatcolor.utils.VersionCheck;
 import lombok.Getter;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventPriority;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -51,6 +53,8 @@ public class ChatColor extends JavaPlugin {
         this.patternManager.load();
         this.playerDataManager.load();
 
+        new Metrics(this, 30495);
+
         registerListeners();
         registerCommands();
         registerHooks();
@@ -88,6 +92,7 @@ public class ChatColor extends JavaPlugin {
         }, this, true);
 
         Bukkit.getPluginManager().registerEvents(new GUIListener(this.guiManager), this);
+        Bukkit.getPluginManager().registerEvents(new VersionCheck(this), this);
     }
 
     private void registerCommands() {
