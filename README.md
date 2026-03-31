@@ -1,6 +1,6 @@
-# 🌈 LuminaColor
+# 🌈 chatcolor
 
-**LuminaColor** is an advanced Minecraft chat color plugin built for **Paper 1.20+** that lets players personalize their chat messages with solid colors, multi-stop gradients, and animated character-cycling patterns — all through a sleek GUI or simple commands.
+**chatcolor** is an advanced Minecraft chat color plugin built for **Paper 1.20+** that lets players personalize their chat messages with solid colors, multi-stop gradients, and animated character-cycling patterns — all through a sleek GUI or simple commands.
 
 ---
 
@@ -14,14 +14,14 @@
 - 🔒 **Per-Entry Permissions** — Grant or restrict individual colors, gradients, and patterns per player/group
 - 💾 **Persistent Data** — Player color selections are saved to disk and restored on rejoin
 - 🔌 **PlaceholderAPI Support** — Expose player color data as placeholders for use in other plugins
-- 🛠️ **Developer API** — Clean `LuminaColorAPI` class for third-party plugin integration
+- 🛠️ **Developer API** — Clean `chatcolorAPI` class for third-party plugin integration
 - ⚡ **Hot Reload** — Reload all configuration files at runtime without restarting
 
 ---
 
 ## 📦 Installation
 
-1. Download the `LuminaColor.jar` file
+1. Download the `chatcolor.jar` file
 2. Place it in your server's `plugins/` folder
 3. Restart your server
 4. Configure `config.yml`, `messages.yml`, and `patterns.yml` to your liking
@@ -38,15 +38,15 @@
 
 | Command | Description | Permission |
 |---|---|---|
-| `/color` | Opens the main color selector GUI | `luminacolor.use` |
-| `/color gui` | Opens the main color selector GUI | `luminacolor.use` |
-| `/color reset` | Removes your active chat color | `luminacolor.use` |
-| `/color set color <key>` | Sets a solid color by key | `luminacolor.use` |
-| `/color set gradient <key>` | Sets a gradient by key | `luminacolor.use` |
-| `/color set pattern <key>` | Sets a pattern by key | `luminacolor.use` |
-| `/color reload` | Reloads all plugin configuration | `luminacolor.reload` |
+| `/color` | Opens the main color selector GUI | `chatcolor.use` |
+| `/color gui` | Opens the main color selector GUI | `chatcolor.use` |
+| `/color reset` | Removes your active chat color | `chatcolor.use` |
+| `/color set color <key>` | Sets a solid color by key | `chatcolor.use` |
+| `/color set gradient <key>` | Sets a gradient by key | `chatcolor.use` |
+| `/color set pattern <key>` | Sets a pattern by key | `chatcolor.use` |
+| `/color reload` | Reloads all plugin configuration | `chatcolor.reload` |
 
-**Aliases:** `/chatcolor`, `/cc`, `/luminacolor`
+**Aliases:** `/chatcolor`, `/cc`, `/chatcolor`
 
 ---
 
@@ -54,16 +54,16 @@
 
 | Permission | Description | Default |
 |---|---|---|
-| `luminacolor.use` | Access to the GUI and commands | `true` |
-| `luminacolor.reload` | Reload the plugin config | `op` |
-| `luminacolor.color.*` | Access to all solid colors | `op` |
-| `luminacolor.gradient.*` | Access to all gradients | `op` |
-| `luminacolor.pattern.*` | Access to all patterns | `op` |
+| `chatcolor.use` | Access to the GUI and commands | `true` |
+| `chatcolor.reload` | Reload the plugin config | `op` |
+| `chatcolor.color.*` | Access to all solid colors | `op` |
+| `chatcolor.gradient.*` | Access to all gradients | `op` |
+| `chatcolor.pattern.*` | Access to all patterns | `op` |
 
 Individual entries have their own permission nodes defined in `config.yml` / `patterns.yml`, for example:
-- `luminacolor.color.red`
-- `luminacolor.gradient.sunset`
-- `luminacolor.pattern.rainbow`
+- `chatcolor.color.red`
+- `chatcolor.gradient.sunset`
+- `chatcolor.pattern.rainbow`
 
 ---
 
@@ -82,7 +82,7 @@ colors:
   red:
     display-name: "Red"
     tag: "<red>"
-    permission: "luminacolor.color.red"
+    permission: "chatcolor.color.red"
     icon: "RED_WOOL"
 ```
 
@@ -93,7 +93,7 @@ Defines character-cycling color patterns. Each message character cycles through 
 patterns:
   rainbow:
     display-name: "Rainbow"
-    permission: "luminacolor.pattern.rainbow"
+    permission: "chatcolor.pattern.rainbow"
     icon: "YELLOW_WOOL"
     colors:
       - "<red>"
@@ -109,7 +109,7 @@ patterns:
 All plugin messages with full MiniMessage support and placeholder tags.
 
 ```yaml
-prefix: "<dark_gray>[<gradient:blue:aqua>LuminaColor<dark_gray>] "
+prefix: "<dark_gray>[<gradient:blue:aqua>ChatColor<dark_gray>] "
 color-applied: "<prefix><green>Color <reset><color> <gray>has been applied!"
 color-reset: "<prefix><gray>Your chat color has been <red>reset<gray>."
 ```
@@ -185,19 +185,19 @@ When PlaceholderAPI is installed, the following placeholders are available:
 
 | Placeholder | Description |
 |---|---|
-| `%luminacolor_type%` | The player's active color type (`SOLID`, `GRADIENT`, `PATTERN`, or `NONE`) |
-| `%luminacolor_key%` | The key of the player's active color selection |
-| `%luminacolor_tag%` | The raw MiniMessage tag for the player's active color |
+| `%chatcolor_type%` | The player's active color type (`SOLID`, `GRADIENT`, `PATTERN`, or `NONE`) |
+| `%chatcolor_key%` | The key of the player's active color selection |
+| `%chatcolor_tag%` | The raw MiniMessage tag for the player's active color |
 
 ---
 
 ## 🛠️ Developer API
 
-Add LuminaColor as a dependency and use the `LuminaColorAPI` to interact with player color data programmatically.
+Add chatcolor as a dependency and use the `chatcolorAPI` to interact with player color data programmatically.
 
 ```java
-LuminaColor plugin = (LuminaColor) Bukkit.getPluginManager().getPlugin("LuminaColor");
-LuminaColorAPI api = plugin.getLuminaColorAPI();
+chatcolor plugin = (chatcolor) Bukkit.getPluginManager().getPlugin("ChatColor");
+chatcolorAPI api = plugin.getchatcolorAPI();
 
 // Set a player's color
 api.setColor(player, "red");
@@ -221,7 +221,7 @@ Component colored = api.applyColorToText(player, "Hello, world!");
 ## 📁 File Structure
 
 ```
-plugins/LuminaColor/
+plugins/chatcolor/
 ├── config.yml       # Colors, gradients, GUI titles, and settings
 ├── messages.yml     # All plugin messages
 ├── patterns.yml     # Pattern definitions

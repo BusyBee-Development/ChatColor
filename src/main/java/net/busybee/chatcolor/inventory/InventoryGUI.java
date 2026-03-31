@@ -25,7 +25,6 @@ public abstract class InventoryGUI implements InventoryHandler {
     public void addButton(int slot, InventoryButton button) {
         this.buttonMap.put(slot, button);
     }
-
     public void clearButtons() {
         this.buttonMap.clear();
     }

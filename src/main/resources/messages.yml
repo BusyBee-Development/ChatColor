@@ -1,5 +1,6 @@
-prefix: "<dark_gray>[<gradient:blue:aqua>LuminaColor<dark_gray>] "
+prefix: "<dark_gray>[<gradient:blue:aqua>ChatColor<dark_gray>] "
 color-applied: "<prefix><green>Color <reset><color> <gray>has been applied!"
+color-created: "<prefix><green>Custom color '<gray><name><green>' has been created!"
 color-reset: "<prefix><gray>Your chat color has been <red>reset<gray>."
 no-permission: "<prefix><red>You don't have permission to use that color."
 no-permission-command: "<prefix><red>You don't have permission to use this command."

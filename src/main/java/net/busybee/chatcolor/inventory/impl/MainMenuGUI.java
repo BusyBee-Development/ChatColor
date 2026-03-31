@@ -1,6 +1,6 @@
 package net.busybee.chatcolor.inventory.impl;
 
-import net.busybee.chatcolor.LuminaColor;
+import net.busybee.chatcolor.ChatColor;
 import net.busybee.chatcolor.inventory.InventoryButton;
 import net.busybee.chatcolor.inventory.InventoryGUI;
 import net.busybee.chatcolor.utils.ColorUtil;
@@ -24,9 +24,9 @@ public class MainMenuGUI extends InventoryGUI {
             18, 19, 20, 21, 22, 23, 24, 25, 26
     };
 
-    private final LuminaColor plugin;
+    private final ChatColor plugin;
 
-    public MainMenuGUI(LuminaColor plugin) {
+    public MainMenuGUI(ChatColor plugin) {
         this.plugin = plugin;
     }
 
@@ -96,7 +96,7 @@ public class MainMenuGUI extends InventoryGUI {
                 ))
                 .consumer(event -> {
                     Player clicker = (Player) event.getWhoClicked();
-                    plugin.getLuminaColorAPI().resetColor(clicker);
+                    plugin.getChatColorAPI().resetColor(clicker);
                     clicker.closeInventory();
                     plugin.getMessageManager().send(clicker, "color-reset");
                 })

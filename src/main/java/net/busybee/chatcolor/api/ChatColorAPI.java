@@ -1,6 +1,6 @@
 package net.busybee.chatcolor.api;
 
-import net.busybee.chatcolor.LuminaColor;
+import net.busybee.chatcolor.ChatColor;
 import net.busybee.chatcolor.data.PlayerColorData;
 import net.busybee.chatcolor.models.ColorEntry;
 import net.busybee.chatcolor.models.GradientEntry;
@@ -12,11 +12,11 @@ import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
-public class LuminaColorAPI {
+public class ChatColorAPI {
 
-    private final LuminaColor plugin;
+    private final ChatColor plugin;
 
-    public LuminaColorAPI(LuminaColor plugin) {
+    public ChatColorAPI(ChatColor plugin) {
         this.plugin = plugin;
     }
 

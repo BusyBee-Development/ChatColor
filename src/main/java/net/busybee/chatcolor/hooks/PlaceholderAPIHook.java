@@ -1,6 +1,6 @@
 package net.busybee.chatcolor.hooks;
 
-import net.busybee.chatcolor.LuminaColor;
+import net.busybee.chatcolor.ChatColor;
 import net.busybee.chatcolor.data.PlayerColorData;
 import net.busybee.chatcolor.models.PatternEntry;
 import net.busybee.chatcolor.utils.ColorUtil;
@@ -13,15 +13,15 @@ import org.jetbrains.annotations.NotNull;
 
 public class PlaceholderAPIHook extends PlaceholderExpansion {
 
-    private final LuminaColor plugin;
+    private final ChatColor plugin;
 
-    public PlaceholderAPIHook(LuminaColor plugin) {
+    public PlaceholderAPIHook(ChatColor plugin) {
         this.plugin = plugin;
     }
 
     @Override
     public @NotNull String getIdentifier() {
-        return "luminacolor";
+        return "chatcolor";
     }
 
     @Override
@@ -57,6 +57,19 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
 
         if (params.equalsIgnoreCase("color_type")) {
             return data.getColorType() != null ? data.getColorType() : "NONE";
+        }
+
+        if (params.equalsIgnoreCase("message")) {
+            if (!plugin.getConfigManager().isPapiIntegration()) return null;
+            return "%message%"; // PlaceholderAPI will replace this after we process it
+        }
+
+        if (params.startsWith("message_")) {
+            if (!plugin.getConfigManager().isPapiIntegration()) return null;
+            String message = params.substring("message_".length());
+            if (message.isEmpty()) return "";
+            Component colored = buildColored(data, message);
+            return LegacyComponentSerializer.legacySection().serialize(colored);
         }
 
         if (params.startsWith("formatted_msg_")) {

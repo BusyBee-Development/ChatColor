@@ -1,6 +1,6 @@
 package net.busybee.chatcolor.data;
 
-import net.busybee.chatcolor.LuminaColor;
+import net.busybee.chatcolor.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -12,12 +12,12 @@ import java.util.UUID;
 
 public class PlayerDataManager {
 
-    private final LuminaColor plugin;
+    private final ChatColor plugin;
     private final Map<UUID, PlayerColorData> dataMap = new HashMap<>();
     private File dataFile;
     private FileConfiguration dataConfig;
 
-    public PlayerDataManager(LuminaColor plugin) {
+    public PlayerDataManager(ChatColor plugin) {
         this.plugin = plugin;
     }
 

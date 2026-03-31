@@ -1,6 +1,6 @@
 name: ChatColor
 version: ${project.version}
-main: net.busybee.chatcolor.LuminaColor
+main: net.busybee.chatcolor.ChatColor
 api-version: '1.20'
 author: BusyBee
 description: Advanced chat color plugin with gradient and pattern support.
@@ -13,7 +13,6 @@ commands:
     aliases:
       - chatcolor
       - cc
-      - luminacolor
 
 permissions:
   chatcolor.use:

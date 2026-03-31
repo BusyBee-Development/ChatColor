@@ -1,6 +1,6 @@
 package net.busybee.chatcolor.config;
 
-import net.busybee.chatcolor.LuminaColor;
+import net.busybee.chatcolor.ChatColor;
 import net.busybee.chatcolor.utils.ColorUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -13,11 +13,11 @@ import java.util.Map;
 
 public class MessageManager {
 
-    private final LuminaColor plugin;
+    private final ChatColor plugin;
     private FileConfiguration messagesConfig;
     private String prefix;
 
-    public MessageManager(LuminaColor plugin) {
+    public MessageManager(ChatColor plugin) {
         this.plugin = plugin;
     }
 
@@ -27,7 +27,7 @@ public class MessageManager {
             plugin.saveResource("messages.yml", false);
         }
         this.messagesConfig = YamlConfiguration.loadConfiguration(file);
-        this.prefix = this.messagesConfig.getString("prefix", "<dark_gray>[<gradient:blue:aqua>LuminaColor<dark_gray>] ");
+        this.prefix = this.messagesConfig.getString("prefix", "<dark_gray>[<gradient:blue:aqua>ChatColor<dark_gray>] ");
     }
 
     public Component get(String key) {

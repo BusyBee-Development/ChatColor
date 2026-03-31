@@ -1,6 +1,6 @@
 package net.busybee.chatcolor.inventory.impl;
 
-import net.busybee.chatcolor.LuminaColor;
+import net.busybee.chatcolor.ChatColor;
 import net.busybee.chatcolor.data.PlayerColorData;
 import net.busybee.chatcolor.inventory.InventoryButton;
 import net.busybee.chatcolor.inventory.InventoryGUI;
@@ -27,12 +27,12 @@ public class ColorSelectorGUI extends InventoryGUI {
     private static final int SLOT_NEXT = 53;
     private static final int NAV_ROW_START = 45;
 
-    private final LuminaColor plugin;
+    private final ChatColor plugin;
     private final String type;
     private int page = 0;
     private List<? extends SelectableEntry> entries;
 
-    public ColorSelectorGUI(LuminaColor plugin, String type) {
+    public ColorSelectorGUI(ChatColor plugin, String type) {
         this.plugin = plugin;
         this.type = type;
     }

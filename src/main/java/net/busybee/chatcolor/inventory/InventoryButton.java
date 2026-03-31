@@ -25,7 +25,6 @@ public class InventoryButton {
     public Function<Player, ItemStack> getIconCreator() {
         return this.iconCreator;
     }
-
     public Consumer<InventoryClickEvent> getEventConsumer() {
         return this.eventConsumer;
     }

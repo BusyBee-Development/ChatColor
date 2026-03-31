@@ -1,6 +1,6 @@
 package net.busybee.chatcolor.listeners;
 
-import net.busybee.chatcolor.LuminaColor;
+import net.busybee.chatcolor.ChatColor;
 import net.busybee.chatcolor.data.PlayerColorData;
 import net.busybee.chatcolor.models.PatternEntry;
 import net.busybee.chatcolor.utils.ColorUtil;
@@ -11,21 +11,22 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 public class ChatListener implements Listener {
 
-    private final LuminaColor plugin;
+    private final ChatColor plugin;
     private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacySection();
 
-    public ChatListener(LuminaColor plugin) {
+    public ChatListener(ChatColor plugin) {
         this.plugin = plugin;
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true)
     public void onChat(AsyncChatEvent event) {
+        if (plugin.getConfigManager().isLateBind()) return;
+
         Player player = event.getPlayer();
         PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
 
@@ -39,8 +40,10 @@ public class ChatListener implements Listener {
         event.message(colored);
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true)
     public void onLegacyChat(AsyncPlayerChatEvent event) {
+        if (plugin.getConfigManager().isLateBind()) return;
+
         Player player = event.getPlayer();
         PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
 

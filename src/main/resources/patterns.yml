@@ -1,7 +1,7 @@
 patterns:
   rainbow:
     display-name: "Rainbow"
-    permission: "luminacolor.pattern.rainbow"
+    permission: "chatcolor.pattern.rainbow"
     icon: "YELLOW_WOOL"
     colors:
       - "<red>"
@@ -13,7 +13,7 @@ patterns:
       - "<light_purple>"
   fire:
     display-name: "Fire"
-    permission: "luminacolor.pattern.fire"
+    permission: "chatcolor.pattern.fire"
     icon: "MAGMA_BLOCK"
     colors:
       - "<#FF4500>"
@@ -23,7 +23,7 @@ patterns:
       - "<#FFD700>"
   ice:
     display-name: "Ice"
-    permission: "luminacolor.pattern.ice"
+    permission: "chatcolor.pattern.ice"
     icon: "PACKED_ICE"
     colors:
       - "<#B0E0E6>"
@@ -33,7 +33,7 @@ patterns:
       - "<#00BFFF>"
   galaxy:
     display-name: "Galaxy"
-    permission: "luminacolor.pattern.galaxy"
+    permission: "chatcolor.pattern.galaxy"
     icon: "PURPLE_CONCRETE"
     colors:
       - "<#0D47A1>"
@@ -44,7 +44,7 @@ patterns:
       - "<#1A237E>"
   toxic:
     display-name: "Toxic"
-    permission: "luminacolor.pattern.toxic"
+    permission: "chatcolor.pattern.toxic"
     icon: "SLIME_BLOCK"
     colors:
       - "<#39FF14>"
@@ -53,7 +53,7 @@ patterns:
       - "<#00FF7F>"
   cherry:
     display-name: "Cherry"
-    permission: "luminacolor.pattern.cherry"
+    permission: "chatcolor.pattern.cherry"
     icon: "PINK_PETALS"
     colors:
       - "<#FF69B4>"
