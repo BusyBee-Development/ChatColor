@@ -1,58 +1,13 @@
-config:
-  # The plugin will check if there is a new version available
-  update-checker: true
+gui:
+  main-menu-title: "<gradient:blue:aqua><bold>ChatColor"
+  color-selector-title: "<aqua><bold>Solid Colors"
+  gradient-selector-title: "<gradient:red:blue><bold>Gradients"
+  pattern-selector-title: "<rainbow><bold>Patterns"
 
-  # Don't change this if you don't know what you're doing
-  # Note: Requires you to restart the server
-  # Valid values: LOWEST, LOW, NORMAL, HIGH, HIGHEST, MONITOR
-  listener-priority: HIGHEST
-
-  # By enabling this option you will be able to open the GUI with /chatcolor instead of /chatcolor gui (/chacolor gui will still work too)
-  use-main-command-as-gui: false
-
-  # The patterns shown in /chatcolor list will only be the ones that the player can use
-  show-pattern-in-list-only-if-has-permissions: true
-
-  # When writing in the chat it will only show the pattern if the player has the permission of that pattern
-  show-pattern-only-if-has-permissions: false
-
-  # When a player write a message like "&6&lHelo World!" this message was colored if the player has the required permission
-  translate-chat-colors: true
-
-  mysql:
-    enable: false
-    database: 'chatcolor'
-    host: 'localhost'
-    port: '3306'
-    username: 'root'
-    password: ''
-    # Important if you need to modify connection url.
-    additional-url: "&useSSL=false&autoReconnect=true"
-
-  show-pattern-on:
-    list: true
-    selected-message: true
-    already-in-use-message: true
-    pattern-disabled-message: true
-  custom-pattern-list:
-    enable: false
-    list:
-      - '&4--&c--&6--&e--&2--&a--&b--&8[ &7Custom List &8]&b--&3--&b--&a--&2--&e--&6--&c--&4--'
-      - '&7This list is a custom list,'
-      - '&7you can use it if you want more customization'
-      - ''
-      - '&7Example:'
-      - '&8> &7/chatcolor color3 &8- &b[MVP]'
-      - '&8> &7/chatcolor color2 &8- &a[VIP]'
-      - '&8> &7/chatcolor color &8- &a[VIP]'
-      - '&4---&c---&6---&e---&2---&a---&b---&3----&b---&a---&2---&e---&6---&c---&4---'
-
-  # Delay to load players. Recommended to leave it in 30 ticks so player data is saved correctly if it's switching servers.
-  data-delay: 30
-  # Should config update when a new option is added? Suggested to leave it enabled.
-  auto-update-config: true
-
-  # Toggle to disable /chatcolor set <color> command
-  disable-set-command: false
-
-config-version: 1
+settings:
+  apply-to-message: true
+  apply-to-name: false
+  default-color: "NONE"
+  event-priority: "LOWEST"
+  papi-integration: true
+  late-bind: false
