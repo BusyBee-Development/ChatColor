@@ -164,7 +164,7 @@ public class ColorSelectorGUI extends InventoryGUI {
         plugin.getPlayerDataManager().setData(player.getUniqueId(), data);
         plugin.getPlayerDataManager().save(player.getUniqueId());
 
-        String coloredDisplay = entry.getEntryType().equals("PATTERN") ? entry.getDisplayName() : entry.getTag() + entry.getDisplayName() + ColorUtil.getClosingTag(entry.getTag());
+        String coloredDisplay = entry.getEntryType().equals("PATTERN") ? entry.getDisplayName() : entry.getTag() + entry.getDisplayName() + "<reset>";
         plugin.getMessageManager().send(player, "color-applied", "color", coloredDisplay);
     }
 

@@ -31,7 +31,7 @@ public class ConfigManager {
         this.gradientSelectorTitle = plugin.getConfig().getString("gui.gradient-selector-title", "<gradient:red:blue><bold>Gradients");
         this.patternSelectorTitle = plugin.getConfig().getString("gui.pattern-selector-title", "<rainbow><bold>Patterns");
         this.applyToMessage = plugin.getConfig().getBoolean("settings.apply-to-message", true);
-        this.applyToName = plugin.getConfig().getBoolean("settings.apply-to-name", true);
+        this.applyToName = plugin.getConfig().getBoolean("settings.apply-to-name", false);
         this.eventPriority = plugin.getConfig().getString("settings.event-priority", "LOWEST");
         this.papiIntegration = plugin.getConfig().getBoolean("settings.papi-integration", true);
         this.lateBind = plugin.getConfig().getBoolean("settings.late-bind", false);

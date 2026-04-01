@@ -20,7 +20,11 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 public class ChatListener implements Listener {
 
     private final ChatColor plugin;
-    private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacySection();
+    private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.builder()
+            .character('§')
+            .hexColors()
+            .useUnusualXRepeatedCharacterHexFormat()
+            .build();
     private static final Map<UUID, String> lastMessages = new ConcurrentHashMap<>();
 
     public ChatListener(ChatColor plugin) {
@@ -44,6 +48,10 @@ public class ChatListener implements Listener {
 
         Component colored = buildColoredMessage(data, rawMessage);
         event.message(colored);
+
+        if (plugin.getConfigManager().isApplyToName()) {
+            player.displayName(buildColoredMessage(data, PlainTextComponentSerializer.plainText().serialize(player.name())));
+        }
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -65,6 +73,10 @@ public class ChatListener implements Listener {
         Component colored = buildColoredMessage(data, rawMessage);
         String legacyColored = LEGACY.serialize(colored);
         event.setMessage(legacyColored);
+
+        if (plugin.getConfigManager().isApplyToName()) {
+            player.setDisplayName(LEGACY.serialize(buildColoredMessage(data, player.getName())));
+        }
     }
 
     public static String getLastMessage(UUID uuid) {

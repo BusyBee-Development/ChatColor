@@ -2,10 +2,18 @@ package net.busybee.chatcolor.utils;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 
 public class ColorUtil {
 
-    private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
+    private static final MiniMessage MINI_MESSAGE = MiniMessage.builder()
+            .tags(TagResolver.builder()
+                    .resolver(StandardTags.defaults())
+                    .resolver(StandardTags.color())
+                    .resolver(StandardTags.decorations())
+                    .build())
+            .build();
 
     public static Component colorize(String text) {
         if (text == null) return Component.empty();
@@ -14,8 +22,7 @@ public class ColorUtil {
 
     public static Component applyTagToText(String tag, String rawText) {
         if (tag == null || tag.isBlank() || rawText == null) return Component.text(rawText != null ? rawText : "");
-        String closing = getClosingTag(tag);
-        String formatted = tag + escape(rawText) + closing;
+        String formatted = tag + escape(rawText);
         try {
             return MINI_MESSAGE.deserialize(formatted);
         } catch (Exception e) {
@@ -23,22 +30,6 @@ public class ColorUtil {
         }
     }
 
-    public static String getClosingTag(String tag) {
-        if (tag == null || tag.isBlank()) return "<reset>";
-        String inner = tag.trim();
-        if (!inner.startsWith("<") || !inner.endsWith(">")) return "<reset>";
-        
-        String content = inner.substring(1, inner.length() - 1);
-        if (content.startsWith("#")) return "</color>";
-        if (content.startsWith("gradient")) return "</gradient>";
-        if (content.startsWith("rainbow")) return "</rainbow>";
-        
-        int colonIndex = content.indexOf(':');
-        String tagName = colonIndex > 0 ? content.substring(0, colonIndex) : content;
-        
-        if (tagName.isEmpty()) return "<reset>";
-        return "</" + tagName + ">";
-    }
 
     public static String escape(String text) {
         if (text == null) return "";

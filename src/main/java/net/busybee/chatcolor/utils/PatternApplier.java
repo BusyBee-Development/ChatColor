@@ -7,29 +7,26 @@ import java.util.List;
 
 public class PatternApplier {
 
-    private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
-
     public static Component apply(String text, List<String> colors) {
         if (colors == null || colors.isEmpty() || text == null || text.isEmpty()) {
             return Component.text(text != null ? text : "");
         }
 
-        Component result = Component.empty();
+        net.kyori.adventure.text.TextComponent.Builder builder = Component.text();
         int colorIndex = 0;
 
         for (int i = 0; i < text.length(); i++) {
             char c = text.charAt(i);
             if (c == ' ') {
-                result = result.append(Component.space());
+                builder.append(Component.space());
                 continue;
             }
             String colorTag = colors.get(colorIndex % colors.size());
-            String safe = ColorUtil.escape(String.valueOf(c));
-            result = result.append(MINI_MESSAGE.deserialize(colorTag + safe + "<reset>"));
+            builder.append(ColorUtil.colorize(colorTag + ColorUtil.escape(String.valueOf(c)) + "<reset>"));
             colorIndex++;
         }
 
-        return result;
+        return builder.build();
     }
 
     public static Component applyToName(String text, List<String> colors) {
