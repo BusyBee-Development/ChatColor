@@ -125,11 +125,13 @@ patterns:
 
 When PlaceholderAPI is installed, the following placeholders are available:
 
-| Placeholder | Description |
-|---|---|
-| `%chatcolor_type%` | The player's active color type (`SOLID`, `GRADIENT`, `PATTERN`, or `NONE`) |
-| `%chatcolor_key%` | The key of the player's active color selection |
-| `%chatcolor_tag%` | The raw MiniMessage tag for the player's active color |
+| Placeholder | Description | Example Output |
+| :--- | :--- | :--- |
+| `%chatcolor_color_type%` | Player's active color type | `SOLID`, `GRADIENT`, `PATTERN`, `NONE` |
+| `%chatcolor_color_key%` | Key of player's active selection | `red`, `sunset`, `rainbow`, `none` |
+| `%chatcolor_color%` | Raw MiniMessage tag / Pattern key | `<red>`, `rainbow` |
+| `%chatcolor_message%` | Player's last chat message colored | `§cHello world!` |
+| `%chatcolor_formatted_msg_<text>%` | Applies color to specific text | `§6§lBusyBee` |
 
 ---
 
