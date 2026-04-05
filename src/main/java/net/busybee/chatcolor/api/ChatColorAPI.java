@@ -62,7 +62,13 @@ public class ChatColorAPI {
 
     public Component applyColorToText(Player player, String text) {
         PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
-        if (!data.hasColor()) return Component.text(text);
+        if (!data.hasColor()) {
+            String defaultColor = plugin.getConfigManager().getDefaultColor();
+            if (defaultColor.equalsIgnoreCase("NONE")) {
+                return Component.text(text);
+            }
+            return ColorUtil.applyTagToText(defaultColor, text);
+        }
         if (data.getColorType().equals("PATTERN")) {
             PatternEntry pattern = plugin.getPatternManager().getPattern(data.getColorKey());
             if (pattern != null) return PatternApplier.apply(text, pattern.getColors());

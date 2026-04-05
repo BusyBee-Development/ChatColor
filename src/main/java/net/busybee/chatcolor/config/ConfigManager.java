@@ -18,6 +18,7 @@ public class ConfigManager {
     private boolean applyToMessage;
     private boolean applyToName;
     private String eventPriority;
+    private String defaultColor;
     private boolean papiIntegration;
     private boolean lateBind;
 
@@ -32,6 +33,7 @@ public class ConfigManager {
         this.patternSelectorTitle = plugin.getConfig().getString("gui.pattern-selector-title", "<rainbow><bold>Patterns");
         this.applyToMessage = plugin.getConfig().getBoolean("settings.apply-to-message", true);
         this.applyToName = plugin.getConfig().getBoolean("settings.apply-to-name", false);
+        this.defaultColor = plugin.getConfig().getString("settings.default-color", "NONE");
         this.eventPriority = plugin.getConfig().getString("settings.event-priority", "LOWEST");
         this.papiIntegration = plugin.getConfig().getBoolean("settings.papi-integration", true);
         this.lateBind = plugin.getConfig().getBoolean("settings.late-bind", false);
@@ -75,6 +77,9 @@ public class ConfigManager {
     }
     public String getEventPriority() {
         return this.eventPriority;
+    }
+    public String getDefaultColor() {
+        return this.defaultColor;
     }
     public boolean isPapiIntegration() {
         return this.papiIntegration;

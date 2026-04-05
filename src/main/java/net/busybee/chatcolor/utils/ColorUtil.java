@@ -2,17 +2,15 @@ package net.busybee.chatcolor.utils;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 public class ColorUtil {
 
-    private static final MiniMessage MINI_MESSAGE = MiniMessage.builder()
-            .tags(TagResolver.builder()
-                    .resolver(StandardTags.defaults())
-                    .resolver(StandardTags.color())
-                    .resolver(StandardTags.decorations())
-                    .build())
+    private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
+    private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.builder()
+            .character('§')
+            .hexColors()
+            .useUnusualXRepeatedCharacterHexFormat()
             .build();
 
     public static Component colorize(String text) {
@@ -38,5 +36,9 @@ public class ColorUtil {
 
     public static MiniMessage getMiniMessage() {
         return MINI_MESSAGE;
+    }
+
+    public static LegacyComponentSerializer getLegacySerializer() {
+        return LEGACY;
     }
 }

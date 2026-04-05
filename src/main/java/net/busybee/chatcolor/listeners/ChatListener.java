@@ -10,7 +10,6 @@ import net.busybee.chatcolor.utils.ColorUtil;
 import net.busybee.chatcolor.utils.PatternApplier;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -20,11 +19,6 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 public class ChatListener implements Listener {
 
     private final ChatColor plugin;
-    private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.builder()
-            .character('§')
-            .hexColors()
-            .useUnusualXRepeatedCharacterHexFormat()
-            .build();
     private static final Map<UUID, String> lastMessages = new ConcurrentHashMap<>();
 
     public ChatListener(ChatColor plugin) {
@@ -43,7 +37,19 @@ public class ChatListener implements Listener {
 
         PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
 
-        if (!data.hasColor()) return;
+        if (!data.hasColor()) {
+            String defaultColor = plugin.getConfigManager().getDefaultColor();
+            if (defaultColor.equalsIgnoreCase("NONE")) return;
+
+            if (plugin.getConfigManager().isApplyToMessage()) {
+                event.message(ColorUtil.applyTagToText(defaultColor, rawMessage));
+            }
+            if (plugin.getConfigManager().isApplyToName()) {
+                player.displayName(ColorUtil.applyTagToText(defaultColor, PlainTextComponentSerializer.plainText().serialize(player.name())));
+            }
+            return;
+        }
+
         if (!plugin.getConfigManager().isApplyToMessage()) return;
 
         Component colored = buildColoredMessage(data, rawMessage);
@@ -67,15 +73,27 @@ public class ChatListener implements Listener {
 
         PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
 
-        if (!data.hasColor()) return;
+        if (!data.hasColor()) {
+            String defaultColor = plugin.getConfigManager().getDefaultColor();
+            if (defaultColor.equalsIgnoreCase("NONE")) return;
+
+            if (plugin.getConfigManager().isApplyToMessage()) {
+                event.setMessage(ColorUtil.getLegacySerializer().serialize(ColorUtil.applyTagToText(defaultColor, rawMessage)));
+            }
+            if (plugin.getConfigManager().isApplyToName()) {
+                player.setDisplayName(ColorUtil.getLegacySerializer().serialize(ColorUtil.applyTagToText(defaultColor, player.getName())));
+            }
+            return;
+        }
+
         if (!plugin.getConfigManager().isApplyToMessage()) return;
 
         Component colored = buildColoredMessage(data, rawMessage);
-        String legacyColored = LEGACY.serialize(colored);
+        String legacyColored = ColorUtil.getLegacySerializer().serialize(colored);
         event.setMessage(legacyColored);
 
         if (plugin.getConfigManager().isApplyToName()) {
-            player.setDisplayName(LEGACY.serialize(buildColoredMessage(data, player.getName())));
+            player.setDisplayName(ColorUtil.getLegacySerializer().serialize(buildColoredMessage(data, player.getName())));
         }
     }
 

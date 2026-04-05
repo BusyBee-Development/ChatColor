@@ -8,7 +8,6 @@ import net.busybee.chatcolor.utils.PatternApplier;
 import net.busybee.chatcolor.listeners.ChatListener;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 
@@ -47,13 +46,16 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
         PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
 
         if (params.equalsIgnoreCase("color")) {
-            if (!data.hasColor()) return "NONE";
+            if (!data.hasColor()) {
+                String defaultColor = plugin.getConfigManager().getDefaultColor();
+                return defaultColor.equalsIgnoreCase("NONE") ? "" : defaultColor;
+            }
             if (data.getColorType().equals("PATTERN")) return data.getColorKey();
-            return data.getColorTag() != null ? data.getColorTag() : "NONE";
+            return data.getColorTag() != null ? data.getColorTag() : "";
         }
 
         if (params.equalsIgnoreCase("color_key")) {
-            return data.getColorKey() != null ? data.getColorKey() : "none";
+            return data.getColorKey() != null ? data.getColorKey() : "";
         }
 
         if (params.equalsIgnoreCase("color_type")) {
@@ -65,7 +67,7 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
             String message = ChatListener.getLastMessage(player.getUniqueId());
             if (message.isEmpty()) return "%message%";
             Component colored = buildColored(data, message);
-            return LegacyComponentSerializer.legacySection().serialize(colored);
+            return ColorUtil.getLegacySerializer().serialize(colored);
         }
 
         if (params.startsWith("message_")) {
@@ -73,21 +75,27 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
             String message = params.substring("message_".length());
             if (message.isEmpty()) return "";
             Component colored = buildColored(data, message);
-            return LegacyComponentSerializer.legacySection().serialize(colored);
+            return ColorUtil.getLegacySerializer().serialize(colored);
         }
 
         if (params.startsWith("formatted_msg_")) {
             String message = params.substring("formatted_msg_".length());
             if (message.isEmpty()) return "";
             Component colored = buildColored(data, message);
-            return LegacyComponentSerializer.legacySection().serialize(colored);
+            return ColorUtil.getLegacySerializer().serialize(colored);
         }
 
         return null;
     }
 
     private Component buildColored(PlayerColorData data, String text) {
-        if (!data.hasColor()) return Component.text(text);
+        if (!data.hasColor()) {
+            String defaultColor = plugin.getConfigManager().getDefaultColor();
+            if (defaultColor.equalsIgnoreCase("NONE")) {
+                return Component.text(text);
+            }
+            return ColorUtil.applyTagToText(defaultColor, text);
+        }
         if (data.getColorType().equals("PATTERN")) {
             PatternEntry pattern = plugin.getPatternManager().getPattern(data.getColorKey());
             if (pattern != null) return PatternApplier.apply(text, pattern.getColors());
