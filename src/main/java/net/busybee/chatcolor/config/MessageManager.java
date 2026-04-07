@@ -55,6 +55,23 @@ public class MessageManager {
         player.sendMessage(get(key, map));
     }
 
+    public void send(Player player, String key, String placeholder, Component value) {
+        String raw = this.messagesConfig.getString(key, "<red>Missing message: " + key);
+        raw = raw.replace("<prefix>", this.prefix);
+        
+        String[] parts = raw.split("<" + placeholder + ">", 2);
+        if (parts.length < 2) {
+            player.sendMessage(ColorUtil.colorize(raw));
+            return;
+        }
+        
+        Component message = ColorUtil.colorize(parts[0])
+                .append(value)
+                .append(ColorUtil.colorize(parts[1]));
+        
+        player.sendMessage(message);
+    }
+
     public void send(Player player, String key, Map<String, String> placeholders) {
         player.sendMessage(get(key, placeholders));
     }

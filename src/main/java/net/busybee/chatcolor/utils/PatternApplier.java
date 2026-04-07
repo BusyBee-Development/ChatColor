@@ -12,21 +12,21 @@ public class PatternApplier {
             return Component.text(text != null ? text : "");
         }
 
-        net.kyori.adventure.text.TextComponent.Builder builder = Component.text();
+        StringBuilder sb = new StringBuilder();
         int colorIndex = 0;
 
         for (int i = 0; i < text.length(); i++) {
             char c = text.charAt(i);
             if (c == ' ') {
-                builder.append(Component.space());
+                sb.append(" ");
                 continue;
             }
             String colorTag = colors.get(colorIndex % colors.size());
-            builder.append(ColorUtil.colorize(colorTag + ColorUtil.escape(String.valueOf(c)) + "<reset>"));
+            sb.append(colorTag).append(ColorUtil.escape(String.valueOf(c))).append("<reset>");
             colorIndex++;
         }
 
-        return builder.build();
+        return ColorUtil.colorize(sb.toString());
     }
 
     public static Component applyToName(String text, List<String> colors) {

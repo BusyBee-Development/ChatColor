@@ -34,6 +34,11 @@ public class ColorUtil {
         return text.replace("\\", "\\\\").replace("<", "\\<");
     }
 
+    public static String stripLegacy(String text) {
+        if (text == null) return "";
+        return text.replaceAll("(?i)§[0-9A-FK-ORX]", "");
+    }
+
     public static MiniMessage getMiniMessage() {
         return MINI_MESSAGE;
     }

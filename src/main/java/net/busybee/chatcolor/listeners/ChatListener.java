@@ -37,26 +37,28 @@ public class ChatListener implements Listener {
 
         PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
 
+        String messageToColor = ColorUtil.stripLegacy(rawMessage);
+
         if (!data.hasColor()) {
             String defaultColor = plugin.getConfigManager().getDefaultColor();
             if (defaultColor.equalsIgnoreCase("NONE")) return;
 
             if (plugin.getConfigManager().isApplyToMessage()) {
-                event.message(ColorUtil.applyTagToText(defaultColor, rawMessage));
+                event.message(ColorUtil.applyTagToText(defaultColor, messageToColor));
             }
             if (plugin.getConfigManager().isApplyToName()) {
-                player.displayName(ColorUtil.applyTagToText(defaultColor, PlainTextComponentSerializer.plainText().serialize(player.name())));
+                player.displayName(ColorUtil.applyTagToText(defaultColor, ColorUtil.stripLegacy(PlainTextComponentSerializer.plainText().serialize(player.name()))));
             }
             return;
         }
 
         if (!plugin.getConfigManager().isApplyToMessage()) return;
 
-        Component colored = buildColoredMessage(data, rawMessage);
+        Component colored = buildColoredMessage(data, messageToColor);
         event.message(colored);
 
         if (plugin.getConfigManager().isApplyToName()) {
-            player.displayName(buildColoredMessage(data, PlainTextComponentSerializer.plainText().serialize(player.name())));
+            player.displayName(buildColoredMessage(data, ColorUtil.stripLegacy(PlainTextComponentSerializer.plainText().serialize(player.name()))));
         }
     }
 
@@ -73,27 +75,29 @@ public class ChatListener implements Listener {
 
         PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
 
+        String messageToColor = ColorUtil.stripLegacy(rawMessage);
+
         if (!data.hasColor()) {
             String defaultColor = plugin.getConfigManager().getDefaultColor();
             if (defaultColor.equalsIgnoreCase("NONE")) return;
 
             if (plugin.getConfigManager().isApplyToMessage()) {
-                event.setMessage(ColorUtil.getLegacySerializer().serialize(ColorUtil.applyTagToText(defaultColor, rawMessage)));
+                event.setMessage(ColorUtil.getLegacySerializer().serialize(ColorUtil.applyTagToText(defaultColor, messageToColor)));
             }
             if (plugin.getConfigManager().isApplyToName()) {
-                player.setDisplayName(ColorUtil.getLegacySerializer().serialize(ColorUtil.applyTagToText(defaultColor, player.getName())));
+                player.setDisplayName(ColorUtil.getLegacySerializer().serialize(ColorUtil.applyTagToText(defaultColor, ColorUtil.stripLegacy(player.getName()))));
             }
             return;
         }
 
         if (!plugin.getConfigManager().isApplyToMessage()) return;
 
-        Component colored = buildColoredMessage(data, rawMessage);
+        Component colored = buildColoredMessage(data, messageToColor);
         String legacyColored = ColorUtil.getLegacySerializer().serialize(colored);
         event.setMessage(legacyColored);
 
         if (plugin.getConfigManager().isApplyToName()) {
-            player.setDisplayName(ColorUtil.getLegacySerializer().serialize(buildColoredMessage(data, player.getName())));
+            player.setDisplayName(ColorUtil.getLegacySerializer().serialize(buildColoredMessage(data, ColorUtil.stripLegacy(player.getName()))));
         }
     }
 

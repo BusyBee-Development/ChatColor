@@ -6,14 +6,14 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerDataManager {
 
     private final ChatColor plugin;
-    private final Map<UUID, PlayerColorData> dataMap = new HashMap<>();
+    private final Map<UUID, PlayerColorData> dataMap = new ConcurrentHashMap<>();
     private File dataFile;
     private FileConfiguration dataConfig;
 

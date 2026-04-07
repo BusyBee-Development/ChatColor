@@ -164,8 +164,14 @@ public class ColorSelectorGUI extends InventoryGUI {
         plugin.getPlayerDataManager().setData(player.getUniqueId(), data);
         plugin.getPlayerDataManager().save(player.getUniqueId());
 
-        String coloredDisplay = entry.getEntryType().equals("PATTERN") ? entry.getDisplayName() : entry.getTag() + entry.getDisplayName() + "<reset>";
-        plugin.getMessageManager().send(player, "color-applied", "color", coloredDisplay);
+        if (entry.getEntryType().equals("PATTERN")) {
+            PatternEntry patternEntry = (PatternEntry) entry;
+            Component coloredDisplay = PatternApplier.apply(entry.getDisplayName(), patternEntry.getColors());
+            plugin.getMessageManager().send(player, "color-applied", "color", coloredDisplay);
+        } else {
+            String coloredDisplay = entry.getTag() + entry.getDisplayName() + "<reset>";
+            plugin.getMessageManager().send(player, "color-applied", "color", coloredDisplay);
+        }
     }
 
     private ItemStack createEntryIcon(SelectableEntry entry, boolean hasPermission) {
