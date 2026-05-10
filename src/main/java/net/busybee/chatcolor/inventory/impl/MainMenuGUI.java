@@ -1,21 +1,18 @@
 package net.busybee.chatcolor.inventory.impl;
 
 import net.busybee.chatcolor.ChatColor;
-import net.busybee.chatcolor.inventory.InventoryButton;
-import net.busybee.chatcolor.inventory.InventoryGUI;
+import fr.mrmicky.fastinv.FastInv;
 import net.busybee.chatcolor.utils.ColorUtil;
-import com.cryptomorin.xseries.XMaterial;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainMenuGUI extends InventoryGUI {
+public class MainMenuGUI extends FastInv {
 
     private static final int SIZE = 27;
     private static final int[] FILLER_SLOTS = {
@@ -27,86 +24,69 @@ public class MainMenuGUI extends InventoryGUI {
     private final ChatColor plugin;
 
     public MainMenuGUI(ChatColor plugin) {
+        super(SIZE, ColorUtil.colorize(plugin.getConfigManager().getMainMenuTitle()));
         this.plugin = plugin;
+        decorate();
     }
 
-    @Override
-    protected Inventory createInventory() {
-        Component title = ColorUtil.colorize(plugin.getConfigManager().getMainMenuTitle());
-        return Bukkit.createInventory(null, SIZE, title);
-    }
-
-    @Override
-    public void decorate(Player player) {
+    private void decorate() {
         ItemStack filler = createFiller();
         for (int slot : FILLER_SLOTS) {
-            getInventory().setItem(slot, filler);
+            setItem(slot, filler);
         }
 
-        addButton(10, new InventoryButton()
-                .creator(p -> createItem(
-                        XMaterial.matchXMaterial("LIME_DYE").map(XMaterial::parseItem).orElse(new ItemStack(XMaterial.PAPER.parseMaterial())),
+        setItem(10, createItem(
+                        new ItemStack(Material.LIME_DYE),
                         "<green><bold>Solid Colors",
                         "<gray>Browse and apply solid colors",
                         "<gray>and hex RGB colors."
-                ))
-                .consumer(event -> {
+                ),
+                event -> {
                     Player clicker = (Player) event.getWhoClicked();
-                    clicker.closeInventory();
-                    ColorSelectorGUI gui = new ColorSelectorGUI(plugin, "SOLID");
-                    plugin.getGuiManager().openGUI(gui, clicker);
-                })
+                    new ColorSelectorGUI(plugin, "SOLID").open(clicker);
+                }
         );
 
-        addButton(12, new InventoryButton()
-                .creator(p -> createItem(
-                        XMaterial.matchXMaterial("MAGMA_CREAM").map(XMaterial::parseItem).orElse(new ItemStack(XMaterial.PAPER.parseMaterial())),
+        setItem(12, createItem(
+                        new ItemStack(Material.MAGMA_CREAM),
                         "<gradient:red:blue><bold>Gradients",
                         "<gray>Apply smooth gradient colors",
                         "<gray>across your messages."
-                ))
-                .consumer(event -> {
+                ),
+                event -> {
                     Player clicker = (Player) event.getWhoClicked();
-                    clicker.closeInventory();
-                    ColorSelectorGUI gui = new ColorSelectorGUI(plugin, "GRADIENT");
-                    plugin.getGuiManager().openGUI(gui, clicker);
-                })
+                    new ColorSelectorGUI(plugin, "GRADIENT").open(clicker);
+                }
         );
 
-        addButton(14, new InventoryButton()
-                .creator(p -> createItem(
-                        XMaterial.matchXMaterial("NETHER_STAR").map(XMaterial::parseItem).orElse(new ItemStack(XMaterial.PAPER.parseMaterial())),
+        setItem(14, createItem(
+                        new ItemStack(Material.NETHER_STAR),
                         "<rainbow><bold>Patterns",
                         "<gray>Apply cycling color patterns",
                         "<gray>character by character."
-                ))
-                .consumer(event -> {
+                ),
+                event -> {
                     Player clicker = (Player) event.getWhoClicked();
-                    clicker.closeInventory();
-                    ColorSelectorGUI gui = new ColorSelectorGUI(plugin, "PATTERN");
-                    plugin.getGuiManager().openGUI(gui, clicker);
-                })
+                    new ColorSelectorGUI(plugin, "PATTERN").open(clicker);
+                }
         );
 
-        addButton(16, new InventoryButton()
-                .creator(p -> createItem(
-                        XMaterial.matchXMaterial("BARRIER").map(XMaterial::parseItem).orElse(new ItemStack(XMaterial.PAPER.parseMaterial())),
+        setItem(16, createItem(
+                        new ItemStack(Material.BARRIER),
                         "<red><bold>Reset Color",
                         "<gray>Remove your current chat color."
-                ))
-                .consumer(event -> {
+                ),
+                event -> {
                     Player clicker = (Player) event.getWhoClicked();
                     plugin.getChatColorAPI().resetColor(clicker);
                     clicker.closeInventory();
                     plugin.getMessageManager().send(clicker, "color-reset");
-                })
+                }
         );
-
-        super.decorate(player);
     }
 
     private ItemStack createItem(ItemStack base, String name, String... lorelines) {
-        if (base == null) base = XMaterial.matchXMaterial("PAPER").map(XMaterial::parseItem).orElse(new ItemStack(XMaterial.PAPER.parseMaterial()));
+        if (base == null || base.getType() == Material.AIR) base = new ItemStack(Material.PAPER);
         ItemMeta meta = base.getItemMeta();
         if (meta == null) return base;
         meta.displayName(ColorUtil.colorize(name));
@@ -120,7 +100,7 @@ public class MainMenuGUI extends InventoryGUI {
     }
 
     private ItemStack createFiller() {
-        ItemStack item = XMaterial.matchXMaterial("GRAY_STAINED_GLASS_PANE").map(XMaterial::parseItem).orElse(new ItemStack(XMaterial.GRAY_STAINED_GLASS_PANE.parseMaterial()));
+        ItemStack item = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             meta.displayName(Component.empty());

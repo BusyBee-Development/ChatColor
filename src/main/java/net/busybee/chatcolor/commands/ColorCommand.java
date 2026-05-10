@@ -39,8 +39,7 @@ public class ColorCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args.length == 0) {
-            MainMenuGUI gui = new MainMenuGUI(plugin);
-            plugin.getGuiManager().openGUI(gui, player);
+            new MainMenuGUI(plugin).open(player);
             return true;
         }
 
@@ -67,8 +66,7 @@ public class ColorCommand implements CommandExecutor, TabCompleter {
                 handleSet(player, type, key);
             }
             case "gui" -> {
-                MainMenuGUI gui = new MainMenuGUI(plugin);
-                plugin.getGuiManager().openGUI(gui, player);
+                new MainMenuGUI(plugin).open(player);
             }
             case "create" -> {
                 if (!player.hasPermission("chatcolor.create")) {
@@ -86,8 +84,7 @@ public class ColorCommand implements CommandExecutor, TabCompleter {
                 plugin.getMessageManager().send(player, "color-created", "name", name);
             }
             default -> {
-                MainMenuGUI gui = new MainMenuGUI(plugin);
-                plugin.getGuiManager().openGUI(gui, player);
+                new MainMenuGUI(plugin).open(player);
             }
         }
 

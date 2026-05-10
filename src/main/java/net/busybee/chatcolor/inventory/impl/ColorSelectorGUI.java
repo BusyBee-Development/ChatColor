@@ -2,24 +2,21 @@ package net.busybee.chatcolor.inventory.impl;
 
 import net.busybee.chatcolor.ChatColor;
 import net.busybee.chatcolor.data.PlayerColorData;
-import net.busybee.chatcolor.inventory.InventoryButton;
-import net.busybee.chatcolor.inventory.InventoryGUI;
+import fr.mrmicky.fastinv.FastInv;
 import net.busybee.chatcolor.models.PatternEntry;
 import net.busybee.chatcolor.models.SelectableEntry;
 import net.busybee.chatcolor.utils.ColorUtil;
 import net.busybee.chatcolor.utils.PatternApplier;
-import com.cryptomorin.xseries.XMaterial;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ColorSelectorGUI extends InventoryGUI {
+public class ColorSelectorGUI extends FastInv {
 
     private static final int CONTENT_SLOTS = 45;
     private static final int SLOT_PREV = 45;
@@ -29,12 +26,34 @@ public class ColorSelectorGUI extends InventoryGUI {
 
     private final ChatColor plugin;
     private final String type;
-    private int page = 0;
+    private int page;
     private List<? extends SelectableEntry> entries;
 
     public ColorSelectorGUI(ChatColor plugin, String type) {
+        this(plugin, type, 0);
+    }
+
+    public ColorSelectorGUI(ChatColor plugin, String type, int page) {
+        super(54, buildTitle(plugin, type));
         this.plugin = plugin;
         this.type = type;
+        this.page = page;
+    }
+
+    @Override
+    public void open(Player player) {
+        decorate(player);
+        super.open(player);
+    }
+
+    private static Component buildTitle(ChatColor plugin, String type) {
+        String raw = switch (type) {
+            case "SOLID" -> plugin.getConfigManager().getColorSelectorTitle();
+            case "GRADIENT" -> plugin.getConfigManager().getGradientSelectorTitle();
+            case "PATTERN" -> plugin.getConfigManager().getPatternSelectorTitle();
+            default -> "<white>Colors";
+        };
+        return ColorUtil.colorize(raw);
     }
 
     private List<? extends SelectableEntry> getEntries() {
@@ -54,34 +73,15 @@ public class ColorSelectorGUI extends InventoryGUI {
         return Math.max(1, (int) Math.ceil((double) size / CONTENT_SLOTS));
     }
 
-    @Override
-    protected Inventory createInventory() {
-        Component title = buildTitle();
-        return Bukkit.createInventory(null, 54, title);
-    }
-
-    private Component buildTitle() {
-        String raw = switch (this.type) {
-            case "SOLID" -> plugin.getConfigManager().getColorSelectorTitle();
-            case "GRADIENT" -> plugin.getConfigManager().getGradientSelectorTitle();
-            case "PATTERN" -> plugin.getConfigManager().getPatternSelectorTitle();
-            default -> "<white>Colors";
-        };
-        return ColorUtil.colorize(raw);
-    }
-
-    @Override
-    public void decorate(Player player) {
+    private void decorate(Player player) {
         getInventory().clear();
-        clearButtons();
-
         List<? extends SelectableEntry> all = getEntries();
         int start = this.page * CONTENT_SLOTS;
         int end = Math.min(start + CONTENT_SLOTS, all.size());
 
         ItemStack filler = createFiller();
         for (int i = NAV_ROW_START; i < 54; i++) {
-            getInventory().setItem(i, filler);
+            setItem(i, filler);
         }
 
         for (int i = start; i < end; i++) {
@@ -89,63 +89,57 @@ public class ColorSelectorGUI extends InventoryGUI {
             final SelectableEntry entry = all.get(i);
             final boolean hasPermission = player.hasPermission(entry.getPermission());
 
-            addButton(slot, new InventoryButton()
-                    .creator(p -> createEntryIcon(entry, hasPermission))
-                    .consumer(event -> {
-                        Player clicker = (Player) event.getWhoClicked();
-                        if (!clicker.hasPermission(entry.getPermission())) {
-                            plugin.getMessageManager().send(clicker, "no-permission");
-                            return;
-                        }
-                        applyEntry(clicker, entry);
-                        clicker.closeInventory();
-                    })
-            );
+            setItem(slot, createEntryIcon(entry, hasPermission), event -> {
+                Player clicker = (Player) event.getWhoClicked();
+                if (!clicker.hasPermission(entry.getPermission())) {
+                    plugin.getMessageManager().send(clicker, "no-permission");
+                    return;
+                }
+                applyEntry(clicker, entry);
+                clicker.closeInventory();
+            });
         }
 
         if (this.page > 0) {
-            addButton(SLOT_PREV, new InventoryButton()
-                    .creator(p -> createNavItem(
-                            XMaterial.matchXMaterial("ARROW").map(XMaterial::parseItem).orElse(new ItemStack(XMaterial.ARROW.parseMaterial())),
+            setItem(SLOT_PREV, createNavItem(
+                            new ItemStack(Material.ARROW),
                             "<yellow><bold>← Previous Page",
                             "<gray>Page " + this.page + " / " + getTotalPages()
-                    ))
-                    .consumer(event -> {
+                    ),
+                    event -> {
                         this.page--;
                         decorate((Player) event.getWhoClicked());
-                    })
+                    }
             );
+        } else {
+            setItem(SLOT_PREV, filler);
         }
 
-        addButton(SLOT_BACK, new InventoryButton()
-                .creator(p -> createNavItem(
-                        XMaterial.matchXMaterial("DARK_OAK_DOOR").map(XMaterial::parseItem).orElse(new ItemStack(XMaterial.DARK_OAK_DOOR.parseMaterial())),
+        setItem(SLOT_BACK, createNavItem(
+                        new ItemStack(Material.DARK_OAK_DOOR),
                         "<red><bold>← Back to Main Menu",
                         "<gray>Return to the color category menu."
-                ))
-                .consumer(event -> {
+                ),
+                event -> {
                     Player clicker = (Player) event.getWhoClicked();
-                    clicker.closeInventory();
-                    MainMenuGUI mainMenu = new MainMenuGUI(plugin);
-                    plugin.getGuiManager().openGUI(mainMenu, clicker);
-                })
+                    new MainMenuGUI(plugin).open(clicker);
+                }
         );
 
         if (this.page < getTotalPages() - 1) {
-            addButton(SLOT_NEXT, new InventoryButton()
-                    .creator(p -> createNavItem(
-                            XMaterial.matchXMaterial("ARROW").map(XMaterial::parseItem).orElse(new ItemStack(XMaterial.ARROW.parseMaterial())),
+            setItem(SLOT_NEXT, createNavItem(
+                            new ItemStack(Material.ARROW),
                             "<yellow><bold>Next Page →",
                             "<gray>Page " + (this.page + 2) + " / " + getTotalPages()
-                    ))
-                    .consumer(event -> {
+                    ),
+                    event -> {
                         this.page++;
                         decorate((Player) event.getWhoClicked());
-                    })
+                    }
             );
+        } else {
+            setItem(SLOT_NEXT, filler);
         }
-
-        super.decorate(player);
     }
 
     private void applyEntry(Player player, SelectableEntry entry) {
@@ -175,11 +169,9 @@ public class ColorSelectorGUI extends InventoryGUI {
     }
 
     private ItemStack createEntryIcon(SelectableEntry entry, boolean hasPermission) {
-        ItemStack item = XMaterial.matchXMaterial(entry.getIconMaterial())
-                .map(XMaterial::parseItem)
-                .orElse(XMaterial.matchXMaterial("PAPER").map(XMaterial::parseItem).orElse(new ItemStack(XMaterial.PAPER.parseMaterial())));
-
-        if (item == null) item = new ItemStack(XMaterial.PAPER.parseMaterial());
+        Material mat = Material.matchMaterial(entry.getIconMaterial());
+        if (mat == null) mat = Material.PAPER;
+        ItemStack item = new ItemStack(mat);
 
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return item;
@@ -207,7 +199,7 @@ public class ColorSelectorGUI extends InventoryGUI {
     }
 
     private ItemStack createNavItem(ItemStack base, String name, String lore) {
-        if (base == null) base = XMaterial.matchXMaterial("PAPER").map(XMaterial::parseItem).orElse(new ItemStack(XMaterial.PAPER.parseMaterial()));
+        if (base == null || base.getType() == Material.AIR) base = new ItemStack(Material.PAPER);
         ItemMeta meta = base.getItemMeta();
         if (meta == null) return base;
         meta.displayName(ColorUtil.colorize(name));
@@ -219,9 +211,7 @@ public class ColorSelectorGUI extends InventoryGUI {
     }
 
     private ItemStack createFiller() {
-        ItemStack item = XMaterial.matchXMaterial("GRAY_STAINED_GLASS_PANE")
-                .map(XMaterial::parseItem)
-                .orElse(new ItemStack(XMaterial.GRAY_STAINED_GLASS_PANE.parseMaterial()));
+        ItemStack item = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             meta.displayName(Component.empty());

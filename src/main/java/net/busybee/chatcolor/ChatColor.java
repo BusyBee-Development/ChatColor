@@ -8,8 +8,7 @@ import net.busybee.chatcolor.config.MessageManager;
 import net.busybee.chatcolor.config.PatternManager;
 import net.busybee.chatcolor.data.PlayerDataManager;
 import net.busybee.chatcolor.hooks.PlaceholderAPIHook;
-import net.busybee.chatcolor.inventory.gui.GUIListener;
-import net.busybee.chatcolor.inventory.gui.GUIManager;
+import fr.mrmicky.fastinv.FastInvManager;
 import net.busybee.chatcolor.listeners.ChatListener;
 import net.busybee.chatcolor.utils.VersionCheck;
 import lombok.Getter;
@@ -30,7 +29,6 @@ public class ChatColor extends JavaPlugin {
     private MessageManager messageManager;
     private PatternManager patternManager;
     private PlayerDataManager playerDataManager;
-    private GUIManager guiManager;
     private ChatColorAPI chatColorAPI;
 
     @Override
@@ -44,8 +42,9 @@ public class ChatColor extends JavaPlugin {
         this.messageManager = new MessageManager(this);
         this.patternManager = new PatternManager(this);
         this.playerDataManager = new PlayerDataManager(this);
-        this.guiManager = new GUIManager();
         this.chatColorAPI = new ChatColorAPI(this);
+
+        FastInvManager.register(this);
 
         this.colorManager.load();
         this.configManager.load();
@@ -94,7 +93,6 @@ public class ChatColor extends JavaPlugin {
             }
         }, this, true);
 
-        Bukkit.getPluginManager().registerEvents(new GUIListener(this.guiManager), this);
         Bukkit.getPluginManager().registerEvents(new VersionCheck(this), this);
     }
 
