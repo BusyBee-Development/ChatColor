@@ -1,7 +1,7 @@
 name: ChatColor
 version: ${project.version}
 main: net.busybee.chatcolor.ChatColor
-api-version: '1.20'
+api-version: '1.21'
 author: BusyBee
 description: Advanced chat color plugin with gradient and pattern support.
 
