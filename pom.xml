@@ -6,7 +6,7 @@
 
     <groupId>net.busybee</groupId>
     <artifactId>ChatColor</artifactId>
-    <version>2026.4.2</version>
+    <version>2026.5.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -48,11 +48,6 @@
             <artifactId>lombok</artifactId>
             <version>1.18.30</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.cryptomorin</groupId>
-            <artifactId>XSeries</artifactId>
-            <version>13.6.0</version>
         </dependency>
         <dependency>
             <groupId>org.bstats</groupId>
@@ -99,8 +94,8 @@
                         <configuration>
                             <relocations>
                                 <relocation>
-                                    <pattern>com.cryptomorin.xseries</pattern>
-                                    <shadedPattern>net.busybee.chatcolor.libs.xseries</shadedPattern>
+                                    <pattern>fr.mrmicky.fastinv</pattern>
+                                    <shadedPattern>net.busybee.chatcolor.libs.fastinv</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>org.bstats</pattern>
