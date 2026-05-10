@@ -70,10 +70,27 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
             return ColorUtil.getLegacySerializer().serialize(colored);
         }
 
+        if (params.equalsIgnoreCase("message_mm")) {
+            if (!plugin.getConfigManager().isPapiIntegration()) return null;
+            String message = ChatListener.getLastMessage(player.getUniqueId());
+            if (message.isEmpty()) return "%message%";
+            Component colored = buildColored(data, message);
+            return ColorUtil.toMiniMessage(colored);
+        }
+
         if (params.startsWith("message_")) {
             if (!plugin.getConfigManager().isPapiIntegration()) return null;
             String message = params.substring("message_".length());
             if (message.isEmpty()) return "";
+
+            // Check if it's the mm variant
+            if (message.startsWith("mm_")) {
+                message = message.substring(3);
+                if (message.isEmpty()) return "";
+                Component colored = buildColored(data, message);
+                return ColorUtil.toMiniMessage(colored);
+            }
+
             Component colored = buildColored(data, message);
             return ColorUtil.getLegacySerializer().serialize(colored);
         }
@@ -81,6 +98,15 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
         if (params.startsWith("formatted_msg_")) {
             String message = params.substring("formatted_msg_".length());
             if (message.isEmpty()) return "";
+
+            // Check if it's the mm variant
+            if (message.startsWith("mm_")) {
+                message = message.substring(3);
+                if (message.isEmpty()) return "";
+                Component colored = buildColored(data, message);
+                return ColorUtil.toMiniMessage(colored);
+            }
+
             Component colored = buildColored(data, message);
             return ColorUtil.getLegacySerializer().serialize(colored);
         }

@@ -43,6 +43,10 @@ public class ColorUtil {
         return MINI_MESSAGE;
     }
 
+    public static String toMiniMessage(Component component) {
+        return MINI_MESSAGE.serialize(component);
+    }
+
     public static LegacyComponentSerializer getLegacySerializer() {
         return LEGACY;
     }
