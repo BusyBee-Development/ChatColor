@@ -8,7 +8,7 @@ description: Advanced chat color plugin with gradient and pattern support.
 commands:
   color:
     description: Open the color selector GUI or manage your chat color.
-    usage: /color [set <key> | reset | reload]
+    usage: /color [set <type> <key> | reset | reload | create | gui]
     permission: chatcolor.use
     aliases:
       - chatcolor
@@ -16,10 +16,23 @@ commands:
 
 permissions:
   chatcolor.use:
-    description: Allows the player to use the color GUI.
+    description: Allows the player to use the color GUI and basic commands.
     default: true
+  chatcolor.gui.solid:
+    description: Access to the Solid Colors section in the GUI.
+    default: false
+  chatcolor.gui.gradient:
+    description: Access to the Gradients section in the GUI.
+    default: false
+  chatcolor.gui.pattern:
+    description: Access to the Patterns section in the GUI.
+    default: false
+
   chatcolor.reload:
     description: Allows reloading the plugin configuration.
+    default: op
+  chatcolor.create:
+    description: Allows creating custom colors via command.
     default: op
   chatcolor.color.*:
     description: Access to all solid colors.
