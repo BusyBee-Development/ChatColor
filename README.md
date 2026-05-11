@@ -1,6 +1,6 @@
 # 🌈 ChatColor
 
-**ChatColor** is an advanced Minecraft chat color plugin built for **Paper 1.20+** that lets players personalize their chat messages with solid colors, multi-stop gradients, and character-cycling patterns — all through a sleek GUI or simple commands.
+**ChatColor** is an advanced Minecraft chat color plugin built for **Paper 1.21+** that lets players personalize their chat messages with solid colors, multi-stop gradients, and character-cycling patterns — all through a sleek GUI or simple commands.
 
 ---
 
@@ -29,22 +29,22 @@
 5. (Optional) Install **PlaceholderAPI** for placeholder support.
 
 **Requirements:**
-- Paper (or Spigot) **1.20+**
-- Java **17+**
+- Paper (or Spigot) **1.21+**
+- Java **21+**
 - PlaceholderAPI *(optional)*
 
 ---
 
 ## 🕹️ Commands
 
-| Command                             | Description                               | Permission         |
-|-------------------------------------|-------------------------------------------|--------------------|
-| `/color`                            | Opens the main color selector GUI         | `chatcolor.use`    |
-| `/color gui`                        | Opens the main color selector GUI         | `chatcolor.use`    |
-| `/color reset`                      | Removes your active chat color            | `chatcolor.use`    |
-| `/color set <type> <key>`           | Sets a color, gradient, or pattern by key | `chatcolor.use`    |
-| `/color create <name> <tag> <icon>` | Create a new custom color                 | `chatcolor.create` |
-| `/color reload`                     | Reloads all plugin configuration          | `chatcolor.reload` |
+| Command                                          | Description                               | Permission         |
+|--------------------------------------------------|-------------------------------------------|--------------------|
+| `/color`                                         | Opens the main color selector GUI         | `chatcolor.use`    |
+| `/color gui`                                     | Opens the main color selector GUI         | `chatcolor.use`    |
+| `/color reset`                                   | Removes your active chat color            | `chatcolor.use`    |
+| `/color set <type> <key>`                        | Sets a color, gradient, or pattern by key | `chatcolor.use`    |
+| `/color create <name> <tag> <icon> [permission]` | Create a new custom color                 | `chatcolor.create` |
+| `/color reload`                                  | Reloads all plugin configuration          | `chatcolor.reload` |
 
 **Aliases:** `/chatcolor`, `/cc`
 
@@ -52,14 +52,17 @@
 
 ## 🔑 Permissions
 
-| Permission             | Description                          | Default   |
-|------------------------|--------------------------------------|-----------|
-| `chatcolor.use`        | Access to the GUI and basic commands | `true`    |
-| `chatcolor.reload`     | Reload the plugin config             | `op`      |
-| `chatcolor.create`     | Create custom colors                 | `op`      |
-| `chatcolor.color.*`    | Access to all solid colors           | `op`      |
-| `chatcolor.gradient.*` | Access to all gradients              | `op`      |
-| `chatcolor.pattern.*`  | Access to all patterns               | `op`      |
+| Permission               | Description                            | Default   |
+|--------------------------|----------------------------------------|-----------|
+| `chatcolor.use`          | Access to the GUI and basic commands   | `true`    |
+| `chatcolor.reload`       | Reload the plugin config               | `op`      |
+| `chatcolor.create`       | Create custom colors                   | `op`      |
+| `chatcolor.gui.solid`    | Access to Solid Colors section         | `false`   |
+| `chatcolor.gui.gradient` | Access to Gradients section            | `false`   |
+| `chatcolor.gui.pattern`  | Access to Patterns section             | `false`   |
+| `chatcolor.color.*`      | Access to all solid colors             | `op`      |
+| `chatcolor.gradient.*`   | Access to all gradients                | `op`      |
+| `chatcolor.pattern.*`    | Access to all patterns                 | `op`      |
 
 Individual entries have their own permission nodes, for example:
 - `chatcolor.color.red`
@@ -125,13 +128,15 @@ patterns:
 
 When PlaceholderAPI is installed, the following placeholders are available:
 
-| Placeholder                        | Description                        | Example Output                         |
-|:-----------------------------------|:-----------------------------------|:---------------------------------------|
-| `%chatcolor_color_type%`           | Player's active color type         | `SOLID`, `GRADIENT`, `PATTERN`, `NONE` |
-| `%chatcolor_color_key%`            | Key of player's active selection   | `red`, `sunset`, `rainbow`, `none`     |
-| `%chatcolor_color%`                | Raw MiniMessage tag / Pattern key  | `<red>`, `rainbow`                     |
-| `%chatcolor_message%`              | Player's last chat message colored | `§cHello world!`                       |
-| `%chatcolor_formatted_msg_<text>%` | Applies color to specific text     | `§6§lBusyBee`                          |
+| Placeholder                           | Description                          | Example Output                         |
+|:--------------------------------------|:-------------------------------------|:---------------------------------------|
+| `%chatcolor_color_type%`              | Player's active color type           | `SOLID`, `GRADIENT`, `PATTERN`, `NONE` |
+| `%chatcolor_color_key%`               | Key of player's active selection     | `red`, `sunset`, `rainbow`, `none`     |
+| `%chatcolor_color%`                   | Raw MiniMessage tag / Pattern key    | `<red>`, `rainbow`                     |
+| `%chatcolor_message%`                 | Player's last chat message colored   | `§cHello world!`                       |
+| `%chatcolor_message_mm%`              | Last message (MiniMessage)           | `<red>Hello world!`                    |
+| `%chatcolor_formatted_msg_<text>%`    | Applies color to text (Legacy)       | `§6§lBusyBee`                          |
+| `%chatcolor_formatted_msg_mm_<text>%` | Applies color to text (MiniMessage)  | `<gradient:red:blue>BusyBee`           |
 
 ---
 
