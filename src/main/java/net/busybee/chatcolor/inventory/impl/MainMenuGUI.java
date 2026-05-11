@@ -26,50 +26,67 @@ public class MainMenuGUI extends FastInv {
     public MainMenuGUI(ChatColor plugin) {
         super(SIZE, ColorUtil.colorize(plugin.getConfigManager().getMainMenuTitle()));
         this.plugin = plugin;
-        decorate();
     }
 
-    private void decorate() {
+    @Override
+    public void open(Player player) {
+        decorate(player);
+        super.open(player);
+    }
+
+    private void decorate(Player player) {
         ItemStack filler = createFiller();
         for (int slot : FILLER_SLOTS) {
             setItem(slot, filler);
         }
 
-        setItem(10, createItem(
-                        new ItemStack(Material.LIME_DYE),
-                        "<green><bold>Solid Colors",
-                        "<gray>Browse and apply solid colors",
-                        "<gray>and hex RGB colors."
-                ),
-                event -> {
-                    Player clicker = (Player) event.getWhoClicked();
-                    new ColorSelectorGUI(plugin, "SOLID").open(clicker);
-                }
-        );
+        if (player.hasPermission("chatcolor.gui.solid")) {
+            setItem(10, createItem(
+                            new ItemStack(Material.LIME_DYE),
+                            "<green><bold>Solid Colors",
+                            "<gray>Browse and apply solid colors",
+                            "<gray>and hex RGB colors."
+                    ),
+                    event -> {
+                        Player clicker = (Player) event.getWhoClicked();
+                        new ColorSelectorGUI(plugin, "SOLID").open(clicker);
+                    }
+            );
+        } else {
+            setItem(10, filler);
+        }
 
-        setItem(12, createItem(
-                        new ItemStack(Material.MAGMA_CREAM),
-                        "<gradient:red:blue><bold>Gradients",
-                        "<gray>Apply smooth gradient colors",
-                        "<gray>across your messages."
-                ),
-                event -> {
-                    Player clicker = (Player) event.getWhoClicked();
-                    new ColorSelectorGUI(plugin, "GRADIENT").open(clicker);
-                }
-        );
+        if (player.hasPermission("chatcolor.gui.gradient")) {
+            setItem(12, createItem(
+                            new ItemStack(Material.MAGMA_CREAM),
+                            "<gradient:red:blue><bold>Gradients",
+                            "<gray>Apply smooth gradient colors",
+                            "<gray>across your messages."
+                    ),
+                    event -> {
+                        Player clicker = (Player) event.getWhoClicked();
+                        new ColorSelectorGUI(plugin, "GRADIENT").open(clicker);
+                    }
+            );
+        } else {
+            setItem(12, filler);
+        }
 
-        setItem(14, createItem(
-                        new ItemStack(Material.NETHER_STAR),
-                        "<rainbow><bold>Patterns",
-                        "<gray>Apply cycling color patterns",
-                        "<gray>character by character."
-                ),
-                event -> {
-                    Player clicker = (Player) event.getWhoClicked();
-                    new ColorSelectorGUI(plugin, "PATTERN").open(clicker);
-                }
-        );
+        if (player.hasPermission("chatcolor.gui.pattern")) {
+            setItem(14, createItem(
+                            new ItemStack(Material.NETHER_STAR),
+                            "<rainbow><bold>Patterns",
+                            "<gray>Apply cycling color patterns",
+                            "<gray>character by character."
+                    ),
+                    event -> {
+                        Player clicker = (Player) event.getWhoClicked();
+                        new ColorSelectorGUI(plugin, "PATTERN").open(clicker);
+                    }
+            );
+        } else {
+            setItem(14, filler);
+        }
 
         setItem(16, createItem(
                         new ItemStack(Material.BARRIER),

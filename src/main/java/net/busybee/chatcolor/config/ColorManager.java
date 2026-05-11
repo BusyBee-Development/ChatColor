@@ -60,13 +60,17 @@ public class ColorManager {
         }
     }
 
-    public void saveCustomColor(String name, String tag, String icon) {
+    public void saveCustomColor(String name, String tag, String icon, String permission) {
         String key = name.toLowerCase().replace(" ", "_");
         config.set("custom-colors." + key + ".display-name", name);
         config.set("custom-colors." + key + ".tag", tag);
         config.set("custom-colors." + key + ".icon", icon);
-        config.set("custom-colors." + key + ".permission", "chatcolor.custom." + key);
-        
+
+        if (permission == null || permission.isEmpty()) {
+            permission = "chatcolor.custom." + key;
+        }
+        config.set("custom-colors." + key + ".permission", permission);
+
         try {
             config.save(file);
             load(); // Reload maps

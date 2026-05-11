@@ -42,6 +42,18 @@ public class ColorSelectorGUI extends FastInv {
 
     @Override
     public void open(Player player) {
+        String perm = switch (this.type) {
+            case "SOLID" -> "chatcolor.gui.solid";
+            case "GRADIENT" -> "chatcolor.gui.gradient";
+            case "PATTERN" -> "chatcolor.gui.pattern";
+            default -> null;
+        };
+
+        if (perm != null && !player.hasPermission(perm)) {
+            plugin.getMessageManager().send(player, "no-permission-command");
+            return;
+        }
+
         decorate(player);
         super.open(player);
     }

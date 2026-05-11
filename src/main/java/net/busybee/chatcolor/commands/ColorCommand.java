@@ -74,13 +74,14 @@ public class ColorCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 if (args.length < 4) {
-                    player.sendMessage(plugin.getMessageManager().get("invalid-usage", java.util.Map.of("usage", "/" + label + " create <name> <tag> <icon>")));
+                    player.sendMessage(plugin.getMessageManager().get("invalid-usage", java.util.Map.of("usage", "/" + label + " create <name> <tag> <icon> [permission]")));
                     return true;
                 }
                 String name = args[1];
                 String tag = args[2];
                 String icon = args[3].toUpperCase();
-                plugin.getColorManager().saveCustomColor(name, tag, icon);
+                String permission = args.length > 4 ? args[4] : null;
+                plugin.getColorManager().saveCustomColor(name, tag, icon, permission);
                 plugin.getMessageManager().send(player, "color-created", "name", name);
             }
             default -> {
@@ -151,6 +152,11 @@ public class ColorCommand implements CommandExecutor, TabCompleter {
             completions.add("GREEN_WOOL");
             completions.add("YELLOW_WOOL");
             return filter(completions, args[3]);
+        }
+
+        if (args.length == 5 && args[0].equalsIgnoreCase("create")) {
+            completions.add("chatcolor.custom." + args[1].toLowerCase().replace(" ", "_"));
+            return filter(completions, args[4]);
         }
 
         if (args.length == 2 && args[0].equalsIgnoreCase("set")) {
