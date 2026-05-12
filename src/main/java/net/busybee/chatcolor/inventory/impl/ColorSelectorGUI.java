@@ -100,8 +100,10 @@ public class ColorSelectorGUI extends FastInv {
             int slot = i - start;
             final SelectableEntry entry = all.get(i);
             final boolean hasPermission = player.hasPermission(entry.getPermission());
+            final PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
+            final boolean isSelected = entry.getKey().equalsIgnoreCase(data.getColorKey()) && entry.getEntryType().equalsIgnoreCase(data.getColorType());
 
-            setItem(slot, createEntryIcon(entry, hasPermission), event -> {
+            setItem(slot, createEntryIcon(entry, hasPermission, isSelected), event -> {
                 Player clicker = (Player) event.getWhoClicked();
                 if (!clicker.hasPermission(entry.getPermission())) {
                     plugin.getMessageManager().send(clicker, "no-permission");
@@ -180,7 +182,7 @@ public class ColorSelectorGUI extends FastInv {
         }
     }
 
-    private ItemStack createEntryIcon(SelectableEntry entry, boolean hasPermission) {
+    private ItemStack createEntryIcon(SelectableEntry entry, boolean hasPermission, boolean isSelected) {
         Material mat = Material.matchMaterial(entry.getIconMaterial());
         if (mat == null) mat = Material.PAPER;
         ItemStack item = new ItemStack(mat);
@@ -196,6 +198,13 @@ public class ColorSelectorGUI extends FastInv {
         }
 
         List<Component> lore = new ArrayList<>();
+        if (isSelected) {
+            lore.add(ColorUtil.colorize("<green><bold>SELECTED"));
+            lore.add(Component.empty());
+            item.addUnsafeEnchantment(org.bukkit.enchantments.Enchantment.BREACH, 1);
+            meta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
+        }
+
         if (hasPermission) {
             lore.add(ColorUtil.colorize("<gray>Click to apply this color."));
             lore.add(Component.empty());

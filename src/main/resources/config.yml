@@ -8,6 +8,11 @@ settings:
   apply-to-message: true
   apply-to-name: false
   default-color: "NONE"
+  # Group-based default colors. Players with 'chatcolor.group.<name>' will get the specified color.
+  # Higher in the list = higher priority.
+  group-defaults:
+    admin: "<gradient:red:gold>"
+    vip: "<aqua>"
   event-priority: "LOWEST"
   papi-integration: true
   late-bind: false

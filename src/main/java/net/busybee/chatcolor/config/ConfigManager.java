@@ -19,6 +19,7 @@ public class ConfigManager {
     private boolean applyToName;
     private String eventPriority;
     private String defaultColor;
+    private java.util.LinkedHashMap<String, String> groupDefaults = new java.util.LinkedHashMap<>();
     private boolean papiIntegration;
     private boolean lateBind;
 
@@ -34,9 +35,22 @@ public class ConfigManager {
         this.applyToMessage = plugin.getConfig().getBoolean("settings.apply-to-message", true);
         this.applyToName = plugin.getConfig().getBoolean("settings.apply-to-name", false);
         this.defaultColor = plugin.getConfig().getString("settings.default-color", "NONE");
+        
+        this.groupDefaults.clear();
+        org.bukkit.configuration.ConfigurationSection groupSection = plugin.getConfig().getConfigurationSection("settings.group-defaults");
+        if (groupSection != null) {
+            for (String key : groupSection.getKeys(false)) {
+                this.groupDefaults.put(key, groupSection.getString(key));
+            }
+        }
+
         this.eventPriority = plugin.getConfig().getString("settings.event-priority", "LOWEST");
         this.papiIntegration = plugin.getConfig().getBoolean("settings.papi-integration", true);
         this.lateBind = plugin.getConfig().getBoolean("settings.late-bind", false);
+    }
+
+    public java.util.Map<String, String> getGroupDefaults() {
+        return this.groupDefaults;
     }
 
     public Map<String, ColorEntry> getColors() {

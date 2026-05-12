@@ -20,13 +20,13 @@ permissions:
     default: true
   chatcolor.gui.solid:
     description: Access to the Solid Colors section in the GUI.
-    default: false
+    default: true
   chatcolor.gui.gradient:
     description: Access to the Gradients section in the GUI.
-    default: false
+    default: true
   chatcolor.gui.pattern:
     description: Access to the Patterns section in the GUI.
-    default: false
+    default: true
 
   chatcolor.reload:
     description: Allows reloading the plugin configuration.

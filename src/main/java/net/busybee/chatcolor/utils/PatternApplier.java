@@ -8,6 +8,10 @@ import java.util.List;
 public class PatternApplier {
 
     public static Component apply(String text, List<String> colors) {
+        return apply(text, colors, true);
+    }
+
+    public static Component apply(String text, List<String> colors, boolean escape) {
         if (colors == null || colors.isEmpty() || text == null || text.isEmpty()) {
             return Component.text(text != null ? text : "");
         }
@@ -22,7 +26,7 @@ public class PatternApplier {
                 continue;
             }
             String colorTag = colors.get(colorIndex % colors.size());
-            sb.append(colorTag).append(ColorUtil.escape(String.valueOf(c))).append("<reset>");
+            sb.append(colorTag).append(escape ? ColorUtil.escape(String.valueOf(c)) : String.valueOf(c));
             colorIndex++;
         }
 

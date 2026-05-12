@@ -19,8 +19,12 @@ public class ColorUtil {
     }
 
     public static Component applyTagToText(String tag, String rawText) {
+        return applyTagToText(tag, rawText, true);
+    }
+
+    public static Component applyTagToText(String tag, String rawText, boolean escape) {
         if (tag == null || tag.isBlank() || rawText == null) return Component.text(rawText != null ? rawText : "");
-        String formatted = tag + escape(rawText);
+        String formatted = tag + (escape ? escape(rawText) : rawText);
         try {
             return MINI_MESSAGE.deserialize(formatted);
         } catch (Exception e) {
