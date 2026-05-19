@@ -10,6 +10,7 @@ import net.busybee.chatcolor.data.PlayerDataManager;
 import net.busybee.chatcolor.hooks.PlaceholderAPIHook;
 import fr.mrmicky.fastinv.FastInvManager;
 import net.busybee.chatcolor.listeners.ChatListener;
+import net.busybee.chatcolor.utils.ColorUtil;
 import net.busybee.chatcolor.utils.VersionCheck;
 import lombok.Getter;
 import org.bstats.bukkit.Metrics;
@@ -18,6 +19,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+
+import java.util.logging.Filter;
 
 @Getter
 public class ChatColor extends JavaPlugin {
@@ -57,6 +60,7 @@ public class ChatColor extends JavaPlugin {
         registerListeners();
         registerCommands();
         registerHooks();
+        setupConsoleFilter();
 
         getLogger().info("ChatColor enabled successfully by BusyBee.");
     }
@@ -74,13 +78,13 @@ public class ChatColor extends JavaPlugin {
         try {
             priority = EventPriority.valueOf(configManager.getEventPriority());
         } catch (IllegalArgumentException e) {
-            priority = EventPriority.LOWEST;
-            getLogger().warning("Invalid event-priority in config.yml, defaulting to LOWEST");
+            priority = EventPriority.HIGHEST;
+            getLogger().warning("Invalid event-priority in config.yml, defaulting to HIGHEST");
         }
 
         ChatListener chatListener = new ChatListener(this);
         if (isPaper()) {
-            Bukkit.getPluginManager().registerEvent(AsyncChatEvent.class, chatListener, priority, (listener, event) -> {
+             Bukkit.getPluginManager().registerEvent(AsyncChatEvent.class, chatListener, priority, (listener, event) -> {
                 if (event instanceof AsyncChatEvent chatEvent) {
                     ((ChatListener) listener).onChat(chatEvent);
                 }
@@ -107,6 +111,20 @@ public class ChatColor extends JavaPlugin {
             new PlaceholderAPIHook(this).register();
             getLogger().info("PlaceholderAPI hook registered.");
         }
+        new net.busybee.chatcolor.hooks.IntegrationChecker(this).check();
+    }
+
+    private void setupConsoleFilter() {
+        if (configManager.isCleanConsole()) {
+            Filter filter = record -> {
+                if (record.getMessage() != null) {
+                    record.setMessage(ColorUtil.stripLegacy(record.getMessage()));
+                }
+                return true;
+            };
+            Bukkit.getLogger().setFilter(filter);
+            java.util.logging.Logger.getLogger("Minecraft").setFilter(filter);
+        }
     }
 
     public void reload() {
@@ -117,6 +135,7 @@ public class ChatColor extends JavaPlugin {
         this.patternManager.load();
         this.playerDataManager.saveAll();
         this.playerDataManager.load();
+        setupConsoleFilter();
     }
 
     public boolean isPaper() {

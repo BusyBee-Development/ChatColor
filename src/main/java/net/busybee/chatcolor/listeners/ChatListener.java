@@ -73,11 +73,14 @@ public class ChatListener implements Listener {
         Player player = event.getPlayer();
         String rawMessage = event.getMessage();
 
-        lastMessages.put(player.getUniqueId(), rawMessage);
+        if (!plugin.isPaper()) {
+            lastMessages.put(player.getUniqueId(), rawMessage);
+        }
 
         if (plugin.getConfigManager().isLateBind()) return;
 
         PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
+        String messageToColor = ColorUtil.stripLegacy(rawMessage);
 
         boolean canUseMiniMessage = player.hasPermission("chatcolor.minimessage");
 
@@ -86,6 +89,8 @@ public class ChatListener implements Listener {
             if (defaultColor.equalsIgnoreCase("NONE")) return;
 
             if (plugin.getConfigManager().isApplyToMessage()) {
+                Component colored = ColorUtil.applyTagToText(defaultColor, messageToColor, !canUseMiniMessage);
+                event.setMessage(ColorUtil.getLegacySerializer().serialize(colored));
                 event.setMessage(ColorUtil.getLegacySerializer().serialize(ColorUtil.applyTagToText(defaultColor, rawMessage, !canUseMiniMessage)));
             }
             if (plugin.getConfigManager().isApplyToName()) {
@@ -96,6 +101,8 @@ public class ChatListener implements Listener {
 
         if (!plugin.getConfigManager().isApplyToMessage()) return;
 
+        Component colored = buildColoredMessage(data, messageToColor, !canUseMiniMessage);
+        event.setMessage(ColorUtil.getLegacySerializer().serialize(colored));
         Component colored = buildColoredMessage(data, rawMessage, !canUseMiniMessage);
         String legacyColored = ColorUtil.getLegacySerializer().serialize(colored);
         event.setMessage(legacyColored);

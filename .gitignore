@@ -30,4 +30,5 @@ Thumbs.db
 lib/
 target/
 docs/
+/.vscode
 test/
