@@ -112,6 +112,7 @@ public class ChatColor extends JavaPlugin {
             getLogger().info("PlaceholderAPI hook registered.");
         }
         new net.busybee.chatcolor.hooks.IntegrationChecker(this).check();
+    }
 
     private void setupConsoleFilter() {
         if (configManager.isCleanConsole()) {

@@ -13,6 +13,7 @@ settings:
   group-defaults:
     admin: "<gradient:red:gold>"
     vip: "<aqua>"
+  # HIGHEST is recommended for compatibility with plugins like LPC or DiscordSRV.
   event-priority: "HIGHEST"
   papi-integration: true
   late-bind: false

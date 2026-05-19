@@ -73,6 +73,7 @@ public class ChatListener implements Listener {
         Player player = event.getPlayer();
         String rawMessage = event.getMessage();
 
+        if (!plugin.isPaper()) {
             lastMessages.put(player.getUniqueId(), rawMessage);
         }
 
