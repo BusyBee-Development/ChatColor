@@ -10,7 +10,6 @@ public class ColorUtil {
     private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.builder()
             .character('§')
             .hexColors()
-            .useUnusualXRepeatedCharacterHexFormat()
             .build();
 
     public static Component colorize(String text) {
@@ -24,7 +23,10 @@ public class ColorUtil {
 
     public static Component applyTagToText(String tag, String rawText, boolean escape) {
         if (tag == null || tag.isBlank() || rawText == null) return Component.text(rawText != null ? rawText : "");
-        String formatted = tag + (escape ? escape(rawText) : rawText);
+        
+        String processedText = translateLegacyToMiniMessage(rawText);
+        String formatted = tag + (escape ? escape(processedText) : processedText);
+        
         try {
             return MINI_MESSAGE.deserialize(formatted);
         } catch (Exception e) {
@@ -32,6 +34,29 @@ public class ColorUtil {
         }
     }
 
+    public static String translateLegacyToMiniMessage(String text) {
+        if (text == null) return "";
+        String result = text;
+        
+        // Handle hex first to avoid overlapping with standard colors
+        result = result.replaceAll("(?i)&?#([A-Fa-f0-9]{6})", "<#$1>");
+        result = result.replaceAll("(?i)§x§([A-Fa-f0-9])§([A-Fa-f0-9])§([A-Fa-f0-9])§([A-Fa-f0-9])§([A-Fa-f0-9])§([A-Fa-f0-9])", "<#$1$2$3$4$5$6>");
+
+        // Standard colors & codes
+        String[][] colors = {
+                {"0", "black"}, {"1", "dark_blue"}, {"2", "dark_green"}, {"3", "dark_aqua"},
+                {"4", "dark_red"}, {"5", "dark_purple"}, {"6", "gold"}, {"7", "gray"},
+                {"8", "dark_gray"}, {"9", "blue"}, {"a", "green"}, {"b", "aqua"},
+                {"c", "red"}, {"d", "light_purple"}, {"e", "yellow"}, {"f", "white"},
+                {"l", "bold"}, {"m", "strikethrough"}, {"n", "underlined"}, {"o", "italic"}, {"r", "reset"}
+        };
+
+        for (String[] color : colors) {
+            result = result.replaceAll("(?i)[&§]" + color[0], "<" + color[1] + ">");
+        }
+
+        return result;
+    }
 
     public static String escape(String text) {
         if (text == null) return "";

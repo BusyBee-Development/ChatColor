@@ -2,6 +2,8 @@ package net.busybee.chatcolor.hooks;
 
 import net.busybee.chatcolor.ChatColor;
 import net.busybee.chatcolor.data.PlayerColorData;
+import net.busybee.chatcolor.models.ColorEntry;
+import net.busybee.chatcolor.models.GradientEntry;
 import net.busybee.chatcolor.models.PatternEntry;
 import net.busybee.chatcolor.utils.ColorUtil;
 import net.busybee.chatcolor.utils.PatternApplier;
@@ -62,56 +64,66 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
             return data.getColorType() != null ? data.getColorType() : "NONE";
         }
 
-        if (params.equalsIgnoreCase("message")) {
-            if (!plugin.getConfigManager().isPapiIntegration()) return null;
+        if (!plugin.getConfigManager().isPapiIntegration()) return null;
+
+        boolean mm = false;
+        String processingParams = params;
+        if (processingParams.startsWith("mm_")) {
+            mm = true;
+            processingParams = processingParams.substring(3);
+        }
+
+        if (processingParams.equalsIgnoreCase("message")) {
             String message = ChatListener.getLastMessage(player.getUniqueId());
             if (message.isEmpty()) return "%message%";
             Component colored = buildColored(data, message);
-            return ColorUtil.getLegacySerializer().serialize(colored);
+            return mm ? ColorUtil.toMiniMessage(colored) : ColorUtil.getLegacySerializer().serialize(colored);
         }
 
-        if (params.equalsIgnoreCase("message_mm")) {
-            if (!plugin.getConfigManager().isPapiIntegration()) return null;
-            String message = ChatListener.getLastMessage(player.getUniqueId());
-            if (message.isEmpty()) return "%message%";
-            Component colored = buildColored(data, message);
-            return ColorUtil.toMiniMessage(colored);
+        if (processingParams.startsWith("formatted_msg_")) {
+            processingParams = processingParams.substring("formatted_msg_".length());
         }
 
-        if (params.startsWith("message_")) {
-            if (!plugin.getConfigManager().isPapiIntegration()) return null;
-            String message = params.substring("message_".length());
-            if (message.isEmpty()) return "";
+        if (processingParams.isEmpty()) return "";
 
-            // Check if it's the mm variant
-            if (message.startsWith("mm_")) {
-                message = message.substring(3);
-                if (message.isEmpty()) return "";
-                Component colored = buildColored(data, message);
-                return ColorUtil.toMiniMessage(colored);
+        // Check for <color>_<text> pattern
+        if (processingParams.contains("_")) {
+            String[] parts = processingParams.split("_", 2);
+            String colorName = parts[0];
+            String text = parts[1];
+
+            if (isValidColor(colorName)) {
+                Component colored = buildColoredWithOverride(colorName, text);
+                return mm ? ColorUtil.toMiniMessage(colored) : ColorUtil.getLegacySerializer().serialize(colored);
             }
-
-            Component colored = buildColored(data, message);
-            return ColorUtil.getLegacySerializer().serialize(colored);
         }
 
-        if (params.startsWith("formatted_msg_")) {
-            String message = params.substring("formatted_msg_".length());
-            if (message.isEmpty()) return "";
+        // Default: color the whole processingParams with player's color
+        Component colored = buildColored(data, processingParams);
+        return mm ? ColorUtil.toMiniMessage(colored) : ColorUtil.getLegacySerializer().serialize(colored);
+    }
 
-            // Check if it's the mm variant
-            if (message.startsWith("mm_")) {
-                message = message.substring(3);
-                if (message.isEmpty()) return "";
-                Component colored = buildColored(data, message);
-                return ColorUtil.toMiniMessage(colored);
-            }
+    private boolean isValidColor(String name) {
+        if (plugin.getColorManager().getColor(name) != null) return true;
+        if (plugin.getColorManager().getGradient(name) != null) return true;
+        if (plugin.getPatternManager().getPattern(name) != null) return true;
+        return false;
+    }
 
-            Component colored = buildColored(data, message);
-            return ColorUtil.getLegacySerializer().serialize(colored);
+    private Component buildColoredWithOverride(String colorName, String text) {
+        ColorEntry color = plugin.getColorManager().getColor(colorName);
+        if (color != null) {
+            return ColorUtil.applyTagToText(color.getTag(), text, false);
         }
-
-        return null;
+        GradientEntry gradient = plugin.getColorManager().getGradient(colorName);
+        if (gradient != null) {
+            return ColorUtil.applyTagToText(gradient.getTag(), text, false);
+        }
+        PatternEntry pattern = plugin.getPatternManager().getPattern(colorName);
+        if (pattern != null) {
+            return PatternApplier.apply(text, pattern.getColors(), false);
+        }
+        return Component.text(text);
     }
 
     private Component buildColored(PlayerColorData data, String text) {
@@ -120,13 +132,13 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
             if (defaultColor.equalsIgnoreCase("NONE")) {
                 return Component.text(text);
             }
-            return ColorUtil.applyTagToText(defaultColor, text);
+            return ColorUtil.applyTagToText(defaultColor, text, false);
         }
         if (data.getColorType().equals("PATTERN")) {
             PatternEntry pattern = plugin.getPatternManager().getPattern(data.getColorKey());
-            if (pattern != null) return PatternApplier.apply(text, pattern.getColors());
+            if (pattern != null) return PatternApplier.apply(text, pattern.getColors(), false);
             return Component.text(text);
         }
-        return ColorUtil.applyTagToText(data.getColorTag(), text);
+        return ColorUtil.applyTagToText(data.getColorTag(), text, false);
     }
 }
