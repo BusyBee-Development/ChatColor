@@ -13,6 +13,8 @@ settings:
   group-defaults:
     admin: "<gradient:red:gold>"
     vip: "<aqua>"
-  event-priority: "LOWEST"
+  event-priority: "HIGHEST"
   papi-integration: true
   late-bind: false
+  # Strips color codes from console output to keep it readable.
+  clean-console: true

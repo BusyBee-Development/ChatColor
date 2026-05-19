@@ -40,7 +40,13 @@ public class ColorUtil {
 
     public static String stripLegacy(String text) {
         if (text == null) return "";
-        return text.replaceAll("(?i)§[0-9A-FK-ORX]", "");
+        return text.replaceAll("(?i)§[0-9A-FK-ORX]", "").replaceAll("(?i)§x(§[0-9A-F]){6}", "");
+    }
+
+    public static String stripAll(String text) {
+        if (text == null) return "";
+        String stripped = stripLegacy(text);
+        return stripped.replaceAll("<[^>]*>", "");
     }
 
     public static MiniMessage getMiniMessage() {

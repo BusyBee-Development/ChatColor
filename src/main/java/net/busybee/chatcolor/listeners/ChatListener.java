@@ -70,17 +70,15 @@ public class ChatListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onLegacyChat(AsyncPlayerChatEvent event) {
-        if (plugin.isPaper()) return;
-
         Player player = event.getPlayer();
         String rawMessage = event.getMessage();
 
-        lastMessages.put(player.getUniqueId(), rawMessage);
+            lastMessages.put(player.getUniqueId(), rawMessage);
+        }
 
         if (plugin.getConfigManager().isLateBind()) return;
 
         PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
-
         String messageToColor = ColorUtil.stripLegacy(rawMessage);
         boolean canUseMiniMessage = player.hasPermission("chatcolor.minimessage");
 
@@ -89,10 +87,8 @@ public class ChatListener implements Listener {
             if (defaultColor.equalsIgnoreCase("NONE")) return;
 
             if (plugin.getConfigManager().isApplyToMessage()) {
-                event.setMessage(ColorUtil.getLegacySerializer().serialize(ColorUtil.applyTagToText(defaultColor, messageToColor, !canUseMiniMessage)));
-            }
-            if (plugin.getConfigManager().isApplyToName()) {
-                player.setDisplayName(ColorUtil.getLegacySerializer().serialize(ColorUtil.applyTagToText(defaultColor, ColorUtil.stripLegacy(player.getName()), true)));
+                Component colored = ColorUtil.applyTagToText(defaultColor, messageToColor, !canUseMiniMessage);
+                event.setMessage(ColorUtil.getLegacySerializer().serialize(colored));
             }
             return;
         }
@@ -100,12 +96,7 @@ public class ChatListener implements Listener {
         if (!plugin.getConfigManager().isApplyToMessage()) return;
 
         Component colored = buildColoredMessage(data, messageToColor, !canUseMiniMessage);
-        String legacyColored = ColorUtil.getLegacySerializer().serialize(colored);
-        event.setMessage(legacyColored);
-
-        if (plugin.getConfigManager().isApplyToName()) {
-            player.setDisplayName(ColorUtil.getLegacySerializer().serialize(buildColoredMessage(data, ColorUtil.stripLegacy(player.getName()), true)));
-        }
+        event.setMessage(ColorUtil.getLegacySerializer().serialize(colored));
     }
 
     private String getDefaultColorForPlayer(Player player) {

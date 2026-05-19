@@ -22,6 +22,7 @@ public class ConfigManager {
     private java.util.LinkedHashMap<String, String> groupDefaults = new java.util.LinkedHashMap<>();
     private boolean papiIntegration;
     private boolean lateBind;
+    private boolean cleanConsole;
 
     public ConfigManager(ChatColor plugin) {
         this.plugin = plugin;
@@ -47,6 +48,7 @@ public class ConfigManager {
         this.eventPriority = plugin.getConfig().getString("settings.event-priority", "LOWEST");
         this.papiIntegration = plugin.getConfig().getBoolean("settings.papi-integration", true);
         this.lateBind = plugin.getConfig().getBoolean("settings.late-bind", false);
+        this.cleanConsole = plugin.getConfig().getBoolean("settings.clean-console", true);
     }
 
     public java.util.Map<String, String> getGroupDefaults() {
@@ -100,5 +102,8 @@ public class ConfigManager {
     }
     public boolean isLateBind() {
         return this.lateBind;
+    }
+    public boolean isCleanConsole() {
+        return this.cleanConsole;
     }
 }
