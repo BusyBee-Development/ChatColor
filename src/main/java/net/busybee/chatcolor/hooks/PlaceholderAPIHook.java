@@ -2,6 +2,8 @@ package net.busybee.chatcolor.hooks;
 
 import net.busybee.chatcolor.ChatColor;
 import net.busybee.chatcolor.data.PlayerColorData;
+import net.busybee.chatcolor.models.ColorEntry;
+import net.busybee.chatcolor.models.GradientEntry;
 import net.busybee.chatcolor.models.PatternEntry;
 import net.busybee.chatcolor.utils.ColorUtil;
 import net.busybee.chatcolor.utils.PatternApplier;
@@ -91,6 +93,66 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
             }
         }
         return tag;
+        if (!plugin.getConfigManager().isPapiIntegration()) return null;
+
+        boolean mm = false;
+        String processingParams = params;
+        if (processingParams.startsWith("mm_")) {
+            mm = true;
+            processingParams = processingParams.substring(3);
+        }
+
+        if (processingParams.equalsIgnoreCase("message")) {
+            String message = ChatListener.getLastMessage(player.getUniqueId());
+            if (message.isEmpty()) return "%message%";
+            Component colored = buildColored(data, message);
+            return mm ? ColorUtil.toMiniMessage(colored) : ColorUtil.getLegacySerializer().serialize(colored);
+        }
+
+        if (processingParams.startsWith("formatted_msg_")) {
+            processingParams = processingParams.substring("formatted_msg_".length());
+        }
+
+        if (processingParams.isEmpty()) return "";
+
+        // Check for <color>_<text> pattern
+        if (processingParams.contains("_")) {
+            String[] parts = processingParams.split("_", 2);
+            String colorName = parts[0];
+            String text = parts[1];
+
+            if (isValidColor(colorName)) {
+                Component colored = buildColoredWithOverride(colorName, text);
+                return mm ? ColorUtil.toMiniMessage(colored) : ColorUtil.getLegacySerializer().serialize(colored);
+            }
+        }
+
+        // Default: color the whole processingParams with player's color
+        Component colored = buildColored(data, processingParams);
+        return mm ? ColorUtil.toMiniMessage(colored) : ColorUtil.getLegacySerializer().serialize(colored);
+    }
+
+    private boolean isValidColor(String name) {
+        if (plugin.getColorManager().getColor(name) != null) return true;
+        if (plugin.getColorManager().getGradient(name) != null) return true;
+        if (plugin.getPatternManager().getPattern(name) != null) return true;
+        return false;
+    }
+
+    private Component buildColoredWithOverride(String colorName, String text) {
+        ColorEntry color = plugin.getColorManager().getColor(colorName);
+        if (color != null) {
+            return ColorUtil.applyTagToText(color.getTag(), text, false);
+        }
+        GradientEntry gradient = plugin.getColorManager().getGradient(colorName);
+        if (gradient != null) {
+            return ColorUtil.applyTagToText(gradient.getTag(), text, false);
+        }
+        PatternEntry pattern = plugin.getPatternManager().getPattern(colorName);
+        if (pattern != null) {
+            return PatternApplier.apply(text, pattern.getColors(), false);
+        }
+        return Component.text(text);
     }
 
     private Component buildColored(PlayerColorData data, String text) {
@@ -99,13 +161,13 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
             if (defaultColor == null || defaultColor.equalsIgnoreCase("NONE")) {
                 return Component.text(text);
             }
-            return ColorUtil.applyTagToText(defaultColor, text);
+            return ColorUtil.applyTagToText(defaultColor, text, false);
         }
         if ("PATTERN".equals(data.getColorType())) {
             PatternEntry pattern = plugin.getPatternManager().getPattern(data.getColorKey());
-            if (pattern != null) return PatternApplier.apply(text, pattern.getColors());
+            if (pattern != null) return PatternApplier.apply(text, pattern.getColors(), false);
             return Component.text(text);
         }
-        return ColorUtil.applyTagToText(data.getColorTag(), text);
+        return ColorUtil.applyTagToText(data.getColorTag(), text, false);
     }
 }

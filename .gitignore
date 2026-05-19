@@ -31,3 +31,4 @@ lib/
 target/
 docs/
 /.vscode
+test/

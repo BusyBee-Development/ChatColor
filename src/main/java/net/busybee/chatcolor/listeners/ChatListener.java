@@ -37,20 +37,19 @@ public class ChatListener implements Listener {
 
         PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
 
-        String messageToColor = ColorUtil.stripLegacy(rawMessage);
         boolean canUseMiniMessage = player.hasPermission("chatcolor.minimessage");
 
         if (!data.hasColor()) {
             String defaultColor = getDefaultColorForPlayer(player);
             if (defaultColor.equalsIgnoreCase("NONE")) {
                 if (!canUseMiniMessage) {
-                    event.message(Component.text(messageToColor));
+                    event.message(Component.text(ColorUtil.stripLegacy(rawMessage)));
                 }
                 return;
             }
 
             if (plugin.getConfigManager().isApplyToMessage()) {
-                event.message(ColorUtil.applyTagToText(defaultColor, messageToColor, !canUseMiniMessage));
+                event.message(ColorUtil.applyTagToText(defaultColor, rawMessage, !canUseMiniMessage));
             }
             if (plugin.getConfigManager().isApplyToName()) {
                 player.displayName(ColorUtil.applyTagToText(defaultColor, ColorUtil.stripLegacy(PlainTextComponentSerializer.plainText().serialize(player.name())), true));
@@ -60,7 +59,7 @@ public class ChatListener implements Listener {
 
         if (!plugin.getConfigManager().isApplyToMessage()) return;
 
-        Component colored = buildColoredMessage(data, messageToColor, !canUseMiniMessage);
+        Component colored = buildColoredMessage(data, rawMessage, !canUseMiniMessage);
         event.message(colored);
 
         if (plugin.getConfigManager().isApplyToName()) {
@@ -70,6 +69,7 @@ public class ChatListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onLegacyChat(AsyncPlayerChatEvent event) {
+
         Player player = event.getPlayer();
         String rawMessage = event.getMessage();
 
@@ -81,6 +81,7 @@ public class ChatListener implements Listener {
 
         PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
         String messageToColor = ColorUtil.stripLegacy(rawMessage);
+
         boolean canUseMiniMessage = player.hasPermission("chatcolor.minimessage");
 
         if (!data.hasColor()) {
@@ -90,6 +91,10 @@ public class ChatListener implements Listener {
             if (plugin.getConfigManager().isApplyToMessage()) {
                 Component colored = ColorUtil.applyTagToText(defaultColor, messageToColor, !canUseMiniMessage);
                 event.setMessage(ColorUtil.getLegacySerializer().serialize(colored));
+                event.setMessage(ColorUtil.getLegacySerializer().serialize(ColorUtil.applyTagToText(defaultColor, rawMessage, !canUseMiniMessage)));
+            }
+            if (plugin.getConfigManager().isApplyToName()) {
+                player.setDisplayName(ColorUtil.getLegacySerializer().serialize(ColorUtil.applyTagToText(defaultColor, ColorUtil.stripLegacy(player.getName()), true)));
             }
             return;
         }
@@ -98,6 +103,13 @@ public class ChatListener implements Listener {
 
         Component colored = buildColoredMessage(data, messageToColor, !canUseMiniMessage);
         event.setMessage(ColorUtil.getLegacySerializer().serialize(colored));
+        Component colored = buildColoredMessage(data, rawMessage, !canUseMiniMessage);
+        String legacyColored = ColorUtil.getLegacySerializer().serialize(colored);
+        event.setMessage(legacyColored);
+
+        if (plugin.getConfigManager().isApplyToName()) {
+            player.setDisplayName(ColorUtil.getLegacySerializer().serialize(buildColoredMessage(data, ColorUtil.stripLegacy(player.getName()), true)));
+        }
     }
 
     private String getDefaultColorForPlayer(Player player) {
@@ -117,7 +129,7 @@ public class ChatListener implements Listener {
         if (data.getColorType().equals("PATTERN")) {
             PatternEntry pattern = plugin.getPatternManager().getPattern(data.getColorKey());
             if (pattern != null) {
-                return PatternApplier.apply(rawText, pattern.getColors(), escape);
+                return PatternApplier.apply(ColorUtil.stripLegacy(rawText), pattern.getColors(), escape);
             }
             return Component.text(rawText);
         }
