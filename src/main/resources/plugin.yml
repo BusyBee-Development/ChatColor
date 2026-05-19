@@ -43,3 +43,6 @@ permissions:
   chatcolor.pattern.*:
     description: Access to all patterns.
     default: op
+  chatcolor.minimessage:
+    description: Allows using MiniMessage tags and legacy color codes in chat.
+    default: false
