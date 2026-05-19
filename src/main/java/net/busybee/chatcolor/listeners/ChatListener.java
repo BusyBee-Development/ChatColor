@@ -89,9 +89,8 @@ public class ChatListener implements Listener {
             if (defaultColor.equalsIgnoreCase("NONE")) return;
 
             if (plugin.getConfigManager().isApplyToMessage()) {
-                Component colored = ColorUtil.applyTagToText(defaultColor, messageToColor, !canUseMiniMessage);
+                Component colored = ColorUtil.applyTagToText(defaultColor, rawMessage, !canUseMiniMessage);
                 event.setMessage(ColorUtil.getLegacySerializer().serialize(colored));
-                event.setMessage(ColorUtil.getLegacySerializer().serialize(ColorUtil.applyTagToText(defaultColor, rawMessage, !canUseMiniMessage)));
             }
             if (plugin.getConfigManager().isApplyToName()) {
                 player.setDisplayName(ColorUtil.getLegacySerializer().serialize(ColorUtil.applyTagToText(defaultColor, ColorUtil.stripLegacy(player.getName()), true)));
@@ -101,11 +100,8 @@ public class ChatListener implements Listener {
 
         if (!plugin.getConfigManager().isApplyToMessage()) return;
 
-        Component colored = buildColoredMessage(data, messageToColor, !canUseMiniMessage);
-        event.setMessage(ColorUtil.getLegacySerializer().serialize(colored));
         Component colored = buildColoredMessage(data, rawMessage, !canUseMiniMessage);
-        String legacyColored = ColorUtil.getLegacySerializer().serialize(colored);
-        event.setMessage(legacyColored);
+        event.setMessage(ColorUtil.getLegacySerializer().serialize(colored));
 
         if (plugin.getConfigManager().isApplyToName()) {
             player.setDisplayName(ColorUtil.getLegacySerializer().serialize(buildColoredMessage(data, ColorUtil.stripLegacy(player.getName()), true)));
