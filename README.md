@@ -52,18 +52,18 @@
 
 ## 🔑 Permissions
 
-| Permission               | Description                            | Default   |
-|--------------------------|----------------------------------------|-----------|
-| `chatcolor.use`          | Access to the GUI and basic commands   | `true`    |
-| `chatcolor.reload`       | Reload the plugin config               | `op`      |
-| `chatcolor.create`       | Create custom colors                   | `op`      |
-| `chatcolor.minimessage`  | Use MiniMessage & legacy codes in chat | `false`   |
-| `chatcolor.gui.solid`    | Access to Solid Colors section         | `false`   |
-| `chatcolor.gui.gradient` | Access to Gradients section            | `false`   |
-| `chatcolor.gui.pattern`  | Access to Patterns section             | `false`   |
-| `chatcolor.color.*`      | Access to all solid colors             | `op`      |
-| `chatcolor.gradient.*`   | Access to all gradients                | `op`      |
-| `chatcolor.pattern.*`    | Access to all patterns                 | `op`      |
+| Permission               | Description                            | Default |
+|--------------------------|----------------------------------------|---------|
+| `chatcolor.use`          | Access to the GUI and basic commands   | `true`  |
+| `chatcolor.reload`       | Reload the plugin config               | `op`    |
+| `chatcolor.create`       | Create custom colors                   | `op`    |
+| `chatcolor.minimessage`  | Use MiniMessage & legacy codes in chat | `true`  |
+| `chatcolor.gui.solid`    | Access to Solid Colors section         | `true`  |
+| `chatcolor.gui.gradient` | Access to Gradients section            | `true`  |
+| `chatcolor.gui.pattern`  | Access to Patterns section             | `true`  |
+| `chatcolor.color.*`      | Access to all solid colors             | `op`    |
+| `chatcolor.gradient.*`   | Access to all gradients                | `op`    |
+| `chatcolor.pattern.*`    | Access to all patterns                 | `op`    |
 
 Individual entries have their own permission nodes, for example:
 - `chatcolor.color.red`
@@ -130,22 +130,23 @@ patterns:
 When PlaceholderAPI is installed, the following placeholders are available:
 
 ### Universal Placeholders
-These placeholders automatically handle player colors, gradients, and patterns.
+These placeholders automatically detect whether the player has a **Solid Color**, **Gradient**, or **Pattern** selected and apply it.
 
-| Placeholder | Description | Example Output |
-|:---|:---|:---|
-| `%chatcolor_message%` | Colors the player's last chat message | `§cHello world!` |
-| `%chatcolor_<text>%` | Colors arbitrary `<text>` with player's color | `§6§lBusyBee` |
-| `%chatcolor_<color>_<text>%` | Colors `<text>` with a specific color/gradient | `§x§F§F§8§C§0§0Sunset` |
+| Placeholder              | Description                                                           | Example Output      |
+|:-------------------------|:----------------------------------------------------------------------|:--------------------|
+| `%chatcolor_message%`    | Colors the player's last chat message (Legacy)                        | `§cHello world!`    |
+| `%chatcolor_mm_message%` | Colors the player's last chat message (**MiniMessage - Use for LPC**) | `<red>Hello world!` |
+| `%chatcolor_<text>%`     | Colors arbitrary `<text>` with player's color (Legacy)                | `§6§lBusyBee`       |
+| `%chatcolor_mm_<text>%`  | Colors arbitrary `<text>` with player's color (MiniMessage)           | `<red>BusyBee`      |
 
-**MiniMessage Support:** Add `mm_` prefix for MiniMessage output (e.g., `%chatcolor_mm_message%`).
+**Pro Tip:** Use the `mm_` variant (e.g., `%chatcolor_mm_message%`) for modern plugins like **LPC** or **Tab**.
 
 ### Status Placeholders
-| Placeholder | Description | Example Output |
-|:---|:---|:---|
-| `%chatcolor_color_type%` | Player's active color type | `SOLID`, `GRADIENT`, `PATTERN`, `NONE` |
-| `%chatcolor_color_key%` | Key of player's active selection | `red`, `sunset`, `rainbow`, `none` |
-| `%chatcolor_color%` | Raw MiniMessage tag / Pattern key | `<red>`, `rainbow` |
+| Placeholder              | Description                       | Example Output                         |
+|:-------------------------|:----------------------------------|:---------------------------------------|
+| `%chatcolor_color_type%` | Player's active color type        | `SOLID`, `GRADIENT`, `PATTERN`, `NONE` |
+| `%chatcolor_color_key%`  | Key of player's active selection  | `red`, `sunset`, `rainbow`, `none`     |
+| `%chatcolor_color%`      | Raw MiniMessage tag / Pattern key | `<red>`, `rainbow`                     |
 
 ---
 
