@@ -69,13 +69,12 @@ public class ChatListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onLegacyChat(AsyncPlayerChatEvent event) {
+        if (plugin.isPaper()) return;
 
         Player player = event.getPlayer();
         String rawMessage = event.getMessage();
 
-        if (!plugin.isPaper()) {
-            lastMessages.put(player.getUniqueId(), rawMessage);
-        }
+        lastMessages.put(player.getUniqueId(), rawMessage);
 
         if (plugin.getConfigManager().isLateBind()) return;
 
@@ -91,7 +90,6 @@ public class ChatListener implements Listener {
             if (plugin.getConfigManager().isApplyToMessage()) {
                 Component colored = ColorUtil.applyTagToText(defaultColor, messageToColor, !canUseMiniMessage);
                 event.setMessage(ColorUtil.getLegacySerializer().serialize(colored));
-                event.setMessage(ColorUtil.getLegacySerializer().serialize(ColorUtil.applyTagToText(defaultColor, rawMessage, !canUseMiniMessage)));
             }
             if (plugin.getConfigManager().isApplyToName()) {
                 player.setDisplayName(ColorUtil.getLegacySerializer().serialize(ColorUtil.applyTagToText(defaultColor, ColorUtil.stripLegacy(player.getName()), true)));
@@ -103,9 +101,6 @@ public class ChatListener implements Listener {
 
         Component colored = buildColoredMessage(data, messageToColor, !canUseMiniMessage);
         event.setMessage(ColorUtil.getLegacySerializer().serialize(colored));
-        Component colored = buildColoredMessage(data, rawMessage, !canUseMiniMessage);
-        String legacyColored = ColorUtil.getLegacySerializer().serialize(colored);
-        event.setMessage(legacyColored);
 
         if (plugin.getConfigManager().isApplyToName()) {
             player.setDisplayName(ColorUtil.getLegacySerializer().serialize(buildColoredMessage(data, ColorUtil.stripLegacy(player.getName()), true)));

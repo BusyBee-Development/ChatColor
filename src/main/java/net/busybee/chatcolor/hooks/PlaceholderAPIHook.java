@@ -44,6 +44,7 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
     @Override
     public String onRequest(OfflinePlayer player, @NotNull String params) {
         if (player == null) return "";
+        if (!plugin.getConfigManager().isPapiIntegration()) return null;
 
         PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
 
@@ -65,46 +66,19 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
             return data != null && data.getColorKey() != null ? data.getColorKey() : "";
         }
 
-        if (params.equalsIgnoreCase("message")) {
-            String message = ChatListener.getLastMessage(player.getUniqueId());
-            if (message == null || message.isEmpty()) return "%message%";
-            Component colored = buildColored(data, message);
-            return ColorUtil.getLegacySerializer().serialize(colored);
-        }
-
-        return null;
-    }
-
-    private String getTag(PlayerColorData data) {
-        if (data == null || !data.hasColor()) {
-            return plugin.getConfigManager().getDefaultColor();
-        }
-        if ("PATTERN".equals(data.getColorType())) return null;
-        
-        String tag = data.getColorTag();
-        if (tag == null || tag.isEmpty()) {
-            if (data.getColorKey() != null) {
-                var entry = plugin.getConfigManager().getColor(data.getColorKey());
-                if (entry != null) tag = entry.getTag();
-                else {
-                    var gradient = plugin.getConfigManager().getGradient(data.getColorKey());
-                    if (gradient != null) tag = gradient.getTag();
-                }
-            }
-        }
-        return tag;
-        if (!plugin.getConfigManager().isPapiIntegration()) return null;
-
         boolean mm = false;
         String processingParams = params;
         if (processingParams.startsWith("mm_")) {
             mm = true;
             processingParams = processingParams.substring(3);
+        } else if (processingParams.endsWith("_mm")) {
+            mm = true;
+            processingParams = processingParams.substring(0, processingParams.length() - 3);
         }
 
         if (processingParams.equalsIgnoreCase("message")) {
             String message = ChatListener.getLastMessage(player.getUniqueId());
-            if (message.isEmpty()) return "%message%";
+            if (message == null || message.isEmpty()) return "%message%";
             Component colored = buildColored(data, message);
             return mm ? ColorUtil.toMiniMessage(colored) : ColorUtil.getLegacySerializer().serialize(colored);
         }
@@ -130,6 +104,26 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
         // Default: color the whole processingParams with player's color
         Component colored = buildColored(data, processingParams);
         return mm ? ColorUtil.toMiniMessage(colored) : ColorUtil.getLegacySerializer().serialize(colored);
+    }
+
+    private String getTag(PlayerColorData data) {
+        if (data == null || !data.hasColor()) {
+            return plugin.getConfigManager().getDefaultColor();
+        }
+        if ("PATTERN".equals(data.getColorType())) return null;
+        
+        String tag = data.getColorTag();
+        if (tag == null || tag.isEmpty()) {
+            if (data.getColorKey() != null) {
+                var entry = plugin.getConfigManager().getColor(data.getColorKey());
+                if (entry != null) tag = entry.getTag();
+                else {
+                    var gradient = plugin.getConfigManager().getGradient(data.getColorKey());
+                    if (gradient != null) tag = gradient.getTag();
+                }
+            }
+        }
+        return tag;
     }
 
     private boolean isValidColor(String name) {

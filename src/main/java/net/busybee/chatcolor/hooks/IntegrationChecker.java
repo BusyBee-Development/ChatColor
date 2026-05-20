@@ -21,12 +21,9 @@ public class IntegrationChecker {
                 plugin.getLogger().warning("[ChatColor] DiscordSRV detected!");
                 plugin.getLogger().warning("To make ChatColor work smoothly with DiscordSRV:");
                 plugin.getLogger().warning("1. Open DiscordSRV's config.yml.");
-                plugin.getLogger().warning("2. Ensure PlaceholderAPI is enabled in DiscordSRV.");
-                plugin.getLogger().warning("3. If you want the colored message in Discord, replace {message}");
-                plugin.getLogger().warning("   with %chatcolor_message% in the format strings.");
-                plugin.getLogger().warning("   (Note: Discord itself doesn't support RGB gradients well,");
-                plugin.getLogger().warning("   so it might look plain or use basic markdown).");
-                plugin.getLogger().warning("4. Alternatively, use %chatcolor_color% before the name.");
+                plugin.getLogger().warning("2. If running Paper, set 'UseModernPaperChatEvent: true' in DiscordSRV.");
+                plugin.getLogger().warning("3. Discord automatically strips formatting, but ensure");
+                plugin.getLogger().warning("   no raw MiniMessage tags (<...>) leak to Discord channel.");
                 plugin.getLogger().warning("======================================================");
             }
 
@@ -35,7 +32,7 @@ public class IntegrationChecker {
                 plugin.getLogger().warning("[ChatColor] LPC (LuckPermsChat) detected!");
                 plugin.getLogger().warning("To make ChatColor gradients work correctly with LPC:");
                 plugin.getLogger().warning("1. Open LPC's config.yml.");
-                plugin.getLogger().warning("2. Replace the standard {message} variable with %chatcolor_message%");
+                plugin.getLogger().warning("2. Replace the standard {message} variable with %chatcolor_message_mm%");
                 plugin.getLogger().warning("   in your chat formats.");
                 plugin.getLogger().warning("3. In ChatColor's config.yml, set 'apply-to-message: false'");
                 plugin.getLogger().warning("   to avoid double-coloring, and set 'late-bind: true'.");

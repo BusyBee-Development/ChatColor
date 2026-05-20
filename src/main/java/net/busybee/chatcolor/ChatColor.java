@@ -20,12 +20,15 @@ import org.bukkit.plugin.java.JavaPlugin;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
+import java.io.PrintStream;
 import java.util.logging.Filter;
 
 @Getter
 public class ChatColor extends JavaPlugin {
 
     private static ChatColor instance;
+    private static PrintStream originalOut;
+    private static PrintStream originalErr;
 
     private ConfigManager configManager;
     private ColorManager colorManager;
@@ -67,6 +70,14 @@ public class ChatColor extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (originalOut != null) {
+            System.setOut(originalOut);
+            originalOut = null;
+        }
+        if (originalErr != null) {
+            System.setErr(originalErr);
+            originalErr = null;
+        }
         if (this.playerDataManager != null) {
             this.playerDataManager.saveAll();
         }
@@ -116,14 +127,34 @@ public class ChatColor extends JavaPlugin {
 
     private void setupConsoleFilter() {
         if (configManager.isCleanConsole()) {
+            if (originalOut == null) {
+                originalOut = System.out;
+                System.setOut(new net.busybee.chatcolor.utils.ConsoleFilterStream(originalOut));
+            }
+            if (originalErr == null) {
+                originalErr = System.err;
+                System.setErr(new net.busybee.chatcolor.utils.ConsoleFilterStream(originalErr));
+            }
+
             Filter filter = record -> {
                 if (record.getMessage() != null) {
-                    record.setMessage(ColorUtil.stripLegacy(record.getMessage()));
+                    record.setMessage(ColorUtil.stripAll(record.getMessage()));
                 }
                 return true;
             };
             Bukkit.getLogger().setFilter(filter);
             java.util.logging.Logger.getLogger("Minecraft").setFilter(filter);
+        } else {
+            if (originalOut != null) {
+                System.setOut(originalOut);
+                originalOut = null;
+            }
+            if (originalErr != null) {
+                System.setErr(originalErr);
+                originalErr = null;
+            }
+            Bukkit.getLogger().setFilter(null);
+            java.util.logging.Logger.getLogger("Minecraft").setFilter(null);
         }
     }
 
