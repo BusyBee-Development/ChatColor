@@ -10,10 +10,11 @@ import net.busybee.chatcolor.data.PlayerDataManager;
 import net.busybee.chatcolor.hooks.PlaceholderAPIHook;
 import fr.mrmicky.fastinv.FastInvManager;
 import net.busybee.chatcolor.listeners.ChatListener;
+import net.busybee.chatcolor.utils.BStatsManager;
 import net.busybee.chatcolor.utils.ColorUtil;
+import net.busybee.chatcolor.utils.FastStatsManager;
 import net.busybee.chatcolor.utils.VersionCheck;
 import lombok.Getter;
-import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventPriority;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -33,6 +34,9 @@ public class ChatColor extends JavaPlugin {
     private PatternManager patternManager;
     private PlayerDataManager playerDataManager;
     private ChatColorAPI chatColorAPI;
+
+    private BStatsManager bStatsManager;
+    private FastStatsManager fastStatsManager;
 
     @Override
     public void onEnable() {
@@ -55,7 +59,9 @@ public class ChatColor extends JavaPlugin {
         this.patternManager.load();
         this.playerDataManager.load();
 
-        new Metrics(this, 30495);
+        this.bStatsManager = new BStatsManager(this);
+        this.fastStatsManager = new FastStatsManager(this);
+        this.fastStatsManager.onEnable();
 
         registerListeners();
         registerCommands();
@@ -67,6 +73,9 @@ public class ChatColor extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (this.fastStatsManager != null) {
+            this.fastStatsManager.onDisable();
+        }
         if (this.playerDataManager != null) {
             this.playerDataManager.saveAll();
         }

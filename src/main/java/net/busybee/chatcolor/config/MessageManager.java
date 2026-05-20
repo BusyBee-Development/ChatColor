@@ -22,11 +22,7 @@ public class MessageManager {
     }
 
     public void load() {
-        File file = new File(plugin.getDataFolder(), "messages.yml");
-        if (!file.exists()) {
-            plugin.saveResource("messages.yml", false);
-        }
-        this.messagesConfig = YamlConfiguration.loadConfiguration(file);
+        this.messagesConfig = new net.busybee.chatcolor.utils.ConfigMigrator(plugin).migrate("messages.yml");
         this.prefix = this.messagesConfig.getString("prefix", "<dark_gray>[<gradient:blue:aqua>ChatColor<dark_gray>] ");
     }
 

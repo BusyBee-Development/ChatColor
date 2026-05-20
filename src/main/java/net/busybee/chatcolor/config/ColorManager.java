@@ -30,10 +30,7 @@ public class ColorManager {
     }
 
     public void load() {
-        if (!file.exists()) {
-            plugin.saveResource("colors.yml", false);
-        }
-        this.config = YamlConfiguration.loadConfiguration(file);
+        this.config = new net.busybee.chatcolor.utils.ConfigMigrator(plugin).migrate("colors.yml");
         
         this.colors.clear();
         this.gradients.clear();
