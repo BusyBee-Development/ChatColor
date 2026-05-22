@@ -109,19 +109,15 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
             return plugin.getConfigManager().getDefaultColor();
         }
         if ("PATTERN".equals(data.getColorType())) return null;
-        
-        String tag = data.getColorTag();
-        if (tag == null || tag.isEmpty()) {
-            if (data.getColorKey() != null) {
-                var entry = plugin.getConfigManager().getColor(data.getColorKey());
 
         String tag = data.getColorTag();
         if (tag == null || tag.isEmpty()) {
             if (data.getColorKey() != null) {
-                var entry = plugin.getColorManager().getColor(data.getColorKey());
-                if (entry != null) tag = entry.getTag();
-                else {
-                    var gradient = plugin.getConfigManager().getGradient(data.getColorKey());
+                ColorEntry entry = plugin.getColorManager().getColor(data.getColorKey());
+                if (entry != null) {
+                    tag = entry.getTag();
+                } else {
+                    GradientEntry gradient = plugin.getColorManager().getGradient(data.getColorKey());
                     if (gradient != null) tag = gradient.getTag();
                 }
             }
