@@ -6,7 +6,7 @@
 
     <groupId>net.busybee</groupId>
     <artifactId>ChatColor</artifactId>
-    <version>2026.5.3</version>
+    <version>2026.5.4</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -28,6 +28,11 @@
             <id>codemc</id>
             <url>https://repo.codemc.org/repository/maven-public/</url>
         </repository>
+        <repository>
+            <id>faststats-releases</id>
+            <url>https://repo.faststats.dev/releases</url>
+        </repository>
+
     </repositories>
 
     <dependencies>
@@ -52,9 +57,15 @@
         <dependency>
             <groupId>org.bstats</groupId>
             <artifactId>bstats-bukkit</artifactId>
-            <version>3.0.2</version>
+            <version>3.2.1</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>dev.faststats.metrics</groupId>
+            <artifactId>bukkit</artifactId>
+            <version>0.22.0</version>
+        </dependency>
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
@@ -112,6 +123,10 @@
                                 <relocation>
                                     <pattern>org.bstats</pattern>
                                     <shadedPattern>net.busybee.chatcolor.libs.bstats</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>dev.faststats</pattern>
+                                    <shadedPattern>net.busybee.chatcolor.libs.faststats</shadedPattern>
                                 </relocation>
                             </relocations>
                             <filters>

@@ -89,7 +89,6 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
 
         if (processingParams.isEmpty()) return "";
 
-        // Check for <color>_<text> pattern
         if (processingParams.contains("_")) {
             String[] parts = processingParams.split("_", 2);
             String colorName = parts[0];
@@ -101,7 +100,6 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
             }
         }
 
-        // Default: color the whole processingParams with player's color
         Component colored = buildColored(data, processingParams);
         return mm ? ColorUtil.toMiniMessage(colored) : ColorUtil.getLegacySerializer().serialize(colored);
     }
@@ -116,6 +114,11 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
         if (tag == null || tag.isEmpty()) {
             if (data.getColorKey() != null) {
                 var entry = plugin.getConfigManager().getColor(data.getColorKey());
+
+        String tag = data.getColorTag();
+        if (tag == null || tag.isEmpty()) {
+            if (data.getColorKey() != null) {
+                var entry = plugin.getColorManager().getColor(data.getColorKey());
                 if (entry != null) tag = entry.getTag();
                 else {
                     var gradient = plugin.getConfigManager().getGradient(data.getColorKey());

@@ -29,6 +29,9 @@ public class ConfigManager {
     }
 
     public void load() {
+        new net.busybee.chatcolor.utils.ConfigMigrator(plugin).migrate("config.yml");
+        plugin.reloadConfig();
+
         this.mainMenuTitle = plugin.getConfig().getString("gui.main-menu-title", "<gradient:blue:aqua><bold>ChatColor");
         this.colorSelectorTitle = plugin.getConfig().getString("gui.color-selector-title", "<aqua><bold>Solid Colors");
         this.gradientSelectorTitle = plugin.getConfig().getString("gui.gradient-selector-title", "<gradient:red:blue><bold>Gradients");

@@ -88,7 +88,7 @@ public class ChatListener implements Listener {
             if (defaultColor.equalsIgnoreCase("NONE")) return;
 
             if (plugin.getConfigManager().isApplyToMessage()) {
-                Component colored = ColorUtil.applyTagToText(defaultColor, messageToColor, !canUseMiniMessage);
+                Component colored = ColorUtil.applyTagToText(defaultColor, rawMessage, !canUseMiniMessage);
                 event.setMessage(ColorUtil.getLegacySerializer().serialize(colored));
             }
             if (plugin.getConfigManager().isApplyToName()) {
@@ -100,6 +100,7 @@ public class ChatListener implements Listener {
         if (!plugin.getConfigManager().isApplyToMessage()) return;
 
         Component colored = buildColoredMessage(data, messageToColor, !canUseMiniMessage);
+        Component colored = buildColoredMessage(data, rawMessage, !canUseMiniMessage);
         event.setMessage(ColorUtil.getLegacySerializer().serialize(colored));
 
         if (plugin.getConfigManager().isApplyToName()) {

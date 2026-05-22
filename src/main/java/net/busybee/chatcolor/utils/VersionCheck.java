@@ -94,7 +94,6 @@ public final class VersionCheck implements Listener {
 
         String currentVersion = plugin.getDescription().getVersion();
         if (isNewerVersion(latestVersion, currentVersion)) {
-            // Loading from messages.yml to get the configured prefix and optional custom message
             File messagesFile = new File(plugin.getDataFolder(), "messages.yml");
             FileConfiguration messagesConfig = YamlConfiguration.loadConfiguration(messagesFile);
             
