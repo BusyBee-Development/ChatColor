@@ -83,6 +83,7 @@ public class ChatColor extends JavaPlugin {
         if (originalErr != null) {
             System.setErr(originalErr);
             originalErr = null;
+        }
         if (this.fastStatsManager != null) {
             this.fastStatsManager.onDisable();
         }
