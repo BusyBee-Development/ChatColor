@@ -100,7 +100,6 @@ public class ChatListener implements Listener {
         if (!plugin.getConfigManager().isApplyToMessage()) return;
 
         Component colored = buildColoredMessage(data, messageToColor, !canUseMiniMessage);
-        Component colored = buildColoredMessage(data, rawMessage, !canUseMiniMessage);
         event.setMessage(ColorUtil.getLegacySerializer().serialize(colored));
 
         if (plugin.getConfigManager().isApplyToName()) {
