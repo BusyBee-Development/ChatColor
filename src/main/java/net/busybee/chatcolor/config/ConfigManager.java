@@ -27,23 +27,27 @@ public class ConfigManager {
     public void load() {
         new net.busybee.chatcolor.utils.ConfigMigrator(plugin).migrate("config.yml");
         plugin.reloadConfig();
+        org.bukkit.configuration.file.FileConfiguration config = plugin.getConfig();
+        try {
+            config.options().getClass().getMethod("useQuotes", boolean.class).invoke(config.options(), true);
+        } catch (Exception ignored) {}
 
-        this.applyToMessage = plugin.getConfig().getBoolean("settings.apply-to-message", true);
-        this.applyToName = plugin.getConfig().getBoolean("settings.apply-to-name", false);
-        this.defaultColor = plugin.getConfig().getString("settings.default-color", "NONE");
+        this.applyToMessage = config.getBoolean("settings.apply-to-message", true);
+        this.applyToName = config.getBoolean("settings.apply-to-name", false);
+        this.defaultColor = config.getString("settings.default-color", "NONE");
         
         this.groupDefaults.clear();
-        org.bukkit.configuration.ConfigurationSection groupSection = plugin.getConfig().getConfigurationSection("settings.group-defaults");
+        org.bukkit.configuration.ConfigurationSection groupSection = config.getConfigurationSection("settings.group-defaults");
         if (groupSection != null) {
             for (String key : groupSection.getKeys(false)) {
                 this.groupDefaults.put(key, groupSection.getString(key));
             }
         }
 
-        this.eventPriority = plugin.getConfig().getString("settings.event-priority", "LOWEST");
-        this.papiIntegration = plugin.getConfig().getBoolean("settings.papi-integration", true);
-        this.lateBind = plugin.getConfig().getBoolean("settings.late-bind", false);
-        this.cleanConsole = plugin.getConfig().getBoolean("settings.clean-console", true);
+        this.eventPriority = config.getString("settings.event-priority", "LOWEST");
+        this.papiIntegration = config.getBoolean("settings.papi-integration", true);
+        this.lateBind = config.getBoolean("settings.late-bind", false);
+        this.cleanConsole = config.getBoolean("settings.clean-console", true);
     }
 
     public java.util.Map<String, String> getGroupDefaults() {

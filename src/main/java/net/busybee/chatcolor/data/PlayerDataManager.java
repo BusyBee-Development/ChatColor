@@ -33,6 +33,9 @@ public class PlayerDataManager {
         }
 
         this.dataConfig = YamlConfiguration.loadConfiguration(this.dataFile);
+        try {
+            this.dataConfig.options().getClass().getMethod("useQuotes", boolean.class).invoke(this.dataConfig.options(), true);
+        } catch (Exception ignored) {}
         this.dataMap.clear();
 
         for (String uuidStr : this.dataConfig.getKeys(false)) {

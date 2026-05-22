@@ -51,12 +51,15 @@ public class ConfigMigrator {
             } catch (IOException e) {
                 plugin.getLogger().warning("Could not create default " + configFile.getName() + " from " + resourcePath);
             }
-            return YamlConfiguration.loadConfiguration(configFile);
+            FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
+            applyOptions(config);
+            return config;
         }
 
-        YamlConfiguration userConfig = new YamlConfiguration();
+        FileConfiguration userConfig = new YamlConfiguration();
         try {
             userConfig.load(configFile);
+            applyOptions(userConfig);
         } catch (InvalidConfigurationException | IOException e) {
             plugin.getLogger().severe("Detected corruption in " + configFile.getName() + "! Backing up and regenerating...");
             createBackupRaw(configFile, true);
@@ -73,6 +76,7 @@ public class ConfigMigrator {
         FileConfiguration defaultConfig = YamlConfiguration.loadConfiguration(
                 new InputStreamReader(defaultStream, StandardCharsets.UTF_8)
         );
+        applyOptions(defaultConfig);
 
         if (!needsMigration(userConfig, defaultConfig)) {
             return userConfig;
@@ -93,8 +97,15 @@ public class ConfigMigrator {
 
     private FileConfiguration mergeAndReorder(@NotNull FileConfiguration userConfig, @NotNull FileConfiguration defaultConfig) {
         YamlConfiguration newConfig = new YamlConfiguration();
+        applyOptions(newConfig);
         transferSection(userConfig, defaultConfig, newConfig, "");
         return newConfig;
+    }
+
+    private void applyOptions(FileConfiguration config) {
+        try {
+            config.options().getClass().getMethod("useQuotes", boolean.class).invoke(config.options(), true);
+        } catch (Exception ignored) {}
     }
 
     private void transferSection(ConfigurationSection userConfig, ConfigurationSection defaultConfig, ConfigurationSection newConfig, String path) {
@@ -118,6 +129,9 @@ public class ConfigMigrator {
                 Object value;
                 if (userConfig != null && userConfig.contains(key) && !userConfig.isConfigurationSection(key)) {
                     value = userConfig.get(key);
+                    if (value == null) {
+                        value = "";
+                    }
                 } else {
                     value = defaultConfig.get(key);
                     addedKeys.add(fullPath);
