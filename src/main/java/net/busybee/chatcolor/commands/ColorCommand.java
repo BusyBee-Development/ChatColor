@@ -58,7 +58,8 @@ public class ColorCommand implements CommandExecutor, TabCompleter {
             }
             case "set" -> {
                 if (args.length < 3) {
-                    player.sendMessage(plugin.getMessageManager().get("invalid-usage", java.util.Map.of("usage", "/" + label + " set <type> <key>")));
+                    String usageHint = plugin.getMessageManager().getRaw("usage-set");
+                    player.sendMessage(plugin.getMessageManager().get("invalid-usage", java.util.Map.of("usage", usageHint)));
                     return true;
                 }
                 String type = args[1].toLowerCase();
@@ -74,7 +75,8 @@ public class ColorCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 if (args.length < 4) {
-                    player.sendMessage(plugin.getMessageManager().get("invalid-usage", java.util.Map.of("usage", "/" + label + " create <name> <tag> <icon> [permission]")));
+                    String usageHint = plugin.getMessageManager().getRaw("usage-create");
+                    player.sendMessage(plugin.getMessageManager().get("invalid-usage", java.util.Map.of("usage", usageHint)));
                     return true;
                 }
                 String name = args[1];
@@ -133,7 +135,10 @@ public class ColorCommand implements CommandExecutor, TabCompleter {
                 plugin.getChatColorAPI().setPattern(player, key);
                 plugin.getMessageManager().send(player, "color-applied", "color", entry.getDisplayName());
             }
-            default -> player.sendMessage(plugin.getMessageManager().get("invalid-usage", java.util.Map.of("usage", "/color set <color|gradient|pattern> <key>")));
+            default -> {
+                String usageHint = plugin.getMessageManager().getRaw("usage-set");
+                player.sendMessage(plugin.getMessageManager().get("invalid-usage", java.util.Map.of("usage", usageHint)));
+            }
         }
     }
 

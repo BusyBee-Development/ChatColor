@@ -11,10 +11,6 @@ public class ConfigManager {
 
     private final ChatColor plugin;
 
-    private String mainMenuTitle;
-    private String colorSelectorTitle;
-    private String gradientSelectorTitle;
-    private String patternSelectorTitle;
     private boolean applyToMessage;
     private boolean applyToName;
     private String eventPriority;
@@ -32,10 +28,6 @@ public class ConfigManager {
         new net.busybee.chatcolor.utils.ConfigMigrator(plugin).migrate("config.yml");
         plugin.reloadConfig();
 
-        this.mainMenuTitle = plugin.getConfig().getString("gui.main-menu-title", "<gradient:blue:aqua><bold>ChatColor");
-        this.colorSelectorTitle = plugin.getConfig().getString("gui.color-selector-title", "<aqua><bold>Solid Colors");
-        this.gradientSelectorTitle = plugin.getConfig().getString("gui.gradient-selector-title", "<gradient:red:blue><bold>Gradients");
-        this.patternSelectorTitle = plugin.getConfig().getString("gui.pattern-selector-title", "<rainbow><bold>Patterns");
         this.applyToMessage = plugin.getConfig().getBoolean("settings.apply-to-message", true);
         this.applyToName = plugin.getConfig().getBoolean("settings.apply-to-name", false);
         this.defaultColor = plugin.getConfig().getString("settings.default-color", "NONE");
@@ -75,18 +67,6 @@ public class ConfigManager {
     }
     public GradientEntry getGradient(String key) {
         return plugin.getColorManager().getGradient(key);
-    }
-    public String getMainMenuTitle() {
-        return this.mainMenuTitle;
-    }
-    public String getColorSelectorTitle() {
-        return this.colorSelectorTitle;
-    }
-    public String getGradientSelectorTitle() {
-        return this.gradientSelectorTitle;
-    }
-    public String getPatternSelectorTitle() {
-        return this.patternSelectorTitle;
     }
     public boolean isApplyToMessage() {
         return this.applyToMessage;

@@ -24,7 +24,7 @@ public class MainMenuGUI extends FastInv {
     private final ChatColor plugin;
 
     public MainMenuGUI(ChatColor plugin) {
-        super(SIZE, ColorUtil.colorize(plugin.getConfigManager().getMainMenuTitle()));
+        super(SIZE, plugin.getMessageManager().get("gui.titles.main"));
         this.plugin = plugin;
     }
 
@@ -43,9 +43,8 @@ public class MainMenuGUI extends FastInv {
         if (player.hasPermission("chatcolor.gui.solid")) {
             setItem(10, createItem(
                             new ItemStack(Material.LIME_DYE),
-                            "<green><bold>Solid Colors",
-                            "<gray>Browse and apply solid colors",
-                            "<gray>and hex RGB colors."
+                            plugin.getMessageManager().getRaw("gui.items.solid.name"),
+                            plugin.getMessageManager().getStringList("gui.items.solid.lore").toArray(new String[0])
                     ),
                     event -> {
                         Player clicker = (Player) event.getWhoClicked();
@@ -59,9 +58,8 @@ public class MainMenuGUI extends FastInv {
         if (player.hasPermission("chatcolor.gui.gradient")) {
             setItem(12, createItem(
                             new ItemStack(Material.MAGMA_CREAM),
-                            "<gradient:red:blue><bold>Gradients",
-                            "<gray>Apply smooth gradient colors",
-                            "<gray>across your messages."
+                            plugin.getMessageManager().getRaw("gui.items.gradient.name"),
+                            plugin.getMessageManager().getStringList("gui.items.gradient.lore").toArray(new String[0])
                     ),
                     event -> {
                         Player clicker = (Player) event.getWhoClicked();
@@ -75,9 +73,8 @@ public class MainMenuGUI extends FastInv {
         if (player.hasPermission("chatcolor.gui.pattern")) {
             setItem(14, createItem(
                             new ItemStack(Material.NETHER_STAR),
-                            "<rainbow><bold>Patterns",
-                            "<gray>Apply cycling color patterns",
-                            "<gray>character by character."
+                            plugin.getMessageManager().getRaw("gui.items.pattern.name"),
+                            plugin.getMessageManager().getStringList("gui.items.pattern.lore").toArray(new String[0])
                     ),
                     event -> {
                         Player clicker = (Player) event.getWhoClicked();
@@ -90,8 +87,8 @@ public class MainMenuGUI extends FastInv {
 
         setItem(16, createItem(
                         new ItemStack(Material.BARRIER),
-                        "<red><bold>Reset Color",
-                        "<gray>Remove your current chat color."
+                        plugin.getMessageManager().getRaw("gui.items.reset.name"),
+                        plugin.getMessageManager().getStringList("gui.items.reset.lore").toArray(new String[0])
                 ),
                 event -> {
                     Player clicker = (Player) event.getWhoClicked();

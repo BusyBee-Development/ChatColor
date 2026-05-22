@@ -9,15 +9,12 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
@@ -94,11 +91,8 @@ public final class VersionCheck implements Listener {
 
         String currentVersion = plugin.getDescription().getVersion();
         if (isNewerVersion(latestVersion, currentVersion)) {
-            File messagesFile = new File(plugin.getDataFolder(), "messages.yml");
-            FileConfiguration messagesConfig = YamlConfiguration.loadConfiguration(messagesFile);
-            
-            List<String> lines = messagesConfig.getStringList("update-notifier");
-            String prefix = messagesConfig.getString("prefix", "<dark_gray>[<gradient:blue:aqua>ChatColor<dark_gray>] ");
+            List<String> lines = plugin.getMessageManager().getStringList("update-notifier");
+            String prefix = plugin.getMessageManager().getRaw("prefix");
             MiniMessage mm = ColorUtil.getMiniMessage();
 
             if (lines == null || lines.isEmpty()) {

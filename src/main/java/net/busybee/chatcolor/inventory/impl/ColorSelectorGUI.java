@@ -59,13 +59,13 @@ public class ColorSelectorGUI extends FastInv {
     }
 
     private static Component buildTitle(ChatColor plugin, String type) {
-        String raw = switch (type) {
-            case "SOLID" -> plugin.getConfigManager().getColorSelectorTitle();
-            case "GRADIENT" -> plugin.getConfigManager().getGradientSelectorTitle();
-            case "PATTERN" -> plugin.getConfigManager().getPatternSelectorTitle();
-            default -> "<white>Colors";
+        String key = switch (type) {
+            case "SOLID" -> "gui.titles.solid";
+            case "GRADIENT" -> "gui.titles.gradient";
+            case "PATTERN" -> "gui.titles.pattern";
+            default -> "gui.titles.default";
         };
-        return ColorUtil.colorize(raw);
+        return plugin.getMessageManager().get(key);
     }
 
     private List<? extends SelectableEntry> getEntries() {
@@ -117,8 +117,10 @@ public class ColorSelectorGUI extends FastInv {
         if (this.page > 0) {
             setItem(SLOT_PREV, createNavItem(
                             new ItemStack(Material.ARROW),
-                            "<yellow><bold>← Previous Page",
-                            "<gray>Page " + this.page + " / " + getTotalPages()
+                            plugin.getMessageManager().getRaw("gui.items.previous-page.name"),
+                            plugin.getMessageManager().getStringList("gui.items.previous-page.lore"),
+                            this.page,
+                            getTotalPages()
                     ),
                     event -> {
                         this.page--;
@@ -131,8 +133,9 @@ public class ColorSelectorGUI extends FastInv {
 
         setItem(SLOT_BACK, createNavItem(
                         new ItemStack(Material.DARK_OAK_DOOR),
-                        "<red><bold>← Back to Main Menu",
-                        "<gray>Return to the color category menu."
+                        plugin.getMessageManager().getRaw("gui.items.back-menu.name"),
+                        plugin.getMessageManager().getStringList("gui.items.back-menu.lore"),
+                        0, 0
                 ),
                 event -> {
                     Player clicker = (Player) event.getWhoClicked();
@@ -143,8 +146,10 @@ public class ColorSelectorGUI extends FastInv {
         if (this.page < getTotalPages() - 1) {
             setItem(SLOT_NEXT, createNavItem(
                             new ItemStack(Material.ARROW),
-                            "<yellow><bold>Next Page →",
-                            "<gray>Page " + (this.page + 2) + " / " + getTotalPages()
+                            plugin.getMessageManager().getRaw("gui.items.next-page.name"),
+                            plugin.getMessageManager().getStringList("gui.items.next-page.lore"),
+                            this.page + 2,
+                            getTotalPages()
                     ),
                     event -> {
                         this.page++;
@@ -199,18 +204,18 @@ public class ColorSelectorGUI extends FastInv {
 
         List<Component> lore = new ArrayList<>();
         if (isSelected) {
-            lore.add(ColorUtil.colorize("<green><bold>SELECTED"));
+            lore.add(plugin.getMessageManager().get("gui.status.selected"));
             lore.add(Component.empty());
             item.addUnsafeEnchantment(org.bukkit.enchantments.Enchantment.BREACH, 1);
             meta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
         }
 
         if (hasPermission) {
-            lore.add(ColorUtil.colorize("<gray>Click to apply this color."));
+            lore.add(plugin.getMessageManager().get("gui.status.click-to-apply"));
             lore.add(Component.empty());
-            lore.add(ColorUtil.colorize("<green>✔ <gray>You have access."));
+            lore.add(plugin.getMessageManager().get("gui.status.has-access"));
         } else {
-            lore.add(ColorUtil.colorize("<gray>You need permission:"));
+            lore.add(plugin.getMessageManager().get("gui.status.no-access"));
             lore.add(ColorUtil.colorize("<red>" + entry.getPermission()));
         }
 
@@ -219,13 +224,18 @@ public class ColorSelectorGUI extends FastInv {
         return item;
     }
 
-    private ItemStack createNavItem(ItemStack base, String name, String lore) {
+    private ItemStack createNavItem(ItemStack base, String name, List<String> lore, int current, int total) {
         if (base == null || base.getType() == Material.AIR) base = new ItemStack(Material.PAPER);
         ItemMeta meta = base.getItemMeta();
         if (meta == null) return base;
         meta.displayName(ColorUtil.colorize(name));
         List<Component> loreList = new ArrayList<>();
-        loreList.add(ColorUtil.colorize(lore));
+        for (String line : lore) {
+            loreList.add(ColorUtil.colorize(line
+                    .replace("<current>", String.valueOf(current))
+                    .replace("<total>", String.valueOf(total))
+            ));
+        }
         meta.lore(loreList);
         base.setItemMeta(meta);
         return base;

@@ -41,6 +41,14 @@ public class MessageManager {
         return ColorUtil.colorize(raw);
     }
 
+    public java.util.List<String> getStringList(String key) {
+        return this.messagesConfig.getStringList(key);
+    }
+
+    public String getRaw(String key) {
+        return this.messagesConfig.getString(key, "<red>Missing message: " + key);
+    }
+
     public void send(Player player, String key) {
         player.sendMessage(get(key));
     }
