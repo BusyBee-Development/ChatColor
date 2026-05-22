@@ -69,13 +69,12 @@ public class ChatListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onLegacyChat(AsyncPlayerChatEvent event) {
+        if (plugin.isPaper()) return;
 
         Player player = event.getPlayer();
         String rawMessage = event.getMessage();
 
-        if (!plugin.isPaper()) {
-            lastMessages.put(player.getUniqueId(), rawMessage);
-        }
+        lastMessages.put(player.getUniqueId(), rawMessage);
 
         if (plugin.getConfigManager().isLateBind()) return;
 
@@ -100,6 +99,7 @@ public class ChatListener implements Listener {
 
         if (!plugin.getConfigManager().isApplyToMessage()) return;
 
+        Component colored = buildColoredMessage(data, messageToColor, !canUseMiniMessage);
         Component colored = buildColoredMessage(data, rawMessage, !canUseMiniMessage);
         event.setMessage(ColorUtil.getLegacySerializer().serialize(colored));
 

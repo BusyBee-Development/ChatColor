@@ -71,6 +71,9 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
         if (processingParams.startsWith("mm_")) {
             mm = true;
             processingParams = processingParams.substring(3);
+        } else if (processingParams.endsWith("_mm")) {
+            mm = true;
+            processingParams = processingParams.substring(0, processingParams.length() - 3);
         }
 
         if (processingParams.equalsIgnoreCase("message")) {
@@ -106,6 +109,11 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
             return plugin.getConfigManager().getDefaultColor();
         }
         if ("PATTERN".equals(data.getColorType())) return null;
+        
+        String tag = data.getColorTag();
+        if (tag == null || tag.isEmpty()) {
+            if (data.getColorKey() != null) {
+                var entry = plugin.getConfigManager().getColor(data.getColorKey());
 
         String tag = data.getColorTag();
         if (tag == null || tag.isEmpty()) {
