@@ -25,7 +25,7 @@
 1. Download the `ChatColor.jar` file.
 2. Place it in your server's `plugins/` folder.
 3. Restart your server.
-4. Configure `config.yml`, `colors.yml`, `messages.yml`, and `patterns.yml` to your liking.
+4. Configure files in the `plugins/ChatColor/` folder.
 5. (Optional) Install **PlaceholderAPI** for placeholder support.
 
 **Requirements:**
@@ -57,13 +57,14 @@
 | `chatcolor.use`          | Access to the GUI and basic commands   | `true`  |
 | `chatcolor.reload`       | Reload the plugin config               | `op`    |
 | `chatcolor.create`       | Create custom colors                   | `op`    |
-| `chatcolor.minimessage`  | Use MiniMessage & legacy codes in chat | `true`  |
+| `chatcolor.minimessage`  | Use MiniMessage & legacy codes in chat | `false` |
 | `chatcolor.gui.solid`    | Access to Solid Colors section         | `true`  |
 | `chatcolor.gui.gradient` | Access to Gradients section            | `true`  |
 | `chatcolor.gui.pattern`  | Access to Patterns section             | `true`  |
 | `chatcolor.color.*`      | Access to all solid colors             | `op`    |
 | `chatcolor.gradient.*`   | Access to all gradients                | `op`    |
 | `chatcolor.pattern.*`    | Access to all patterns                 | `op`    |
+| `chatcolor.group.<name>` | Apply group-based default colors       | `false` |
 
 Individual entries have their own permission nodes, for example:
 - `chatcolor.color.red`
@@ -75,17 +76,25 @@ Individual entries have their own permission nodes, for example:
 ## ⚙️ Configuration
 
 ### `config.yml`
-Controls GUI titles and general plugin settings.
+Controls general plugin settings and behavior.
 
 ```yaml
 settings:
   apply-to-message: true   # Apply color to chat messages
   apply-to-name: false     # Apply color to display name
   default-color: "NONE"    # Default color for new players
-  event-priority: "LOWEST" # Priority for the chat listener
+  group-defaults:          # Group-based default colors
+    admin: "<gradient:red:gold>"
+  event-priority: "HIGHEST" # Priority for the chat listener
+  papi-integration: true   # Enable PlaceholderAPI support
+  late-bind: false         # Use for compatibility issues
+  clean-console: true      # Strip colors from console logs
 ```
 
-### `colors.yml`
+### `configs/gui.yml`
+Full control over GUI titles, items, layouts, and messages.
+
+### `configs/colors.yml`
 Defines all solid colors and gradients.
 
 ```yaml
@@ -104,7 +113,7 @@ gradients:
     icon: "ORANGE_WOOL"
 ```
 
-### `patterns.yml`
+### `configs/patterns.yml`
 Defines character-cycling color patterns.
 
 ```yaml
@@ -142,11 +151,19 @@ These placeholders automatically detect whether the player has a **Solid Color**
 **Pro Tip:** Use the `mm_` variant (e.g., `%chatcolor_mm_message%`) for modern plugins like **LPC** or **Tab**.
 
 ### Status Placeholders
-| Placeholder              | Description                       | Example Output                         |
-|:-------------------------|:----------------------------------|:---------------------------------------|
-| `%chatcolor_color_type%` | Player's active color type        | `SOLID`, `GRADIENT`, `PATTERN`, `NONE` |
-| `%chatcolor_color_key%`  | Key of player's active selection  | `red`, `sunset`, `rainbow`, `none`     |
-| `%chatcolor_color%`      | Raw MiniMessage tag / Pattern key | `<red>`, `rainbow`                     |
+| Placeholder                | Description                         | Example Output                           |
+|:---------------------------|:------------------------------------|:-----------------------------------------|
+| `%chatcolor_color_key%`    | Key of player's active selection    | `red`, `sunset`, `rainbow`, `none`       |
+| `%chatcolor_color%`        | Raw MiniMessage tag / Pattern key   | `<red>`, `rainbow`                       |
+| `%chatcolor_color_legacy%` | Legacy color code for current color | `§c`                                     |
+
+### Color Overrides
+Force a specific color defined in `colors.yml` or `patterns.yml` on any text.
+
+| Placeholder                          | Example                                               |
+|:-------------------------------------|:------------------------------------------------------|
+| `%chatcolor_<colorName>_<text>%`     | `%chatcolor_red_Warning!%` -> `§cWarning!`            |
+| `%chatcolor_mm_<colorName>_<text>%`  | `%chatcolor_mm_sunset_Hello%` -> `<gradient...>Hello` |
 
 ---
 
