@@ -1,7 +1,6 @@
 package net.busybee.chatcolor.utils;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 
 import java.util.List;
 

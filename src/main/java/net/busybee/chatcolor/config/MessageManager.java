@@ -4,10 +4,8 @@ import net.busybee.chatcolor.ChatColor;
 import net.busybee.chatcolor.utils.ColorUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,11 +42,9 @@ public class MessageManager {
     public java.util.List<String> getStringList(String key) {
         return this.messagesConfig.getStringList(key);
     }
-
     public String getRaw(String key) {
         return this.messagesConfig.getString(key, "<red>Missing message: " + key);
     }
-
     public void send(Player player, String key) {
         player.sendMessage(get(key));
     }

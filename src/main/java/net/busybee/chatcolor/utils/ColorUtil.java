@@ -37,12 +37,10 @@ public class ColorUtil {
     public static String translateLegacyToMiniMessage(String text) {
         if (text == null) return "";
         String result = text;
-        
-        // Handle hex first to avoid overlapping with standard colors
+
         result = result.replaceAll("(?i)&?#([A-Fa-f0-9]{6})", "<#$1>");
         result = result.replaceAll("(?i)§x§([A-Fa-f0-9])§([A-Fa-f0-9])§([A-Fa-f0-9])§([A-Fa-f0-9])§([A-Fa-f0-9])§([A-Fa-f0-9])", "<#$1$2$3$4$5$6>");
 
-        // Standard colors & codes
         String[][] colors = {
                 {"0", "black"}, {"1", "dark_blue"}, {"2", "dark_green"}, {"3", "dark_aqua"},
                 {"4", "dark_red"}, {"5", "dark_purple"}, {"6", "gold"}, {"7", "gray"},
@@ -77,11 +75,9 @@ public class ColorUtil {
     public static MiniMessage getMiniMessage() {
         return MINI_MESSAGE;
     }
-
     public static String toMiniMessage(Component component) {
         return MINI_MESSAGE.serialize(component);
     }
-
     public static LegacyComponentSerializer getLegacySerializer() {
         return LEGACY;
     }

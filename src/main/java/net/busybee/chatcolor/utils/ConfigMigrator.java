@@ -32,7 +32,6 @@ public class ConfigMigrator {
     public FileConfiguration migrate(@NotNull String fileName) {
         File configFile = new File(plugin.getDataFolder(), fileName);
 
-        // If it's a nested file and doesn't exist, check if it exists at the root for migration
         if (fileName.contains("/") || fileName.contains("\\")) {
             if (!configFile.exists()) {
                 String simpleName = new File(fileName).getName();

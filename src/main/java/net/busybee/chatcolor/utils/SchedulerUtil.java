@@ -3,10 +3,8 @@ package net.busybee.chatcolor.utils;
 import net.busybee.chatcolor.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
-import org.bukkit.plugin.Plugin;
 
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 public class SchedulerUtil {
 

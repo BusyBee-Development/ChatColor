@@ -18,12 +18,6 @@ import java.util.List;
 
 public class ColorSelectorGUI extends FastInv {
 
-    private static final int CONTENT_SLOTS = 45;
-    private static final int SLOT_PREV = 45;
-    private static final int SLOT_BACK = 49;
-    private static final int SLOT_NEXT = 53;
-    private static final int NAV_ROW_START = 45;
-
     private final ChatColor plugin;
     private final String type;
     private int page;
@@ -34,7 +28,7 @@ public class ColorSelectorGUI extends FastInv {
     }
 
     public ColorSelectorGUI(ChatColor plugin, String type, int page) {
-        super(54, buildTitle(plugin, type));
+        super(plugin.getGuiManager().getInt("layouts.selector.size", 54), buildTitle(plugin, type));
         this.plugin = plugin;
         this.type = type;
         this.page = page;
@@ -81,18 +75,26 @@ public class ColorSelectorGUI extends FastInv {
     }
 
     private int getTotalPages() {
+        int contentSlots = plugin.getGuiManager().getInt("layouts.selector.content-slots", 45);
         int size = getEntries().size();
-        return Math.max(1, (int) Math.ceil((double) size / CONTENT_SLOTS));
+        return Math.max(1, (int) Math.ceil((double) size / contentSlots));
     }
 
     private void decorate(Player player) {
         getInventory().clear();
-        List<? extends SelectableEntry> all = getEntries();
-        int start = this.page * CONTENT_SLOTS;
-        int end = Math.min(start + CONTENT_SLOTS, all.size());
+        int contentSlots = plugin.getGuiManager().getInt("layouts.selector.content-slots", 45);
+        int navRowStart = plugin.getGuiManager().getInt("layouts.selector.nav-row-start", 45);
+        int prevSlot = plugin.getGuiManager().getInt("layouts.selector.previous-page-slot", 45);
+        int backSlot = plugin.getGuiManager().getInt("layouts.selector.back-menu-slot", 49);
+        int nextSlot = plugin.getGuiManager().getInt("layouts.selector.next-page-slot", 53);
+        int guiSize = plugin.getGuiManager().getInt("layouts.selector.size", 54);
 
-        ItemStack filler = createFiller();
-        for (int i = NAV_ROW_START; i < 54; i++) {
+        List<? extends SelectableEntry> all = getEntries();
+        int start = this.page * contentSlots;
+        int end = Math.min(start + contentSlots, all.size());
+
+        ItemStack filler = plugin.getGuiManager().getFillerItem();
+        for (int i = navRowStart; i < guiSize; i++) {
             setItem(i, filler);
         }
 
@@ -115,8 +117,8 @@ public class ColorSelectorGUI extends FastInv {
         }
 
         if (this.page > 0) {
-            setItem(SLOT_PREV, createNavItem(
-                            new ItemStack(Material.ARROW),
+            setItem(prevSlot, createNavItem(
+                            new ItemStack(plugin.getGuiManager().getMaterial("items.previous-page.material", Material.ARROW)),
                             plugin.getGuiManager().getRaw("items.previous-page.name"),
                             "items.previous-page.lore",
                             this.page,
@@ -128,11 +130,11 @@ public class ColorSelectorGUI extends FastInv {
                     }
             );
         } else {
-            setItem(SLOT_PREV, filler);
+            setItem(prevSlot, filler);
         }
 
-        setItem(SLOT_BACK, createNavItem(
-                        new ItemStack(Material.DARK_OAK_DOOR),
+        setItem(backSlot, createNavItem(
+                        new ItemStack(plugin.getGuiManager().getMaterial("items.back-menu.material", Material.DARK_OAK_DOOR)),
                         plugin.getGuiManager().getRaw("items.back-menu.name"),
                         "items.back-menu.lore",
                         0, 0
@@ -144,8 +146,8 @@ public class ColorSelectorGUI extends FastInv {
         );
 
         if (this.page < getTotalPages() - 1) {
-            setItem(SLOT_NEXT, createNavItem(
-                            new ItemStack(Material.ARROW),
+            setItem(nextSlot, createNavItem(
+                            new ItemStack(plugin.getGuiManager().getMaterial("items.next-page.material", Material.ARROW)),
                             plugin.getGuiManager().getRaw("items.next-page.name"),
                             "items.next-page.lore",
                             this.page + 2,
@@ -157,7 +159,7 @@ public class ColorSelectorGUI extends FastInv {
                     }
             );
         } else {
-            setItem(SLOT_NEXT, filler);
+            setItem(nextSlot, filler);
         }
     }
 
@@ -182,7 +184,8 @@ public class ColorSelectorGUI extends FastInv {
             Component coloredDisplay = PatternApplier.apply(entry.getDisplayName(), patternEntry.getColors());
             plugin.getMessageManager().send(player, "color-applied", "color", coloredDisplay);
         } else {
-            String coloredDisplay = entry.getTag() + entry.getDisplayName() + "<reset>";
+            String resetTag = plugin.getGuiManager().getRaw("settings.reset-tag");
+            String coloredDisplay = entry.getTag() + entry.getDisplayName() + resetTag;
             plugin.getMessageManager().send(player, "color-applied", "color", coloredDisplay);
         }
     }
@@ -195,11 +198,12 @@ public class ColorSelectorGUI extends FastInv {
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return item;
 
+        String resetTag = plugin.getGuiManager().getRaw("settings.reset-tag");
         if (entry.getEntryType().equals("PATTERN")) {
             PatternEntry patternEntry = (PatternEntry) entry;
             meta.displayName(PatternApplier.applyToName(entry.getDisplayName(), patternEntry.getColors()));
         } else {
-            meta.displayName(ColorUtil.colorize(entry.getTag() + entry.getDisplayName() + "<reset>"));
+            meta.displayName(ColorUtil.colorize(entry.getTag() + entry.getDisplayName() + resetTag));
         }
 
         List<Component> lore = new ArrayList<>();
@@ -216,7 +220,8 @@ public class ColorSelectorGUI extends FastInv {
             lore.add(plugin.getGuiManager().get("status.has-access"));
         } else {
             lore.add(plugin.getGuiManager().get("status.no-access"));
-            lore.add(ColorUtil.colorize("<red>" + entry.getPermission()));
+            String permColor = plugin.getGuiManager().getRaw("settings.permission-color");
+            lore.add(ColorUtil.colorize(permColor + entry.getPermission()));
         }
 
         meta.lore(lore);
@@ -237,15 +242,5 @@ public class ColorSelectorGUI extends FastInv {
         meta.lore(plugin.getGuiManager().getList(loreKey, placeholders));
         base.setItemMeta(meta);
         return base;
-    }
-
-    private ItemStack createFiller() {
-        ItemStack item = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
-        ItemMeta meta = item.getItemMeta();
-        if (meta != null) {
-            meta.displayName(Component.empty());
-            item.setItemMeta(meta);
-        }
-        return item;
     }
 }

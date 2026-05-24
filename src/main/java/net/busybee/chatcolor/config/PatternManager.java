@@ -4,9 +4,7 @@ import net.busybee.chatcolor.ChatColor;
 import net.busybee.chatcolor.models.PatternEntry;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
