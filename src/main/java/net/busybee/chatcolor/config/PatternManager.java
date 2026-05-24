@@ -24,7 +24,7 @@ public class PatternManager {
     public void load() {
         this.patterns.clear();
 
-        FileConfiguration config = new net.busybee.chatcolor.utils.ConfigMigrator(plugin).migrate("patterns.yml");
+        FileConfiguration config = new net.busybee.chatcolor.utils.ConfigMigrator(plugin).migrate("configs/patterns.yml");
         ConfigurationSection section = config.getConfigurationSection("patterns");
         if (section == null) return;
 

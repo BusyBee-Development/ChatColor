@@ -24,7 +24,7 @@ public class MainMenuGUI extends FastInv {
     private final ChatColor plugin;
 
     public MainMenuGUI(ChatColor plugin) {
-        super(SIZE, plugin.getMessageManager().get("gui.titles.main"));
+        super(SIZE, plugin.getGuiManager().get("titles.main"));
         this.plugin = plugin;
     }
 
@@ -43,8 +43,8 @@ public class MainMenuGUI extends FastInv {
         if (player.hasPermission("chatcolor.gui.solid")) {
             setItem(10, createItem(
                             new ItemStack(Material.LIME_DYE),
-                            plugin.getMessageManager().getRaw("gui.items.solid.name"),
-                            plugin.getMessageManager().getStringList("gui.items.solid.lore").toArray(new String[0])
+                            plugin.getGuiManager().getRaw("items.solid.name"),
+                            plugin.getGuiManager().getList("items.solid.lore")
                     ),
                     event -> {
                         Player clicker = (Player) event.getWhoClicked();
@@ -58,8 +58,8 @@ public class MainMenuGUI extends FastInv {
         if (player.hasPermission("chatcolor.gui.gradient")) {
             setItem(12, createItem(
                             new ItemStack(Material.MAGMA_CREAM),
-                            plugin.getMessageManager().getRaw("gui.items.gradient.name"),
-                            plugin.getMessageManager().getStringList("gui.items.gradient.lore").toArray(new String[0])
+                            plugin.getGuiManager().getRaw("items.gradient.name"),
+                            plugin.getGuiManager().getList("items.gradient.lore")
                     ),
                     event -> {
                         Player clicker = (Player) event.getWhoClicked();
@@ -73,8 +73,8 @@ public class MainMenuGUI extends FastInv {
         if (player.hasPermission("chatcolor.gui.pattern")) {
             setItem(14, createItem(
                             new ItemStack(Material.NETHER_STAR),
-                            plugin.getMessageManager().getRaw("gui.items.pattern.name"),
-                            plugin.getMessageManager().getStringList("gui.items.pattern.lore").toArray(new String[0])
+                            plugin.getGuiManager().getRaw("items.pattern.name"),
+                            plugin.getGuiManager().getList("items.pattern.lore")
                     ),
                     event -> {
                         Player clicker = (Player) event.getWhoClicked();
@@ -87,8 +87,8 @@ public class MainMenuGUI extends FastInv {
 
         setItem(16, createItem(
                         new ItemStack(Material.BARRIER),
-                        plugin.getMessageManager().getRaw("gui.items.reset.name"),
-                        plugin.getMessageManager().getStringList("gui.items.reset.lore").toArray(new String[0])
+                        plugin.getGuiManager().getRaw("items.reset.name"),
+                        plugin.getGuiManager().getList("items.reset.lore")
                 ),
                 event -> {
                     Player clicker = (Player) event.getWhoClicked();
@@ -99,15 +99,11 @@ public class MainMenuGUI extends FastInv {
         );
     }
 
-    private ItemStack createItem(ItemStack base, String name, String... lorelines) {
+    private ItemStack createItem(ItemStack base, String name, List<Component> lore) {
         if (base == null || base.getType() == Material.AIR) base = new ItemStack(Material.PAPER);
         ItemMeta meta = base.getItemMeta();
         if (meta == null) return base;
         meta.displayName(ColorUtil.colorize(name));
-        List<Component> lore = new ArrayList<>();
-        for (String line : lorelines) {
-            lore.add(ColorUtil.colorize(line));
-        }
         meta.lore(lore);
         base.setItemMeta(meta);
         return base;

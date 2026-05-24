@@ -26,11 +26,11 @@ public class ColorManager {
 
     public ColorManager(ChatColor plugin) {
         this.plugin = plugin;
-        this.file = new File(plugin.getDataFolder(), "colors.yml");
+        this.file = new File(plugin.getDataFolder(), "configs/colors.yml");
     }
 
     public void load() {
-        this.config = new net.busybee.chatcolor.utils.ConfigMigrator(plugin).migrate("colors.yml");
+        this.config = new net.busybee.chatcolor.utils.ConfigMigrator(plugin).migrate("configs/colors.yml");
         
         this.colors.clear();
         this.gradients.clear();

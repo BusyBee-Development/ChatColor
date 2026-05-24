@@ -30,7 +30,25 @@ public class ConfigMigrator {
     }
 
     public FileConfiguration migrate(@NotNull String fileName) {
-        return migrate(fileName, new File(plugin.getDataFolder(), fileName));
+        File configFile = new File(plugin.getDataFolder(), fileName);
+
+        // If it's a nested file and doesn't exist, check if it exists at the root for migration
+        if (fileName.contains("/") || fileName.contains("\\")) {
+            if (!configFile.exists()) {
+                String simpleName = new File(fileName).getName();
+                File rootFile = new File(plugin.getDataFolder(), simpleName);
+                if (rootFile.exists()) {
+                    if (configFile.getParentFile() != null) {
+                        configFile.getParentFile().mkdirs();
+                    }
+                    if (rootFile.renameTo(configFile)) {
+                        plugin.getLogger().info("Migrated " + simpleName + " to " + fileName);
+                    }
+                }
+            }
+        }
+
+        return migrate(fileName, configFile);
     }
 
     public FileConfiguration migrate(@NotNull String resourcePath, @NotNull File configFile) {

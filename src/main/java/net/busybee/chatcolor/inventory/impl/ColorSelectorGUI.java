@@ -60,12 +60,12 @@ public class ColorSelectorGUI extends FastInv {
 
     private static Component buildTitle(ChatColor plugin, String type) {
         String key = switch (type) {
-            case "SOLID" -> "gui.titles.solid";
-            case "GRADIENT" -> "gui.titles.gradient";
-            case "PATTERN" -> "gui.titles.pattern";
-            default -> "gui.titles.default";
+            case "SOLID" -> "titles.solid";
+            case "GRADIENT" -> "titles.gradient";
+            case "PATTERN" -> "titles.pattern";
+            default -> "titles.default";
         };
-        return plugin.getMessageManager().get(key);
+        return plugin.getGuiManager().get(key);
     }
 
     private List<? extends SelectableEntry> getEntries() {
@@ -117,8 +117,8 @@ public class ColorSelectorGUI extends FastInv {
         if (this.page > 0) {
             setItem(SLOT_PREV, createNavItem(
                             new ItemStack(Material.ARROW),
-                            plugin.getMessageManager().getRaw("gui.items.previous-page.name"),
-                            plugin.getMessageManager().getStringList("gui.items.previous-page.lore"),
+                            plugin.getGuiManager().getRaw("items.previous-page.name"),
+                            "items.previous-page.lore",
                             this.page,
                             getTotalPages()
                     ),
@@ -133,8 +133,8 @@ public class ColorSelectorGUI extends FastInv {
 
         setItem(SLOT_BACK, createNavItem(
                         new ItemStack(Material.DARK_OAK_DOOR),
-                        plugin.getMessageManager().getRaw("gui.items.back-menu.name"),
-                        plugin.getMessageManager().getStringList("gui.items.back-menu.lore"),
+                        plugin.getGuiManager().getRaw("items.back-menu.name"),
+                        "items.back-menu.lore",
                         0, 0
                 ),
                 event -> {
@@ -146,8 +146,8 @@ public class ColorSelectorGUI extends FastInv {
         if (this.page < getTotalPages() - 1) {
             setItem(SLOT_NEXT, createNavItem(
                             new ItemStack(Material.ARROW),
-                            plugin.getMessageManager().getRaw("gui.items.next-page.name"),
-                            plugin.getMessageManager().getStringList("gui.items.next-page.lore"),
+                            plugin.getGuiManager().getRaw("items.next-page.name"),
+                            "items.next-page.lore",
                             this.page + 2,
                             getTotalPages()
                     ),
@@ -204,18 +204,18 @@ public class ColorSelectorGUI extends FastInv {
 
         List<Component> lore = new ArrayList<>();
         if (isSelected) {
-            lore.add(plugin.getMessageManager().get("gui.status.selected"));
+            lore.add(plugin.getGuiManager().get("status.selected"));
             lore.add(Component.empty());
             item.addUnsafeEnchantment(org.bukkit.enchantments.Enchantment.BREACH, 1);
             meta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
         }
 
         if (hasPermission) {
-            lore.add(plugin.getMessageManager().get("gui.status.click-to-apply"));
+            lore.add(plugin.getGuiManager().get("status.click-to-apply"));
             lore.add(Component.empty());
-            lore.add(plugin.getMessageManager().get("gui.status.has-access"));
+            lore.add(plugin.getGuiManager().get("status.has-access"));
         } else {
-            lore.add(plugin.getMessageManager().get("gui.status.no-access"));
+            lore.add(plugin.getGuiManager().get("status.no-access"));
             lore.add(ColorUtil.colorize("<red>" + entry.getPermission()));
         }
 
@@ -224,19 +224,17 @@ public class ColorSelectorGUI extends FastInv {
         return item;
     }
 
-    private ItemStack createNavItem(ItemStack base, String name, List<String> lore, int current, int total) {
+    private ItemStack createNavItem(ItemStack base, String name, String loreKey, int current, int total) {
         if (base == null || base.getType() == Material.AIR) base = new ItemStack(Material.PAPER);
         ItemMeta meta = base.getItemMeta();
         if (meta == null) return base;
         meta.displayName(ColorUtil.colorize(name));
-        List<Component> loreList = new ArrayList<>();
-        for (String line : lore) {
-            loreList.add(ColorUtil.colorize(line
-                    .replace("<current>", String.valueOf(current))
-                    .replace("<total>", String.valueOf(total))
-            ));
-        }
-        meta.lore(loreList);
+        
+        java.util.Map<String, String> placeholders = new java.util.HashMap<>();
+        placeholders.put("current", String.valueOf(current));
+        placeholders.put("total", String.valueOf(total));
+        
+        meta.lore(plugin.getGuiManager().getList(loreKey, placeholders));
         base.setItemMeta(meta);
         return base;
     }

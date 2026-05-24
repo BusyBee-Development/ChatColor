@@ -1,0 +1,63 @@
+patterns:
+  rainbow:
+    display-name: "Rainbow"
+    permission: "chatcolor.pattern.rainbow"
+    icon: "YELLOW_WOOL"
+    colors:
+      - "<red>"
+      - "<gold>"
+      - "<yellow>"
+      - "<green>"
+      - "<aqua>"
+      - "<blue>"
+      - "<light_purple>"
+  fire:
+    display-name: "Fire"
+    permission: "chatcolor.pattern.fire"
+    icon: "MAGMA_BLOCK"
+    colors:
+      - "<#FF4500>"
+      - "<#FF6000>"
+      - "<#FF8C00>"
+      - "<#FFA500>"
+      - "<#FFD700>"
+  ice:
+    display-name: "Ice"
+    permission: "chatcolor.pattern.ice"
+    icon: "PACKED_ICE"
+    colors:
+      - "<#B0E0E6>"
+      - "<#ADD8E6>"
+      - "<#87CEEB>"
+      - "<#87CEFA>"
+      - "<#00BFFF>"
+  galaxy:
+    display-name: "Galaxy"
+    permission: "chatcolor.pattern.galaxy"
+    icon: "PURPLE_CONCRETE"
+    colors:
+      - "<#0D47A1>"
+      - "<#4A148C>"
+      - "<#880E4F>"
+      - "<#4A148C>"
+      - "<#6A1B9A>"
+      - "<#1A237E>"
+  toxic:
+    display-name: "Toxic"
+    permission: "chatcolor.pattern.toxic"
+    icon: "SLIME_BLOCK"
+    colors:
+      - "<#39FF14>"
+      - "<#7FFF00>"
+      - "<#ADFF2F>"
+      - "<#00FF7F>"
+  cherry:
+    display-name: "Cherry"
+    permission: "chatcolor.pattern.cherry"
+    icon: "PINK_PETALS"
+    colors:
+      - "<#FF69B4>"
+      - "<#FF1493>"
+      - "<#DB7093>"
+      - "<#FFB6C1>"
+      - "<#FF69B4>"

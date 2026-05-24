@@ -5,6 +5,7 @@ import net.busybee.chatcolor.commands.ColorCommand;
 import net.busybee.chatcolor.config.ConfigManager;
 import net.busybee.chatcolor.config.ColorManager;
 import net.busybee.chatcolor.config.MessageManager;
+import net.busybee.chatcolor.config.GuiManager;
 import net.busybee.chatcolor.config.PatternManager;
 import net.busybee.chatcolor.data.PlayerDataManager;
 import net.busybee.chatcolor.hooks.PlaceholderAPIHook;
@@ -34,6 +35,7 @@ public class ChatColor extends JavaPlugin {
     private ConfigManager configManager;
     private ColorManager colorManager;
     private MessageManager messageManager;
+    private GuiManager guiManager;
     private PatternManager patternManager;
     private PlayerDataManager playerDataManager;
     private ChatColorAPI chatColorAPI;
@@ -50,6 +52,7 @@ public class ChatColor extends JavaPlugin {
         this.configManager = new ConfigManager(this);
         this.colorManager = new ColorManager(this);
         this.messageManager = new MessageManager(this);
+        this.guiManager = new GuiManager(this);
         this.patternManager = new PatternManager(this);
         this.playerDataManager = new PlayerDataManager(this);
         this.chatColorAPI = new ChatColorAPI(this);
@@ -59,6 +62,7 @@ public class ChatColor extends JavaPlugin {
         this.colorManager.load();
         this.configManager.load();
         this.messageManager.load();
+        this.guiManager.load();
         this.patternManager.load();
         this.playerDataManager.load();
 
@@ -172,6 +176,7 @@ public class ChatColor extends JavaPlugin {
         this.colorManager.load();
         this.configManager.load();
         this.messageManager.load();
+        this.guiManager.load();
         this.patternManager.load();
         this.playerDataManager.saveAll();
         this.playerDataManager.load();

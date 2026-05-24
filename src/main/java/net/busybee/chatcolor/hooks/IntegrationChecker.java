@@ -1,6 +1,7 @@
 package net.busybee.chatcolor.hooks;
 
 import net.busybee.chatcolor.ChatColor;
+import net.busybee.chatcolor.utils.SchedulerUtil;
 import org.bukkit.Bukkit;
 
 public class IntegrationChecker {
@@ -12,7 +13,7 @@ public class IntegrationChecker {
     }
 
     public void check() {
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+        SchedulerUtil.runDelayedSync(plugin, () -> {
             boolean hasDiscordSRV = Bukkit.getPluginManager().getPlugin("DiscordSRV") != null;
             boolean hasLPC = Bukkit.getPluginManager().getPlugin("LPC") != null;
 

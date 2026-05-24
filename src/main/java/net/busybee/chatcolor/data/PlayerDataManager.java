@@ -50,7 +50,7 @@ public class PlayerDataManager {
         }
     }
 
-    public void saveAll() {
+    public synchronized void saveAll() {
         if (this.dataConfig == null) return;
 
         for (Map.Entry<UUID, PlayerColorData> entry : this.dataMap.entrySet()) {
@@ -76,7 +76,7 @@ public class PlayerDataManager {
         this.dataMap.put(uuid, data);
     }
 
-    public void save(UUID uuid) {
+    public synchronized void save(UUID uuid) {
         PlayerColorData data = this.dataMap.get(uuid);
         if (data == null || this.dataConfig == null) return;
 

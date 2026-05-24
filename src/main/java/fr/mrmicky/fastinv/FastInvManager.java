@@ -86,8 +86,22 @@ public final class FastInvManager {
                 FastInv inv = (FastInv) e.getInventory().getHolder();
 
                 if (inv.handleClose(e)) {
-                    Bukkit.getScheduler().runTask(this.plugin, () -> inv.open((Player) e.getPlayer()));
+                    Player player = (Player) e.getPlayer();
+                    if (isFolia()) {
+                        player.getScheduler().run(this.plugin, scheduledTask -> inv.open(player), null);
+                    } else {
+                        Bukkit.getScheduler().runTask(this.plugin, () -> inv.open(player));
+                    }
                 }
+            }
+        }
+
+        private boolean isFolia() {
+            try {
+                Class.forName("io.papermc.paper.threadedregions.scheduler.RegionScheduler");
+                return true;
+            } catch (ClassNotFoundException e) {
+                return false;
             }
         }
 
