@@ -22,20 +22,9 @@ public class PlayerDataManager {
     }
 
     public void load() {
-        this.dataFile = new File(plugin.getDataFolder(), "players.yml");
+        this.dataConfig = new net.busybee.chatcolor.utils.ConfigMigrator(plugin).migrate("configs/players.yml");
+        this.dataFile = new File(plugin.getDataFolder(), "configs/players.yml");
 
-        if (!this.dataFile.exists()) {
-            try {
-                this.dataFile.createNewFile();
-            } catch (IOException e) {
-                plugin.getLogger().severe("Could not create players.yml: " + e.getMessage());
-            }
-        }
-
-        this.dataConfig = YamlConfiguration.loadConfiguration(this.dataFile);
-        try {
-            this.dataConfig.options().getClass().getMethod("useQuotes", boolean.class).invoke(this.dataConfig.options(), true);
-        } catch (Exception ignored) {}
         this.dataMap.clear();
 
         for (String uuidStr : this.dataConfig.getKeys(false)) {
