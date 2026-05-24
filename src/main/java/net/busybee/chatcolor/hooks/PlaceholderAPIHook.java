@@ -66,6 +66,10 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
             return data != null && data.getColorKey() != null ? data.getColorKey() : "";
         }
 
+        if (params.equalsIgnoreCase("color_type")) {
+            return data != null && data.getColorType() != null ? data.getColorType() : "NONE";
+        }
+
         boolean mm = false;
         String processingParams = params;
         if (processingParams.startsWith("mm_")) {
