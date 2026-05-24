@@ -2,6 +2,8 @@ name: ChatColor
 version: ${project.version}
 main: net.busybee.chatcolor.ChatColor
 api-version: '1.21'
+folia-supported: true
+canvas-supported: true
 author: BusyBee
 description: Advanced chat color plugin with gradient and pattern support.
 
