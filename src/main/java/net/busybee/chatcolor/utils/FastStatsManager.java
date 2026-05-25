@@ -5,11 +5,8 @@ import dev.faststats.core.ErrorTracker;
 import dev.faststats.core.data.Metric;
 import net.busybee.chatcolor.ChatColor;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-
 public class FastStatsManager {
+    private static final String FAST_STATS_TOKEN = "30d8d244e27052da0508ee242ee389ff";
     private final ChatColor plugin;
     private final BukkitMetrics metrics;
 
@@ -19,26 +16,14 @@ public class FastStatsManager {
 
     public FastStatsManager(ChatColor plugin) {
         this.plugin = plugin;
-        String token = loadToken();
 
         this.metrics = BukkitMetrics.factory()
-                .token(token)
+                .token(FAST_STATS_TOKEN)
                 .errorTracker(ERROR_TRACKER)
                 .addMetric(Metric.number("total_colors", () -> (double) plugin.getColorManager().getColorList().size()))
                 .addMetric(Metric.number("total_gradients", () -> (double) plugin.getColorManager().getGradientList().size()))
                 .addMetric(Metric.number("total_patterns", () -> (double) plugin.getPatternManager().getPatternList().size()))
                 .create(plugin);
-    }
-
-    private String loadToken() {
-        Properties props = new Properties();
-        try (InputStream is = plugin.getResource("faststats.properties")) {
-            if (is != null) {
-                props.load(is);
-                return props.getProperty("token", "YOUR_TOKEN_HERE");
-            }
-        } catch (IOException ignored) {}
-        return "YOUR_TOKEN_HERE";
     }
 
     public void onEnable() {
