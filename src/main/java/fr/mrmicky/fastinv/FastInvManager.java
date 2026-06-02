@@ -2,6 +2,7 @@ package fr.mrmicky.fastinv;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -41,7 +42,7 @@ public final class FastInvManager {
 
         @EventHandler
         public void onInventoryClick(InventoryClickEvent e) {
-            if (e.getInventory().getHolder() instanceof FastInv && e.getClickedInventory() != null) {
+            if (isFastInv(e.getInventory()) && e.getClickedInventory() != null) {
                 FastInv inv = (FastInv) e.getInventory().getHolder();
 
                 boolean wasCancelled = e.isCancelled();
@@ -57,7 +58,7 @@ public final class FastInvManager {
 
         @EventHandler
         public void onInventoryDrag(InventoryDragEvent e) {
-            if (e.getInventory().getHolder() instanceof FastInv) {
+            if (isFastInv(e.getInventory())) {
                 FastInv inv = (FastInv) e.getInventory().getHolder();
 
                 boolean wasCancelled = e.isCancelled();
@@ -73,7 +74,7 @@ public final class FastInvManager {
 
         @EventHandler
         public void onInventoryOpen(InventoryOpenEvent e) {
-            if (e.getInventory().getHolder() instanceof FastInv) {
+            if (isFastInv(e.getInventory())) {
                 FastInv inv = (FastInv) e.getInventory().getHolder();
 
                 inv.handleOpen(e);
@@ -82,7 +83,7 @@ public final class FastInvManager {
 
         @EventHandler
         public void onInventoryClose(InventoryCloseEvent e) {
-            if (e.getInventory().getHolder() instanceof FastInv) {
+            if (isFastInv(e.getInventory())) {
                 FastInv inv = (FastInv) e.getInventory().getHolder();
 
                 if (inv.handleClose(e)) {
@@ -93,6 +94,17 @@ public final class FastInvManager {
                         Bukkit.getScheduler().runTask(this.plugin, () -> inv.open(player));
                     }
                 }
+            }
+        }
+
+        private boolean isFastInv(Inventory inventory) {
+            if (inventory == null) {
+                return false;
+            }
+            try {
+                return inventory.getLocation() == null && inventory.getHolder() instanceof FastInv;
+            } catch (Exception e) {
+                return false;
             }
         }
 
