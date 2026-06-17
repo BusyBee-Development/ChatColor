@@ -8,8 +8,8 @@ settings:
   group-defaults:
     admin: "<gradient:red:gold>"
     vip: "<aqua>"
-  # HIGHEST is recommended for compatibility with plugins like LPC or DiscordSRV.
-  event-priority: "HIGHEST"
+  # MONITOR is recommended for compatibility with EssentialsX and other plugins that strip colors.
+  event-priority: "MONITOR"
   papi-integration: true
   late-bind: false
   # Strips color codes from console output to keep it readable.
