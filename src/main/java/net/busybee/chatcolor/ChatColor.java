@@ -106,6 +106,12 @@ public class ChatColor extends JavaPlugin {
             getLogger().warning("Invalid event-priority in config.yml, defaulting to HIGHEST");
         }
 
+        // Automatic priority adjustment for EssentialsChat compatibility
+        if (priority == EventPriority.HIGHEST && Bukkit.getPluginManager().isPluginEnabled("EssentialsChat")) {
+            priority = EventPriority.MONITOR;
+            getLogger().info("EssentialsChat detected. Automatically switching to MONITOR priority to ensure hex colors are not blocked.");
+        }
+
         ChatListener chatListener = new ChatListener(this);
         if (isPaper()) {
              Bukkit.getPluginManager().registerEvent(AsyncChatEvent.class, chatListener, priority, (listener, event) -> {

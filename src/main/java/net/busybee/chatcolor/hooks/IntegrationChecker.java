@@ -16,6 +16,15 @@ public class IntegrationChecker {
         SchedulerUtil.runDelayedSync(plugin, () -> {
             boolean hasDiscordSRV = Bukkit.getPluginManager().getPlugin("DiscordSRV") != null;
             boolean hasLPC = Bukkit.getPluginManager().getPlugin("LPC") != null;
+            boolean hasEssentialsChat = Bukkit.getPluginManager().getPlugin("EssentialsChat") != null;
+
+            if (hasEssentialsChat) {
+                plugin.getLogger().info("======================================================");
+                plugin.getLogger().info("[ChatColor] EssentialsChat detected!");
+                plugin.getLogger().info("To ensure hex colors work correctly, ChatColor automatically");
+                plugin.getLogger().info("sets its event-priority to MONITOR.");
+                plugin.getLogger().info("======================================================");
+            }
 
             if (hasDiscordSRV) {
                 plugin.getLogger().warning("======================================================");
