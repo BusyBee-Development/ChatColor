@@ -1,16 +1,33 @@
+############################################################
+#                  ChatColor Messages                      #
+############################################################
+
+# Prefix for all plugin messages.
 prefix: "<dark_gray>[<gradient:blue:aqua>ChatColor<dark_gray>] "
+
+# Standard command responses
 color-applied: "<prefix><green>Color <reset><color> <gray>has been applied!"
+color-applied-other: "<prefix><green>Color <reset><color> <gray>has been applied to <white><player><gray>!"
 color-created: "<prefix><green>Custom color '<gray><name><green>' has been created!"
 color-reset: "<prefix><gray>Your chat color has been <red>reset<gray>."
+color-reset-other: "<prefix><gray>Chat color for <white><player> <gray>has been <red>reset<gray>."
+
+# Error and permission messages
 no-permission: "<prefix><red>You don't have permission to use that color."
 no-permission-command: "<prefix><red>You don't have permission to use this command."
 unknown-color: "<prefix><red>Unknown color key: <gray><key>"
+unknown-player: "<prefix><red>Player not found: <gray><player>"
 config-reloaded: "<prefix><green>Configuration reloaded successfully."
 invalid-usage: "<prefix><red>Usage: <gray><usage>"
 player-only: "<prefix><red>This command can only be used by players."
-usage-set: "/color set <color|gradient|pattern> <key>"
-usage-create: "/color create <name> <tag> <icon> [permission]"
+console-must-specify-player: "<prefix><red>You must specify a player when running this command from console."
 
+# Usage hints
+usage-set: "/color set <color|gradient|pattern> <key> [player]"
+usage-create: "/color create <name> <tag> <icon> [permission]"
+usage-reset: "/color reset [player]"
+
+# Update notification
 update-notifier:
   - "<prefix><green>Update available!</green>"
   - "<gray>Current: <red><current_version> <gray>| New: <green><new_version>"

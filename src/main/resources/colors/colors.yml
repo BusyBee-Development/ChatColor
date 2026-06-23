@@ -1,3 +1,11 @@
+############################################################
+#                    ChatColor Colors                      #
+############################################################
+
+# Define solid colors and gradients here.
+# icon: The material to show in the GUI.
+# tag: MiniMessage format tag.
+
 # Standard Colors
 colors:
   red:

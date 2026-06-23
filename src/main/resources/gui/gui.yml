@@ -1,11 +1,21 @@
+############################################################
+#                      ChatColor GUI                       #
+############################################################
+
+# Configuration for the in-game Color Selection Menu.
+
 settings:
+  # The tag used to clear formatting before applying new color
   reset-tag: "<reset>"
+  # Color used for permission requirement text
   permission-color: "<red>"
 
+# Background filler item
 filler:
   material: GRAY_STAINED_GLASS_PANE
   name: " "
 
+# Inventory titles
 titles:
   main: "<gradient:blue:aqua><bold>ChatColor"
   solid: "<aqua><bold>Solid Colors"
@@ -13,6 +23,7 @@ titles:
   pattern: "<rainbow><bold>Patterns"
   default: "<white>Colors"
 
+# Layout configurations for different menus
 layouts:
   main:
     size: 27
@@ -29,12 +40,14 @@ layouts:
     back-menu-slot: 49
     next-page-slot: 53
 
+# Status messages shown in item lores
 status:
   selected: "<green><bold>SELECTED"
   click-to-apply: "<gray>Click to apply this color."
-  has-access: "<green>✔ <gray>You have access."
+  has-access: "<green>? <gray>You have access."
   no-access: "<gray>You need permission:"
 
+# Definitions for navigation and category items
 items:
   solid:
     material: LIME_DYE
@@ -61,16 +74,16 @@ items:
       - "<gray>Remove your current chat color."
   previous-page:
     material: ARROW
-    name: "<yellow><bold>← Previous Page"
+    name: "<yellow><bold>? Previous Page"
     lore:
       - "<gray>Page <current> / <total>"
   next-page:
     material: ARROW
-    name: "<yellow><bold>Next Page →"
+    name: "<yellow><bold>Next Page ?"
     lore:
       - "<gray>Page <current> / <total>"
   back-menu:
     material: DARK_OAK_DOOR
-    name: "<red><bold>← Back to Main Menu"
+    name: "<red><bold>? Back to Main Menu"
     lore:
       - "<gray>Return to the color category menu."

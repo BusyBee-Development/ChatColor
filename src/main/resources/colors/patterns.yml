@@ -1,3 +1,10 @@
+############################################################
+#                   ChatColor Patterns                     #
+############################################################
+
+# Define multi-color patterns here.
+# Colors are applied character-by-character.
+
 patterns:
   rainbow:
     display-name: "Rainbow"

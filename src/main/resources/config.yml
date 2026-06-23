@@ -1,16 +1,26 @@
+############################################################
+#                    ChatColor Config                      #
+############################################################
+
+# Main settings for the ChatColor plugin.
 
 settings:
+  # Whether to apply the selected color to the player's chat messages.
   apply-to-message: true
+  
+  # Whether to apply the selected color to the player's display name.
   apply-to-name: false
+  
+  # The default color to use if a player hasn't selected one.
+  # Set to "NONE" to disable default colors.
   default-color: "NONE"
-  # Group-based default colors. Players with 'chatcolor.group.<name>' will get the specified color.
-  # Higher in the list = higher priority.
+  
+  # Group-based default colors. 
+  # Players with 'chatcolor.group.<name>' permission will get the specified color.
+  # The list is prioritized from top to bottom.
   group-defaults:
     admin: "<gradient:red:gold>"
     vip: "<aqua>"
-  # MONITOR is recommended for compatibility with EssentialsX and other plugins that strip colors.
-  event-priority: "MONITOR"
-  papi-integration: true
-  late-bind: false
+    
   # Strips color codes from console output to keep it readable.
   clean-console: true
