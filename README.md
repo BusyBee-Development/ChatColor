@@ -86,7 +86,6 @@ settings:
   group-defaults:          # Group-based default colors
     admin: "<gradient:red:gold>"
   event-priority: "HIGHEST" # Priority for the chat listener
-  papi-integration: true   # Enable PlaceholderAPI support
   late-bind: false         # Use for compatibility issues
   clean-console: true      # Strip colors from console logs
 ```
