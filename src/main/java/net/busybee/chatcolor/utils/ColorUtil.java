@@ -61,6 +61,28 @@ public class ColorUtil {
         return text.replace("\\", "\\\\").replace("<", "\\<");
     }
 
+    public static Component escapeTags(Component component) {
+        if (component == null) return Component.empty();
+        return component.replaceText(net.kyori.adventure.text.TextReplacementConfig.builder()
+                .matchLiteral("\\")
+                .replacement("\\\\")
+                .build())
+                .replaceText(net.kyori.adventure.text.TextReplacementConfig.builder()
+                .matchLiteral("<")
+                .replacement("\\<")
+                .build());
+    }
+
+    public static Component applyTagToComponent(String tag, Component component) {
+        if (tag == null || tag.isBlank() || component == null) return component;
+        String mm = toMiniMessage(component);
+        try {
+            return MINI_MESSAGE.deserialize(tag + mm);
+        } catch (Exception e) {
+            return component;
+        }
+    }
+
     public static String stripLegacy(String text) {
         if (text == null) return "";
         return text.replaceAll("(?i)§[0-9A-FK-ORX]", "").replaceAll("(?i)§x(§[0-9A-F]){6}", "");

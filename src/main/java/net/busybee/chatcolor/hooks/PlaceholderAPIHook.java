@@ -44,7 +44,6 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
     @Override
     public String onRequest(OfflinePlayer player, @NotNull String params) {
         if (player == null) return "";
-        if (!plugin.getConfigManager().isPapiIntegration()) return null;
 
         PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
 

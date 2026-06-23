@@ -28,42 +28,42 @@ public class ChatListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onChat(AsyncChatEvent event) {
         Player player = event.getPlayer();
-        Component originalMessage = event.message();
-        String rawMessage = PlainTextComponentSerializer.plainText().serialize(originalMessage);
-
-        lastMessages.put(player.getUniqueId(), rawMessage);
+        Component currentComponent = event.message();
+        String plainMessage = PlainTextComponentSerializer.plainText().serialize(currentComponent);
+        lastMessages.put(player.getUniqueId(), plainMessage);
 
         if (plugin.getConfigManager().isLateBind()) return;
 
         PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
-
         boolean canUseMiniMessage = player.hasPermission("chatcolor.minimessage");
+
+        if (!canUseMiniMessage) {
+            currentComponent = ColorUtil.escapeTags(currentComponent);
+        }
 
         if (!data.hasColor()) {
             String defaultColor = getDefaultColorForPlayer(player);
             if (defaultColor.equalsIgnoreCase("NONE")) {
-                if (!canUseMiniMessage) {
-                    event.message(Component.text(ColorUtil.stripLegacy(rawMessage)));
-                }
+                event.message(currentComponent);
                 return;
             }
 
             if (plugin.getConfigManager().isApplyToMessage()) {
-                event.message(ColorUtil.applyTagToText(defaultColor, rawMessage, !canUseMiniMessage));
+                event.message(ColorUtil.applyTagToComponent(defaultColor, currentComponent));
             }
             if (plugin.getConfigManager().isApplyToName()) {
-                player.displayName(ColorUtil.applyTagToText(defaultColor, ColorUtil.stripLegacy(PlainTextComponentSerializer.plainText().serialize(player.name())), true));
+                player.displayName(ColorUtil.applyTagToComponent(defaultColor, ColorUtil.escapeTags(player.name())));
             }
             return;
         }
 
         if (!plugin.getConfigManager().isApplyToMessage()) return;
 
-        Component colored = buildColoredMessage(data, rawMessage, !canUseMiniMessage);
+        Component colored = buildColoredMessage(data, currentComponent);
         event.message(colored);
 
         if (plugin.getConfigManager().isApplyToName()) {
-            player.displayName(buildColoredMessage(data, ColorUtil.stripLegacy(PlainTextComponentSerializer.plainText().serialize(player.name())), true));
+            player.displayName(buildColoredMessage(data, ColorUtil.escapeTags(player.name())));
         }
     }
 
@@ -79,31 +79,36 @@ public class ChatListener implements Listener {
         if (plugin.getConfigManager().isLateBind()) return;
 
         PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
-        String messageToColor = ColorUtil.stripLegacy(rawMessage);
-
         boolean canUseMiniMessage = player.hasPermission("chatcolor.minimessage");
+
+        Component component = ColorUtil.colorize(rawMessage);
+        if (!canUseMiniMessage) {
+            component = ColorUtil.escapeTags(component);
+        }
 
         if (!data.hasColor()) {
             String defaultColor = getDefaultColorForPlayer(player);
             if (defaultColor.equalsIgnoreCase("NONE")) return;
 
             if (plugin.getConfigManager().isApplyToMessage()) {
-                Component colored = ColorUtil.applyTagToText(defaultColor, rawMessage, !canUseMiniMessage);
+                Component colored = ColorUtil.applyTagToComponent(defaultColor, component);
                 event.setMessage(ColorUtil.getLegacySerializer().serialize(colored));
             }
             if (plugin.getConfigManager().isApplyToName()) {
-                player.setDisplayName(ColorUtil.getLegacySerializer().serialize(ColorUtil.applyTagToText(defaultColor, ColorUtil.stripLegacy(player.getName()), true)));
+                Component nameComponent = ColorUtil.escapeTags(Component.text(player.getName()));
+                player.setDisplayName(ColorUtil.getLegacySerializer().serialize(ColorUtil.applyTagToComponent(defaultColor, nameComponent)));
             }
             return;
         }
 
         if (!plugin.getConfigManager().isApplyToMessage()) return;
 
-        Component colored = buildColoredMessage(data, messageToColor, !canUseMiniMessage);
+        Component colored = buildColoredMessage(data, component);
         event.setMessage(ColorUtil.getLegacySerializer().serialize(colored));
 
         if (plugin.getConfigManager().isApplyToName()) {
-            player.setDisplayName(ColorUtil.getLegacySerializer().serialize(buildColoredMessage(data, ColorUtil.stripLegacy(player.getName()), true)));
+            Component nameComponent = ColorUtil.escapeTags(Component.text(player.getName()));
+            player.setDisplayName(ColorUtil.getLegacySerializer().serialize(buildColoredMessage(data, nameComponent)));
         }
     }
 
@@ -120,14 +125,14 @@ public class ChatListener implements Listener {
         return lastMessages.getOrDefault(uuid, "");
     }
 
-    private Component buildColoredMessage(PlayerColorData data, String rawText, boolean escape) {
+    private Component buildColoredMessage(PlayerColorData data, Component component) {
         if (data.getColorType().equals("PATTERN")) {
             PatternEntry pattern = plugin.getPatternManager().getPattern(data.getColorKey());
             if (pattern != null) {
-                return PatternApplier.apply(ColorUtil.stripLegacy(rawText), pattern.getColors(), escape);
+                return PatternApplier.apply(component, pattern.getColors());
             }
-            return Component.text(rawText);
+            return component;
         }
-        return ColorUtil.applyTagToText(data.getColorTag(), rawText, escape);
+        return ColorUtil.applyTagToComponent(data.getColorTag(), component);
     }
 }

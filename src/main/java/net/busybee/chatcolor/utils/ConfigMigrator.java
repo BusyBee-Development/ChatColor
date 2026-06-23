@@ -35,6 +35,8 @@ public class ConfigMigrator {
         if (fileName.contains("/") || fileName.contains("\\")) {
             if (!configFile.exists()) {
                 String simpleName = new File(fileName).getName();
+
+                // Try to find it in root first
                 File rootFile = new File(plugin.getDataFolder(), simpleName);
                 if (rootFile.exists()) {
                     if (configFile.getParentFile() != null) {
@@ -42,6 +44,16 @@ public class ConfigMigrator {
                     }
                     if (rootFile.renameTo(configFile)) {
                         plugin.getLogger().info("Migrated " + simpleName + " to " + fileName);
+                    }
+                } else {
+                    File oldConfigsFile = new File(plugin.getDataFolder(), "configs/" + simpleName);
+                    if (oldConfigsFile.exists()) {
+                        if (configFile.getParentFile() != null) {
+                            configFile.getParentFile().mkdirs();
+                        }
+                        if (oldConfigsFile.renameTo(configFile)) {
+                            plugin.getLogger().info("Migrated configs/" + simpleName + " to " + fileName);
+                        }
                     }
                 }
             }

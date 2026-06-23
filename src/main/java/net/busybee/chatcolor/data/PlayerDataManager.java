@@ -21,8 +21,8 @@ public class PlayerDataManager {
     }
 
     public void load() {
-        this.dataConfig = new net.busybee.chatcolor.utils.ConfigMigrator(plugin).migrate("configs/players.yml");
-        this.dataFile = new File(plugin.getDataFolder(), "configs/players.yml");
+        this.dataConfig = new net.busybee.chatcolor.utils.ConfigMigrator(plugin).migrate("data/players.yml");
+        this.dataFile = new File(plugin.getDataFolder(), "data/players.yml");
 
         this.dataMap.clear();
 

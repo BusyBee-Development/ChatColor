@@ -16,7 +16,6 @@ public class ConfigManager {
     private String eventPriority;
     private String defaultColor;
     private java.util.LinkedHashMap<String, String> groupDefaults = new java.util.LinkedHashMap<>();
-    private boolean papiIntegration;
     private boolean lateBind;
     private boolean cleanConsole;
 
@@ -28,6 +27,7 @@ public class ConfigManager {
         new net.busybee.chatcolor.utils.ConfigMigrator(plugin).migrate("config.yml");
         plugin.reloadConfig();
         org.bukkit.configuration.file.FileConfiguration config = plugin.getConfig();
+        
         try {
             config.options().getClass().getMethod("useQuotes", boolean.class).invoke(config.options(), true);
         } catch (Exception ignored) {}
@@ -44,8 +44,7 @@ public class ConfigManager {
             }
         }
 
-        this.eventPriority = config.getString("settings.event-priority", "LOWEST");
-        this.papiIntegration = config.getBoolean("settings.papi-integration", true);
+        this.eventPriority = config.getString("settings.event-priority", "DEFAULT");
         this.lateBind = config.getBoolean("settings.late-bind", false);
         this.cleanConsole = config.getBoolean("settings.clean-console", true);
     }
@@ -83,9 +82,6 @@ public class ConfigManager {
     }
     public String getDefaultColor() {
         return this.defaultColor;
-    }
-    public boolean isPapiIntegration() {
-        return this.papiIntegration;
     }
     public boolean isLateBind() {
         return this.lateBind;

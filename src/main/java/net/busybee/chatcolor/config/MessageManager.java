@@ -3,6 +3,7 @@ package net.busybee.chatcolor.config;
 import net.busybee.chatcolor.ChatColor;
 import net.busybee.chatcolor.utils.ColorUtil;
 import net.kyori.adventure.text.Component;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
@@ -20,7 +21,7 @@ public class MessageManager {
     }
 
     public void load() {
-        this.messagesConfig = new net.busybee.chatcolor.utils.ConfigMigrator(plugin).migrate("messages.yml");
+        this.messagesConfig = new net.busybee.chatcolor.utils.ConfigMigrator(plugin).migrate("lang/messages.yml");
         this.prefix = this.messagesConfig.getString("prefix", "<dark_gray>[<gradient:blue:aqua>ChatColor<dark_gray>] ");
     }
 
@@ -45,23 +46,23 @@ public class MessageManager {
     public String getRaw(String key) {
         return this.messagesConfig.getString(key, "<red>Missing message: " + key);
     }
-    public void send(Player player, String key) {
-        player.sendMessage(get(key));
+    public void send(CommandSender sender, String key) {
+        sender.sendMessage(get(key));
     }
 
-    public void send(Player player, String key, String placeholder, String value) {
+    public void send(CommandSender sender, String key, String placeholder, String value) {
         Map<String, String> map = new HashMap<>();
         map.put(placeholder, value);
-        player.sendMessage(get(key, map));
+        sender.sendMessage(get(key, map));
     }
 
-    public void send(Player player, String key, String placeholder, Component value) {
+    public void send(CommandSender sender, String key, String placeholder, Component value) {
         String raw = this.messagesConfig.getString(key, "<red>Missing message: " + key);
         raw = raw.replace("<prefix>", this.prefix);
         
         String[] parts = raw.split("<" + placeholder + ">", 2);
         if (parts.length < 2) {
-            player.sendMessage(ColorUtil.colorize(raw));
+            sender.sendMessage(ColorUtil.colorize(raw));
             return;
         }
         
@@ -69,10 +70,26 @@ public class MessageManager {
                 .append(value)
                 .append(ColorUtil.colorize(parts[1]));
         
-        player.sendMessage(message);
+        sender.sendMessage(message);
+    }
+
+    public void send(CommandSender sender, String key, Map<String, String> placeholders) {
+        sender.sendMessage(get(key, placeholders));
+    }
+
+    public void send(Player player, String key) {
+        send((CommandSender) player, key);
+    }
+
+    public void send(Player player, String key, String placeholder, String value) {
+        send((CommandSender) player, key, placeholder, value);
+    }
+
+    public void send(Player player, String key, String placeholder, Component value) {
+        send((CommandSender) player, key, placeholder, value);
     }
 
     public void send(Player player, String key, Map<String, String> placeholders) {
-        player.sendMessage(get(key, placeholders));
+        send((CommandSender) player, key, placeholders);
     }
 }

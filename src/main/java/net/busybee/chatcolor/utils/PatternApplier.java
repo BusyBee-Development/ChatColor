@@ -32,6 +32,21 @@ public class PatternApplier {
         return ColorUtil.colorize(sb.toString());
     }
 
+    public static Component apply(Component component, List<String> colors) {
+        if (colors == null || colors.isEmpty() || component == null) return component;
+
+        java.util.concurrent.atomic.AtomicInteger colorIndex = new java.util.concurrent.atomic.AtomicInteger(0);
+        return component.replaceText(net.kyori.adventure.text.TextReplacementConfig.builder()
+                .match(".|\\s")
+                .replacement((matchResult, builder) -> {
+                    String c = matchResult.group();
+                    if (c.equals(" ")) return Component.text(" ");
+                    String colorTag = colors.get(colorIndex.getAndIncrement() % colors.size());
+                    return ColorUtil.colorize(colorTag + c);
+                })
+                .build());
+    }
+
     public static Component applyToName(String text, List<String> colors) {
         return apply(text, colors);
     }

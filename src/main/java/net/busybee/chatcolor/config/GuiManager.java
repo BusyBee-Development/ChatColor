@@ -22,7 +22,7 @@ public class GuiManager {
     }
 
     public void load() {
-        this.guiConfig = new net.busybee.chatcolor.utils.ConfigMigrator(plugin).migrate("configs/gui.yml");
+        this.guiConfig = new net.busybee.chatcolor.utils.ConfigMigrator(plugin).migrate("gui/gui.yml");
     }
 
     public Component get(String key) {

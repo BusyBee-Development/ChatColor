@@ -98,18 +98,18 @@ public class ChatColor extends JavaPlugin {
     }
 
     private void registerListeners() {
-        EventPriority priority;
-        try {
-            priority = EventPriority.valueOf(configManager.getEventPriority());
-        } catch (IllegalArgumentException e) {
-            priority = EventPriority.HIGHEST;
-            getLogger().warning("Invalid event-priority in config.yml, defaulting to HIGHEST");
-        }
+        EventPriority priority = EventPriority.HIGHEST;
 
-        // Automatic priority adjustment for EssentialsChat compatibility
-        if (priority == EventPriority.HIGHEST && Bukkit.getPluginManager().isPluginEnabled("EssentialsChat")) {
-            priority = EventPriority.MONITOR;
-            getLogger().info("EssentialsChat detected. Automatically switching to MONITOR priority to ensure hex colors are not blocked.");
+        String configPriority = configManager.getEventPriority();
+        if (configPriority != null && !configPriority.equalsIgnoreCase("DEFAULT")) {
+            try {
+                priority = EventPriority.valueOf(configPriority.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                getLogger().warning("Invalid event-priority in config.yml: " + configPriority + ", using auto-detection.");
+                priority = autoDetectPriority();
+            }
+        } else {
+            priority = autoDetectPriority();
         }
 
         ChatListener chatListener = new ChatListener(this);
@@ -128,6 +128,17 @@ public class ChatColor extends JavaPlugin {
         }, this, true);
 
         Bukkit.getPluginManager().registerEvents(new VersionCheck(this), this);
+    }
+
+    private EventPriority autoDetectPriority() {
+        if (Bukkit.getPluginManager().isPluginEnabled("EssentialsChat") || 
+            Bukkit.getPluginManager().isPluginEnabled("LPC") ||
+            Bukkit.getPluginManager().isPluginEnabled("ChatControl") ||
+            Bukkit.getPluginManager().isPluginEnabled("DeluxeChat")) {
+            getLogger().info("Detected compatible chat plugin. Using MONITOR priority.");
+            return EventPriority.MONITOR;
+        }
+        return EventPriority.HIGHEST;
     }
 
     private void registerCommands() {
