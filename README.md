@@ -17,6 +17,8 @@
 - 🔌 **PlaceholderAPI Support** — Expose player color data as placeholders for use in other plugins.
 - 🛠️ **Developer API** — Clean `ChatColorAPI` class for third-party plugin integration.
 - ⚡ **Hot Reload** — Reload all configuration files at runtime without restarting.
+- 📊 **bStats** — Anonymized usage statistics.
+- 📊 **FastStats** — Anonymized usage statistics.
 
 ---
 
@@ -40,11 +42,13 @@
 | Command                                          | Description                               | Permission         |
 |--------------------------------------------------|-------------------------------------------|--------------------|
 | `/color`                                         | Opens the main color selector GUI         | `chatcolor.use`    |
-| `/color gui`                                     | Opens the main color selector GUI         | `chatcolor.use`    |
-| `/color reset`                                   | Removes your active chat color            | `chatcolor.use`    |
-| `/color set <type> <key>`                        | Sets a color, gradient, or pattern by key | `chatcolor.use`    |
+| `/color gui [player]`                            | Opens the color selector for you or others | `chatcolor.use`*   |
+| `/color reset [player]`                          | Removes active chat color                 | `chatcolor.use`*   |
+| `/color set <type> <key> [player]`               | Sets a color, gradient, or pattern by key | `chatcolor.use`*   |
 | `/color create <name> <tag> <icon> [permission]` | Create a new custom color                 | `chatcolor.create` |
 | `/color reload`                                  | Reloads all plugin configuration          | `chatcolor.reload` |
+
+*\*Using `[player]` argument requires `chatcolor.admin`.*
 
 **Aliases:** `/chatcolor`, `/cc`
 
@@ -57,6 +61,7 @@
 | `chatcolor.use`          | Access to the GUI and basic commands   | `true`  |
 | `chatcolor.reload`       | Reload the plugin config               | `op`    |
 | `chatcolor.create`       | Create custom colors                   | `op`    |
+| `chatcolor.admin`        | Use admin command arguments            | `op`    |
 | `chatcolor.minimessage`  | Use MiniMessage & legacy codes in chat | `false` |
 | `chatcolor.gui.solid`    | Access to Solid Colors section         | `true`  |
 | `chatcolor.gui.gradient` | Access to Gradients section            | `true`  |
@@ -83,17 +88,18 @@ settings:
   apply-to-message: true   # Apply color to chat messages
   apply-to-name: false     # Apply color to display name
   default-color: "NONE"    # Default color for new players
-  group-defaults:          # Group-based default colors
+  group-defaults:          # Group-based prioritized defaults
     admin: "<gradient:red:gold>"
-  event-priority: "HIGHEST" # Priority for the chat listener
+    vip: "<aqua>"
+  event-priority: "DEFAULT" # Options: HIGHEST, LOWEST, etc. or DEFAULT (auto-detect)
   late-bind: false         # Use for compatibility issues
   clean-console: true      # Strip colors from console logs
 ```
 
-### `configs/gui.yml`
+### `gui/gui.yml`
 Full control over GUI titles, items, layouts, and messages.
 
-### `configs/colors.yml`
+### `colors/colors.yml`
 Defines all solid colors and gradients.
 
 ```yaml
@@ -112,7 +118,7 @@ gradients:
     icon: "ORANGE_WOOL"
 ```
 
-### `configs/patterns.yml`
+### `colors/patterns.yml`
 Defines character-cycling color patterns.
 
 ```yaml
@@ -147,12 +153,15 @@ These placeholders automatically detect whether the player has a **Solid Color**
 | `%chatcolor_<text>%`     | Colors arbitrary `<text>` with player's color (Legacy)                | `§6§lBusyBee`       |
 | `%chatcolor_mm_<text>%`  | Colors arbitrary `<text>` with player's color (MiniMessage)           | `<red>BusyBee`      |
 
+**Note:** The `mm_` prefix and `_mm` suffix are interchangeable (e.g., `%chatcolor_message_mm%`).
+
 **Pro Tip:** Use the `mm_` variant (e.g., `%chatcolor_mm_message%`) for modern plugins like **LPC** or **Tab**.
 
 ### Status Placeholders
 | Placeholder                | Description                         | Example Output                           |
 |:---------------------------|:------------------------------------|:-----------------------------------------|
 | `%chatcolor_color_key%`    | Key of player's active selection    | `red`, `sunset`, `rainbow`, `none`       |
+| `%chatcolor_color_type%`   | Type of selection                   | `SOLID`, `GRADIENT`, `PATTERN`, `NONE`   |
 | `%chatcolor_color%`        | Raw MiniMessage tag / Pattern key   | `<red>`, `rainbow`                       |
 | `%chatcolor_color_legacy%` | Legacy color code for current color | `§c`                                     |
 
@@ -163,6 +172,19 @@ Force a specific color defined in `colors.yml` or `patterns.yml` on any text.
 |:-------------------------------------|:------------------------------------------------------|
 | `%chatcolor_<colorName>_<text>%`     | `%chatcolor_red_Warning!%` -> `§cWarning!`            |
 | `%chatcolor_mm_<colorName>_<text>%`  | `%chatcolor_mm_sunset_Hello%` -> `<gradient...>Hello` |
+
+---
+
+## 🛠️ Integration Tips
+
+### LuckPermsChat (LPC)
+To use gradients or patterns with LPC:
+1. In LPC `config.yml`, set your format to use `%chatcolor_message_mm%` (e.g., `{message}: %chatcolor_message_mm%`).
+2. In ChatColor `config.yml`, set `apply-to-message: false` and `late-bind: true`.
+
+### DiscordSRV
+- ChatColor automatically works with DiscordSRV. 
+- For the best experience on Paper, ensure `UseModernPaperChatEvent: true` is set in DiscordSRV's config.
 
 ---
 
