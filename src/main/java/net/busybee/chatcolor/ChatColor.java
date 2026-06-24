@@ -40,6 +40,8 @@ public class ChatColor extends JavaPlugin {
     private PlayerDataManager playerDataManager;
     private ChatColorAPI chatColorAPI;
 
+    private EventPriority activePriority;
+
     private BStatsManager bStatsManager;
     private FastStatsManager fastStatsManager;
 
@@ -98,30 +100,32 @@ public class ChatColor extends JavaPlugin {
     }
 
     private void registerListeners() {
-        EventPriority priority = EventPriority.HIGHEST;
+        activePriority = EventPriority.HIGHEST;
 
         String configPriority = configManager.getEventPriority();
         if (configPriority != null && !configPriority.equalsIgnoreCase("DEFAULT")) {
             try {
-                priority = EventPriority.valueOf(configPriority.toUpperCase());
+                activePriority = EventPriority.valueOf(configPriority.toUpperCase());
             } catch (IllegalArgumentException e) {
                 getLogger().warning("Invalid event-priority in config.yml: " + configPriority + ", using auto-detection.");
-                priority = autoDetectPriority();
+                activePriority = autoDetectPriority();
             }
         } else {
-            priority = autoDetectPriority();
+            activePriority = autoDetectPriority();
         }
+
+        getLogger().info("Chat listener registered with priority: " + activePriority.name());
 
         ChatListener chatListener = new ChatListener(this);
         if (isPaper()) {
-             Bukkit.getPluginManager().registerEvent(AsyncChatEvent.class, chatListener, priority, (listener, event) -> {
+             Bukkit.getPluginManager().registerEvent(AsyncChatEvent.class, chatListener, activePriority, (listener, event) -> {
                 if (event instanceof AsyncChatEvent chatEvent) {
                     ((ChatListener) listener).onChat(chatEvent);
                 }
             }, this, true);
         }
 
-        Bukkit.getPluginManager().registerEvent(AsyncPlayerChatEvent.class, chatListener, priority, (listener, event) -> {
+        Bukkit.getPluginManager().registerEvent(AsyncPlayerChatEvent.class, chatListener, activePriority, (listener, event) -> {
             if (event instanceof AsyncPlayerChatEvent chatEvent) {
                 ((ChatListener) listener).onLegacyChat(chatEvent);
             }
@@ -134,7 +138,8 @@ public class ChatColor extends JavaPlugin {
         if (Bukkit.getPluginManager().isPluginEnabled("EssentialsChat") || 
             Bukkit.getPluginManager().isPluginEnabled("LPC") ||
             Bukkit.getPluginManager().isPluginEnabled("ChatControl") ||
-            Bukkit.getPluginManager().isPluginEnabled("DeluxeChat")) {
+            Bukkit.getPluginManager().isPluginEnabled("DeluxeChat") ||
+            Bukkit.getPluginManager().isPluginEnabled("EssentialsC")) {
             getLogger().info("Detected compatible chat plugin. Using MONITOR priority.");
             return EventPriority.MONITOR;
         }

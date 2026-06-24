@@ -21,6 +21,16 @@ settings:
   group-defaults:
     admin: "<gradient:red:gold>"
     vip: "<aqua>"
+
+  # The priority of the chat listener.
+  # Options: LOWEST, LOW, NORMAL, HIGH, HIGHEST, MONITOR, or DEFAULT (auto-detect)
+  # Default is DEFAULT (auto-detects based on other plugins like EssentialsChat).
+  event-priority: "DEFAULT"
+
+  # Whether to use late-binding for placeholders.
+  # Enable this if you use %chatcolor_message_mm% in other plugin formats
+  # and want to avoid double-processing.
+  late-bind: false
     
   # Strips color codes from console output to keep it readable.
   clean-console: true

@@ -17,12 +17,22 @@ public class IntegrationChecker {
             boolean hasDiscordSRV = Bukkit.getPluginManager().getPlugin("DiscordSRV") != null;
             boolean hasLPC = Bukkit.getPluginManager().getPlugin("LPC") != null;
             boolean hasEssentialsChat = Bukkit.getPluginManager().getPlugin("EssentialsChat") != null;
+            boolean hasEssentialsC = Bukkit.getPluginManager().getPlugin("EssentialsC") != null;
 
-            if (hasEssentialsChat) {
+            if (hasEssentialsChat || hasEssentialsC) {
                 plugin.getLogger().info("======================================================");
-                plugin.getLogger().info("[ChatColor] EssentialsChat detected!");
-                plugin.getLogger().info("To ensure hex colors work correctly, ChatColor automatically");
-                plugin.getLogger().info("sets its event-priority to MONITOR.");
+                if (hasEssentialsChat) plugin.getLogger().info("[ChatColor] EssentialsChat detected!");
+                if (hasEssentialsC) plugin.getLogger().info("[ChatColor] EssentialsC detected!");
+
+                plugin.getLogger().info("Active Chat Priority: " + plugin.getActivePriority().name());
+
+                if (hasEssentialsC && Bukkit.getPluginManager().getPlugin("LuckPerms") != null) {
+                    plugin.getLogger().info("------------------------------------------------------");
+                    plugin.getLogger().info("IMPORTANT: Since LuckPerms is also present:");
+                    plugin.getLogger().info("1. In EssentialsC config, replace <MESSAGE> with:");
+                    plugin.getLogger().info("   %chatcolor_message_mm% in your chat format.");
+                    plugin.getLogger().info("2. This ensures gradients and patterns render perfectly.");
+                }
                 plugin.getLogger().info("======================================================");
             }
 
