@@ -39,18 +39,20 @@
 
 ## 🕹️ Commands
 
-| Command                                          | Description                               | Permission         |
-|--------------------------------------------------|-------------------------------------------|--------------------|
-| `/color`                                         | Opens the main color selector GUI         | `chatcolor.use`    |
-| `/color gui [player]`                            | Opens the color selector for you or others | `chatcolor.use`*   |
-| `/color reset [player]`                          | Removes active chat color                 | `chatcolor.use`*   |
-| `/color set <type> <key> [player]`               | Sets a color, gradient, or pattern by key | `chatcolor.use`*   |
-| `/color create <name> <tag> <icon> [permission]` | Create a new custom color                 | `chatcolor.create` |
-| `/color reload`                                  | Reloads all plugin configuration          | `chatcolor.reload` |
+| Command                                            | Description                                 | Permission          |
+|----------------------------------------------------|---------------------------------------------|---------------------|
+| `/color`                                           | Opens the main color selector GUI           | `chatcolor.use`     |
+| `/color gui [player]`                              | Opens the color selector for you or others  | `chatcolor.use`*    |
+| `/color reset [player]`                            | Removes active chat color                   | `chatcolor.use`*    |
+| `/color set <type> <key> [player]`                 | Sets a color, gradient, or pattern by key   | `chatcolor.use`*    |
+| `/color create <name> <tag> <icon> [permission]`   | Create a new custom color                   | `chatcolor.create`  |
+| `/color reload`                                    | Reloads all plugin configuration            | `chatcolor.reload`  |
 
-*\*Using `[player]` argument requires `chatcolor.admin`.*
+*\*Using `[player]` argument (or running from console) requires `chatcolor.admin`.*
 
 **Aliases:** `/chatcolor`, `/cc`
+
+**Note for Console:** Console usage requires specifying a target player for `gui`, `reset`, and `set`.
 
 ---
 
@@ -61,7 +63,7 @@
 | `chatcolor.use`          | Access to the GUI and basic commands   | `true`  |
 | `chatcolor.reload`       | Reload the plugin config               | `op`    |
 | `chatcolor.create`       | Create custom colors                   | `op`    |
-| `chatcolor.admin`        | Use admin command arguments            | `op`    |
+| `chatcolor.admin`        | Use admin command arguments & console  | `op`    |
 | `chatcolor.minimessage`  | Use MiniMessage & legacy codes in chat | `false` |
 | `chatcolor.gui.solid`    | Access to Solid Colors section         | `true`  |
 | `chatcolor.gui.gradient` | Access to Gradients section            | `true`  |
