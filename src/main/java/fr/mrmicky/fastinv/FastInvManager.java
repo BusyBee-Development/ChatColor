@@ -42,9 +42,9 @@ public final class FastInvManager {
 
         @EventHandler
         public void onInventoryClick(InventoryClickEvent e) {
-            if (isFastInv(e.getInventory()) && e.getClickedInventory() != null) {
-                FastInv inv = (FastInv) e.getInventory().getHolder();
+            FastInv inv = getFastInv(e.getInventory());
 
+            if (inv != null && e.getClickedInventory() != null) {
                 boolean wasCancelled = e.isCancelled();
                 e.setCancelled(true);
 
@@ -58,9 +58,9 @@ public final class FastInvManager {
 
         @EventHandler
         public void onInventoryDrag(InventoryDragEvent e) {
-            if (isFastInv(e.getInventory())) {
-                FastInv inv = (FastInv) e.getInventory().getHolder();
+            FastInv inv = getFastInv(e.getInventory());
 
+            if (inv != null) {
                 boolean wasCancelled = e.isCancelled();
                 e.setCancelled(true);
 
@@ -74,18 +74,18 @@ public final class FastInvManager {
 
         @EventHandler
         public void onInventoryOpen(InventoryOpenEvent e) {
-            if (isFastInv(e.getInventory())) {
-                FastInv inv = (FastInv) e.getInventory().getHolder();
+            FastInv inv = getFastInv(e.getInventory());
 
+            if (inv != null) {
                 inv.handleOpen(e);
             }
         }
 
         @EventHandler
         public void onInventoryClose(InventoryCloseEvent e) {
-            if (isFastInv(e.getInventory())) {
-                FastInv inv = (FastInv) e.getInventory().getHolder();
+            FastInv inv = getFastInv(e.getInventory());
 
+            if (inv != null) {
                 if (inv.handleClose(e)) {
                     Player player = (Player) e.getPlayer();
                     if (isFolia()) {
@@ -97,15 +97,22 @@ public final class FastInvManager {
             }
         }
 
-        private boolean isFastInv(Inventory inventory) {
+        private FastInv getFastInv(Inventory inventory) {
             if (inventory == null) {
-                return false;
+                return null;
             }
             try {
-                return inventory.getLocation() == null && inventory.getHolder() instanceof FastInv;
-            } catch (Exception e) {
-                return false;
+                if (inventory.getHolder() instanceof FastInv) {
+                    return (FastInv) inventory.getHolder();
+                }
+            } catch (Throwable t) {
+                // ignore
             }
+            return null;
+        }
+
+        private boolean isFastInv(Inventory inventory) {
+            return getFastInv(inventory) != null;
         }
 
         private boolean isFolia() {
