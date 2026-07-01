@@ -22,7 +22,12 @@ public class PatternManager {
     public void load() {
         this.patterns.clear();
 
-        FileConfiguration config = new net.busybee.chatcolor.utils.ConfigMigrator(plugin).migrate("colors/patterns.yml");
+        FileConfiguration config = new net.busybee.chatcolor.utils.ConfigMigrator(plugin).setReaddMissingKeys(false).migrate("colors/patterns.yml");
+        
+        if (!plugin.getConfigManager().isShowStandardPatterns()) {
+            return;
+        }
+
         ConfigurationSection section = config.getConfigurationSection("patterns");
         if (section == null) return;
 

@@ -61,8 +61,8 @@ public class ChatColor extends JavaPlugin {
 
         FastInvManager.register(this);
 
-        this.colorManager.load();
         this.configManager.load();
+        this.colorManager.load();
         this.messageManager.load();
         this.guiManager.load();
         this.patternManager.load();
@@ -195,8 +195,8 @@ public class ChatColor extends JavaPlugin {
 
     public void reload() {
         reloadConfig();
-        this.colorManager.load();
         this.configManager.load();
+        this.colorManager.load();
         this.messageManager.load();
         this.guiManager.load();
         this.patternManager.load();

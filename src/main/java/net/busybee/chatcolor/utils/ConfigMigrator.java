@@ -24,9 +24,15 @@ public class ConfigMigrator {
     private final Plugin plugin;
     private final List<String> addedKeys = new ArrayList<>();
     private final List<String> removedKeys = new ArrayList<>();
+    private boolean readdMissingKeys = true;
 
     public ConfigMigrator(@NotNull Plugin plugin) {
         this.plugin = plugin;
+    }
+
+    public ConfigMigrator setReaddMissingKeys(boolean readdMissingKeys) {
+        this.readdMissingKeys = readdMissingKeys;
+        return this;
     }
 
     public FileConfiguration migrate(@NotNull String fileName) {
@@ -142,12 +148,17 @@ public class ConfigMigrator {
             String fullPath = path.isEmpty() ? key : path + "." + key;
             
             if (defaultConfig.isConfigurationSection(key)) {
+                ConfigurationSection userSubSection = userConfig != null ? userConfig.getConfigurationSection(key) : null;
+                
+                if (!readdMissingKeys && userSubSection == null) {
+                    continue;
+                }
+                
                 ConfigurationSection newSubSection = newConfig.createSection(key);
 
                 newConfig.setComments(key, defaultConfig.getComments(key));
                 newConfig.setInlineComments(key, defaultConfig.getInlineComments(key));
                 
-                ConfigurationSection userSubSection = userConfig != null ? userConfig.getConfigurationSection(key) : null;
                 ConfigurationSection defaultSubSection = defaultConfig.getConfigurationSection(key);
                 
                 if (defaultSubSection != null) {
@@ -161,9 +172,11 @@ public class ConfigMigrator {
                     if (value == null) {
                         value = "";
                     }
-                } else {
+                } else if (readdMissingKeys) {
                     value = defaultConfig.get(key);
                     addedKeys.add(fullPath);
+                } else {
+                    continue;
                 }
                 
                 newConfig.set(key, value);
@@ -200,6 +213,9 @@ public class ConfigMigrator {
     }
 
     private boolean needsMigration(@NotNull FileConfiguration userConfig, @NotNull FileConfiguration defaultConfig) {
+        if (!readdMissingKeys) {
+            return false;
+        }
         Set<String> userKeys = getAllKeys(userConfig, "");
         Set<String> defaultKeys = getAllKeys(defaultConfig, "");
 

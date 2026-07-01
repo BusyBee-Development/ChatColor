@@ -29,14 +29,20 @@ public class ColorManager {
     }
 
     public void load() {
-        this.config = new net.busybee.chatcolor.utils.ConfigMigrator(plugin).migrate("colors/colors.yml");
+        this.config = new net.busybee.chatcolor.utils.ConfigMigrator(plugin).setReaddMissingKeys(false).migrate("colors/colors.yml");
         
         this.colors.clear();
         this.gradients.clear();
         this.customColors.clear();
 
-        loadSection(config.getConfigurationSection("colors"), colors, ColorEntry.class, "chatcolor.color.");
-        loadSection(config.getConfigurationSection("gradients"), gradients, GradientEntry.class, "chatcolor.gradient.");
+        if (plugin.getConfigManager().isShowStandardColors()) {
+            loadSection(config.getConfigurationSection("colors"), colors, ColorEntry.class, "chatcolor.color.");
+        }
+        
+        if (plugin.getConfigManager().isShowStandardGradients()) {
+            loadSection(config.getConfigurationSection("gradients"), gradients, GradientEntry.class, "chatcolor.gradient.");
+        }
+        
         loadSection(config.getConfigurationSection("custom-colors"), customColors, ColorEntry.class, "chatcolor.custom.");
     }
 

@@ -18,6 +18,9 @@ public class ConfigManager {
     private java.util.LinkedHashMap<String, String> groupDefaults = new java.util.LinkedHashMap<>();
     private boolean lateBind;
     private boolean cleanConsole;
+    private boolean showStandardColors;
+    private boolean showStandardGradients;
+    private boolean showStandardPatterns;
 
     public ConfigManager(ChatColor plugin) {
         this.plugin = plugin;
@@ -47,6 +50,9 @@ public class ConfigManager {
         this.eventPriority = config.getString("settings.event-priority", "DEFAULT");
         this.lateBind = config.getBoolean("settings.late-bind", false);
         this.cleanConsole = config.getBoolean("settings.clean-console", true);
+        this.showStandardColors = config.getBoolean("settings.show-standard-colors", true);
+        this.showStandardGradients = config.getBoolean("settings.show-standard-gradients", true);
+        this.showStandardPatterns = config.getBoolean("settings.show-standard-patterns", true);
     }
 
     public java.util.Map<String, String> getGroupDefaults() {
@@ -88,5 +94,14 @@ public class ConfigManager {
     }
     public boolean isCleanConsole() {
         return this.cleanConsole;
+    }
+    public boolean isShowStandardColors() {
+        return this.showStandardColors;
+    }
+    public boolean isShowStandardGradients() {
+        return this.showStandardGradients;
+    }
+    public boolean isShowStandardPatterns() {
+        return this.showStandardPatterns;
     }
 }
