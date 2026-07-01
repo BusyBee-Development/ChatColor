@@ -34,3 +34,8 @@ settings:
     
   # Strips color codes from console output to keep it readable.
   clean-console: true
+
+  # Centralized toggles to easily hide standard elements.
+  show-standard-colors: true
+  show-standard-gradients: true
+  show-standard-patterns: true
