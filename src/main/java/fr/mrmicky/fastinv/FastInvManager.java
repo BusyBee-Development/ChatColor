@@ -102,11 +102,10 @@ public final class FastInvManager {
                 return null;
             }
             try {
-                if (inventory.getHolder() instanceof FastInv) {
-                    return (FastInv) inventory.getHolder();
+                if (inventory.getHolder() instanceof FastInv fastInv) {
+                    return fastInv;
                 }
             } catch (Throwable t) {
-                // ignore
             }
             return null;
         }
