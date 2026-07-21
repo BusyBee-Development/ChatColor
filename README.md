@@ -22,21 +22,6 @@
 
 ---
 
-## 📦 Installation
-
-1. Download the `ChatColor.jar` file.
-2. Place it in your server's `plugins/` folder.
-3. Restart your server.
-4. Configure files in the `plugins/ChatColor/` folder.
-5. (Optional) Install **PlaceholderAPI** for placeholder support.
-
-**Requirements:**
-- Paper (or Spigot) **1.21+**
-- Java **21+**
-- PlaceholderAPI *(optional)*
-
----
-
 ## 🕹️ Commands
 
 | Command                                            | Description                                 | Permission          |
@@ -96,6 +81,9 @@ settings:
   event-priority: "DEFAULT" # Options: HIGHEST, LOWEST, etc. or DEFAULT (auto-detect)
   late-bind: false         # Use for compatibility issues
   clean-console: true      # Strip colors from console logs
+  show-standard-colors: true # Toggle visibility of standard colors
+  show-standard-gradients: true # Toggle visibility of standard gradients
+  show-standard-patterns: true # Toggle visibility of standard patterns
 ```
 
 ### `gui/gui.yml`
@@ -143,37 +131,18 @@ patterns:
 
 ## 🔌 PlaceholderAPI
 
-When PlaceholderAPI is installed, the following placeholders are available:
+When PlaceholderAPI is installed, the following placeholders are available. All placeholders return results in **Legacy Hex format** (`§x§r§r§g§g§b§b`) for universal compatibility.
 
-### Universal Placeholders
-These placeholders automatically detect whether the player has a **Solid Color**, **Gradient**, or **Pattern** selected and apply it.
+| Placeholder                | Aliases                                                | Description                                                 | Example Output           |
+|:---------------------------|:-------------------------------------------------------|:------------------------------------------------------------|:-------------------------|
+| `%chatcolor_color%`        | `%chatcolor%`, `%chatcolor_prefix%`, `%chatcolor_tag%` | Returns the player's active legacy color code.              | `§c` or `§x§f§f§5§5§f§f` |
+| `%chatcolor_name%`         | -                                                      | Returns the player's name with their active color applied.  | `§cBusyBee`              |
+| `%chatcolor_message%`      | -                                                      | Applies the player's color to their last sent message.      | `§cHello world!`         |
+| `%chatcolor_apply_<text>%` | `%chatcolor_apply:<text>%`                             | Wraps the provided `<text>` with the player's active color. | `§cWelcome!`             |
+| `%chatcolor_key%`          | -                                                      | Returns the internal identifier of the selection.           | `rainbow`                |
+| `%chatcolor_type%`         | -                                                      | Returns the category (`SOLID`, `GRADIENT`, `PATTERN`).     | `GRADIENT`               |
 
-| Placeholder              | Description                                                           | Example Output      |
-|:-------------------------|:----------------------------------------------------------------------|:--------------------|
-| `%chatcolor_message%`    | Colors the player's last chat message (Legacy)                        | `§cHello world!`    |
-| `%chatcolor_mm_message%` | Colors the player's last chat message (**MiniMessage - Use for LPC**) | `<red>Hello world!` |
-| `%chatcolor_<text>%`     | Colors arbitrary `<text>` with player's color (Legacy)                | `§6§lBusyBee`       |
-| `%chatcolor_mm_<text>%`  | Colors arbitrary `<text>` with player's color (MiniMessage)           | `<red>BusyBee`      |
-
-**Note:** The `mm_` prefix and `_mm` suffix are interchangeable (e.g., `%chatcolor_message_mm%`).
-
-**Pro Tip:** Use the `mm_` variant (e.g., `%chatcolor_mm_message%`) for modern plugins like **LPC** or **Tab**.
-
-### Status Placeholders
-| Placeholder                | Description                         | Example Output                           |
-|:---------------------------|:------------------------------------|:-----------------------------------------|
-| `%chatcolor_color_key%`    | Key of player's active selection    | `red`, `sunset`, `rainbow`, `none`       |
-| `%chatcolor_color_type%`   | Type of selection                   | `SOLID`, `GRADIENT`, `PATTERN`, `NONE`   |
-| `%chatcolor_color%`        | Raw MiniMessage tag / Pattern key   | `<red>`, `rainbow`                       |
-| `%chatcolor_color_legacy%` | Legacy color code for current color | `§c`                                     |
-
-### Color Overrides
-Force a specific color defined in `colors.yml` or `patterns.yml` on any text.
-
-| Placeholder                          | Example                                               |
-|:-------------------------------------|:------------------------------------------------------|
-| `%chatcolor_<colorName>_<text>%`     | `%chatcolor_red_Warning!%` -> `§cWarning!`            |
-| `%chatcolor_mm_<colorName>_<text>%`  | `%chatcolor_mm_sunset_Hello%` -> `<gradient...>Hello` |
+**Note:** For modern plugins that support MiniMessage (like LPC or Tab), we recommend using these placeholders in their format strings and letting the plugin handle the conversion if necessary.
 
 ---
 
@@ -181,36 +150,9 @@ Force a specific color defined in `colors.yml` or `patterns.yml` on any text.
 
 ### LuckPermsChat (LPC)
 To use gradients or patterns with LPC:
-1. In LPC `config.yml`, set your format to use `%chatcolor_message_mm%` (e.g., `{message}: %chatcolor_message_mm%`).
+1. In LPC `config.yml`, set your format to use `%chatcolor_message%` (e.g., `{message}: %chatcolor_message%`).
 2. In ChatColor `config.yml`, set `apply-to-message: false` and `late-bind: true`.
 
 ### DiscordSRV
 - ChatColor automatically works with DiscordSRV. 
 - For the best experience on Paper, ensure `UseModernPaperChatEvent: true` is set in DiscordSRV's config.
-
----
-
-## 🛠️ Developer API
-
-Add **ChatColor** as a dependency and use the `ChatColorAPI` to interact with player color data programmatically.
-
-```java
-ChatColor plugin = (ChatColor) Bukkit.getPluginManager().getPlugin("ChatColor");
-ChatColorAPI api = plugin.getChatColorAPI();
-
-// Set a player's color
-api.setColor(player, "red");
-api.setGradient(player, "sunset");
-api.setPattern(player, "rainbow");
-
-// Reset a player's color
-api.resetColor(player);
-
-// Get player data
-PlayerColorData data = api.getPlayerData(player.getUniqueId());
-String type = data.getColorType(); // "SOLID", "GRADIENT", "PATTERN"
-String key  = data.getColorKey();
-
-// Apply the player's color to a string and get a Component
-Component colored = api.applyColorToText(player, "Hello, world!");
-```
