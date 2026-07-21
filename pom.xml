@@ -6,7 +6,7 @@
 
     <groupId>net.busybee</groupId>
     <artifactId>ChatColor</artifactId>
-    <version>2026.7.1</version>
+    <version>2026.7.2</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -45,13 +45,7 @@
         <dependency>
             <groupId>me.clip</groupId>
             <artifactId>placeholderapi</artifactId>
-            <version>2.11.5</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.30</version>
+            <version>2.12.3</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -63,7 +57,7 @@
         <dependency>
             <groupId>dev.faststats.metrics</groupId>
             <artifactId>bukkit</artifactId>
-            <version>0.27.0</version>
+            <version>0.28.0</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -100,13 +94,6 @@
                 <configuration>
                     <source>21</source>
                     <target>21</target>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                            <version>1.18.30</version>
-                        </path>
-                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
             <plugin>
