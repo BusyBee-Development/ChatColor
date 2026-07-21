@@ -28,7 +28,7 @@ settings:
   event-priority: "DEFAULT"
 
   # Whether to use late-binding for placeholders.
-  # Enable this if you use %chatcolor_message_mm% in other plugin formats
+  # Enable this if you use %chatcolor_message% in other plugin formats
   # and want to avoid double-processing.
   late-bind: false
     

@@ -10,6 +10,7 @@ public class ColorUtil {
     private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.builder()
             .character('§')
             .hexColors()
+            .useUnusualXRepeatedCharacterHexFormat()
             .build();
 
     public static Component colorize(String text) {
@@ -24,8 +25,16 @@ public class ColorUtil {
     public static Component applyTagToText(String tag, String rawText, boolean escape) {
         if (tag == null || tag.isBlank() || rawText == null) return Component.text(rawText != null ? rawText : "");
         
+        String processedTag = tag;
+        if (!tag.startsWith("<") || !tag.endsWith(">")) {
+            processedTag = translateLegacyToMiniMessage(tag);
+            if (!processedTag.startsWith("<")) {
+                processedTag = "<" + processedTag + ">";
+            }
+        }
+
         String processedText = translateLegacyToMiniMessage(rawText);
-        String formatted = tag + (escape ? escape(processedText) : processedText);
+        String formatted = processedTag + (escape ? escape(processedText) : processedText);
         
         try {
             return MINI_MESSAGE.deserialize(formatted);
@@ -38,7 +47,8 @@ public class ColorUtil {
         if (text == null) return "";
         String result = text;
 
-        result = result.replaceAll("(?i)&?#([A-Fa-f0-9]{6})", "<#$1>");
+        // Only translate hex if it has a prefix and isn't already in a tag
+        result = result.replaceAll("(?i)[&§]#([A-Fa-f0-9]{6})", "<#$1>");
         result = result.replaceAll("(?i)§x§([A-Fa-f0-9])§([A-Fa-f0-9])§([A-Fa-f0-9])§([A-Fa-f0-9])§([A-Fa-f0-9])§([A-Fa-f0-9])", "<#$1$2$3$4$5$6>");
 
         String[][] colors = {
@@ -75,9 +85,18 @@ public class ColorUtil {
 
     public static Component applyTagToComponent(String tag, Component component) {
         if (tag == null || tag.isBlank() || component == null) return component;
+        
+        String processedTag = tag;
+        if (!tag.startsWith("<") || !tag.endsWith(">")) {
+            processedTag = translateLegacyToMiniMessage(tag);
+            if (!processedTag.startsWith("<")) {
+                processedTag = "<" + processedTag + ">";
+            }
+        }
+
         String mm = toMiniMessage(component);
         try {
-            return MINI_MESSAGE.deserialize(tag + mm);
+            return MINI_MESSAGE.deserialize(processedTag + mm);
         } catch (Exception e) {
             return component;
         }
@@ -99,6 +118,10 @@ public class ColorUtil {
     }
     public static String toMiniMessage(Component component) {
         return MINI_MESSAGE.serialize(component);
+    }
+    public static String toLegacy(Component component) {
+        if (component == null) return "";
+        return LEGACY.serialize(component);
     }
     public static LegacyComponentSerializer getLegacySerializer() {
         return LEGACY;

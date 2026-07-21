@@ -25,14 +25,12 @@ public class IntegrationChecker {
                 if (hasEssentialsC) plugin.getLogger().info("[ChatColor] EssentialsC detected!");
 
                 plugin.getLogger().info("Active Chat Priority: " + plugin.getActivePriority().name());
-
-                if (hasEssentialsC && Bukkit.getPluginManager().getPlugin("LuckPerms") != null) {
-                    plugin.getLogger().info("------------------------------------------------------");
-                    plugin.getLogger().info("IMPORTANT: Since LuckPerms is also present:");
-                    plugin.getLogger().info("1. In EssentialsC config, replace <MESSAGE> with:");
-                    plugin.getLogger().info("   %chatcolor_message_mm% in your chat format.");
-                    plugin.getLogger().info("2. This ensures gradients and patterns render perfectly.");
-                }
+                plugin.getLogger().info("------------------------------------------------------");
+                plugin.getLogger().info("Compatibility Tip:");
+                plugin.getLogger().info("1. Use the standard {MESSAGE} tag in Essentials config.");
+                plugin.getLogger().info("2. Do NOT use %chatcolor_message% in Essentials format;");
+                plugin.getLogger().info("   it only works in plugins with PAPI support (like LPC).");
+                plugin.getLogger().info("3. Hex colors and gradients will work automatically.");
                 plugin.getLogger().info("======================================================");
             }
 
@@ -52,7 +50,7 @@ public class IntegrationChecker {
                 plugin.getLogger().warning("[ChatColor] LPC (LuckPermsChat) detected!");
                 plugin.getLogger().warning("To make ChatColor gradients work correctly with LPC:");
                 plugin.getLogger().warning("1. Open LPC's config.yml.");
-                plugin.getLogger().warning("2. Replace the standard {message} variable with %chatcolor_message_mm%");
+                plugin.getLogger().warning("2. Replace the standard {message} variable with %chatcolor_message%");
                 plugin.getLogger().warning("   in your chat formats.");
                 plugin.getLogger().warning("3. In ChatColor's config.yml, set 'apply-to-message: false'");
                 plugin.getLogger().warning("   to avoid double-coloring, and set 'late-bind: true'.");

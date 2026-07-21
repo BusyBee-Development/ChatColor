@@ -9,6 +9,7 @@ import net.busybee.chatcolor.models.PatternEntry;
 import net.busybee.chatcolor.utils.ColorUtil;
 import net.busybee.chatcolor.utils.PatternApplier;
 import io.papermc.paper.event.player.AsyncChatEvent;
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.entity.Player;
@@ -33,7 +34,9 @@ public class ChatListener implements Listener {
         String plainMessage = PlainTextComponentSerializer.plainText().serialize(currentComponent);
         lastMessages.put(player.getUniqueId(), plainMessage);
 
-        if (plugin.getConfigManager().isLateBind()) return;
+        if (plugin.getConfigManager().isLateBind()) {
+            return;
+        }
 
         PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
         boolean canUseMiniMessage = player.hasPermission("chatcolor.minimessage");
@@ -50,7 +53,8 @@ public class ChatListener implements Listener {
             }
 
             if (plugin.getConfigManager().isApplyToMessage()) {
-                event.message(ColorUtil.applyTagToComponent(defaultColor, currentComponent));
+                Component colored = ColorUtil.applyTagToComponent(defaultColor, currentComponent);
+                event.message(colored);
             }
             if (plugin.getConfigManager().isApplyToName()) {
                 player.displayName(ColorUtil.applyTagToComponent(defaultColor, ColorUtil.escapeTags(player.name())));
@@ -58,7 +62,9 @@ public class ChatListener implements Listener {
             return;
         }
 
-        if (!plugin.getConfigManager().isApplyToMessage()) return;
+        if (!plugin.getConfigManager().isApplyToMessage()) {
+            return;
+        }
 
         Component colored = buildColoredMessage(data, currentComponent);
         event.message(colored);
@@ -70,14 +76,34 @@ public class ChatListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onLegacyChat(AsyncPlayerChatEvent event) {
-        if (plugin.isPaper()) return;
-
         Player player = event.getPlayer();
         String rawMessage = event.getMessage();
 
+        // Support PAPI placeholders in the format (important for EssentialsChat compatibility)
+        if (plugin.getServer().getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            String format = event.getFormat();
+            boolean changed = false;
+            if (format.contains("%chatcolor_message%")) {
+                format = format.replace("%chatcolor_message%", "%2$s");
+                changed = true;
+            }
+            if (format.contains("%")) {
+                String papped = PlaceholderAPI.setPlaceholders(player, format);
+                if (!papped.equals(format)) {
+                    format = papped;
+                    changed = true;
+                }
+            }
+            if (changed) {
+                event.setFormat(format);
+            }
+        }
+
         lastMessages.put(player.getUniqueId(), rawMessage);
 
-        if (plugin.getConfigManager().isLateBind()) return;
+        if (plugin.getConfigManager().isLateBind()) {
+            return;
+        }
 
         PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
         boolean canUseMiniMessage = player.hasPermission("chatcolor.minimessage");
@@ -93,7 +119,8 @@ public class ChatListener implements Listener {
 
             if (plugin.getConfigManager().isApplyToMessage()) {
                 Component colored = ColorUtil.applyTagToComponent(defaultColor, component);
-                event.setMessage(ColorUtil.getLegacySerializer().serialize(colored));
+                String legacy = ColorUtil.getLegacySerializer().serialize(colored);
+                event.setMessage(legacy);
             }
             if (plugin.getConfigManager().isApplyToName()) {
                 Component nameComponent = ColorUtil.escapeTags(Component.text(player.getName()));
@@ -102,10 +129,13 @@ public class ChatListener implements Listener {
             return;
         }
 
-        if (!plugin.getConfigManager().isApplyToMessage()) return;
+        if (!plugin.getConfigManager().isApplyToMessage()) {
+            return;
+        }
 
         Component colored = buildColoredMessage(data, component);
-        event.setMessage(ColorUtil.getLegacySerializer().serialize(colored));
+        String legacy = ColorUtil.getLegacySerializer().serialize(colored);
+        event.setMessage(legacy);
 
         if (plugin.getConfigManager().isApplyToName()) {
             Component nameComponent = ColorUtil.escapeTags(Component.text(player.getName()));

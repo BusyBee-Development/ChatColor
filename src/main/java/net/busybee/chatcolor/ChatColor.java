@@ -144,15 +144,13 @@ public class ChatColor extends JavaPlugin {
     }
 
     private EventPriority autoDetectPriority() {
-        if (Bukkit.getPluginManager().isPluginEnabled("EssentialsChat") || 
-            Bukkit.getPluginManager().isPluginEnabled("LPC") ||
-            Bukkit.getPluginManager().isPluginEnabled("ChatControl") ||
+        if (Bukkit.getPluginManager().isPluginEnabled("LPC") ||
             Bukkit.getPluginManager().isPluginEnabled("DeluxeChat") ||
-            Bukkit.getPluginManager().isPluginEnabled("EssentialsC")) {
-            getLogger().info("Detected compatible chat plugin. Using MONITOR priority.");
-            return EventPriority.MONITOR;
+            Bukkit.getPluginManager().isPluginEnabled("EssentialsChat")) {
+            return EventPriority.HIGHEST;
         }
-        return EventPriority.HIGHEST;
+        // Default to NORMAL for standard behavior
+        return EventPriority.NORMAL;
     }
 
     private void registerCommands() {
@@ -164,7 +162,6 @@ public class ChatColor extends JavaPlugin {
     private void registerHooks() {
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new PlaceholderAPIHook(this).register();
-            getLogger().info("PlaceholderAPI hook registered.");
         }
         new net.busybee.chatcolor.hooks.IntegrationChecker(this).check();
     }

@@ -45,47 +45,50 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
     }
 
     @Override
+    public String onPlaceholderRequest(org.bukkit.entity.Player player, @NotNull String params) {
+        return onRequest(player, params);
+    }
+
+    @Override
     public String onRequest(OfflinePlayer player, @NotNull String params) {
         if (player == null) return "";
 
         PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
+        String result = null;
 
-        if (params.equalsIgnoreCase("color") || params.equalsIgnoreCase("prefix") || params.equalsIgnoreCase("tag")) {
-            if (data == null || !data.hasColor()) {
-                String def = plugin.getConfigManager().getDefaultColor();
-                return (def == null || "NONE".equalsIgnoreCase(def)) ? "" : def;
+        // Simplify and unify logic: default to "color" if params is empty
+        String action = params.isEmpty() ? "color" : params;
+
+        if (action.equalsIgnoreCase("color") || action.equalsIgnoreCase("prefix") || action.equalsIgnoreCase("tag")) {
+            String tag = (data != null && data.hasColor()) ? data.getColorTag() : plugin.getConfigManager().getDefaultColor();
+            if (tag == null || tag.equalsIgnoreCase("NONE")) return "";
+            
+            if (tag.startsWith("<") && tag.endsWith(">")) {
+                Component comp = ColorUtil.applyTagToText(tag, "\u200B");
+                result = ColorUtil.toLegacy(comp).replace("\u200B", "");
+                if (result.isEmpty()) result = tag;
+            } else {
+                result = tag;
             }
-            return data.getColorTag() != null ? data.getColorTag() : "";
-        }
-
-        if (params.equalsIgnoreCase("message")) {
+        } else if (action.equalsIgnoreCase("message")) {
             String msg = ChatListener.getLastMessage(player.getUniqueId());
-            if (msg == null || msg.isEmpty()) return "";
-            return ColorUtil.toMiniMessage(buildColored(data, msg));
-        }
-
-        if (params.equalsIgnoreCase("key")) {
-            return (data != null && data.getColorKey() != null) ? data.getColorKey() : "";
-        }
-
-        if (params.equalsIgnoreCase("type")) {
-            return (data != null && data.getColorType() != null) ? data.getColorType() : "NONE";
-        }
-
-        if (params.equalsIgnoreCase("name")) {
+            result = (msg != null && !msg.isEmpty()) ? ColorUtil.toLegacy(buildColored(data, msg)) : "";
+        } else if (action.equalsIgnoreCase("name")) {
             String name = player.getName();
-            if (name == null) return "";
-            return ColorUtil.toMiniMessage(buildColored(data, name));
+            result = (name != null) ? ColorUtil.toLegacy(buildColored(data, name)) : "";
+        } else if (action.startsWith("apply_")) {
+            String text = action.substring(6);
+            result = ColorUtil.toLegacy(buildColored(data, text));
+        } else if (action.startsWith("apply:")) {
+            String text = action.substring(6);
+            result = ColorUtil.toLegacy(buildColored(data, text));
+        } else if (action.equalsIgnoreCase("key")) {
+            result = (data != null && data.getColorKey() != null) ? data.getColorKey() : "";
+        } else if (action.equalsIgnoreCase("type")) {
+            result = (data != null && data.getColorType() != null) ? data.getColorType() : "NONE";
         }
 
-        if (params.startsWith("apply_")) {
-            return ColorUtil.toMiniMessage(buildColored(data, params.substring(6)));
-        }
-        if (params.startsWith("apply:")) {
-            return ColorUtil.toMiniMessage(buildColored(data, params.substring(6)));
-        }
-
-        return null;
+        return result;
     }
 
     private Component buildColored(PlayerColorData data, String text) {
