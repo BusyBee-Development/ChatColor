@@ -15,7 +15,6 @@ import net.busybee.chatcolor.utils.BStatsManager;
 import net.busybee.chatcolor.utils.ColorUtil;
 import net.busybee.chatcolor.utils.FastStatsManager;
 import net.busybee.chatcolor.utils.VersionCheck;
-import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventPriority;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -25,7 +24,6 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import java.io.PrintStream;
 import java.util.logging.Filter;
 
-@Getter
 public class ChatColor extends JavaPlugin {
 
     private static ChatColor instance;
@@ -44,6 +42,17 @@ public class ChatColor extends JavaPlugin {
 
     private BStatsManager bStatsManager;
     private FastStatsManager fastStatsManager;
+
+    public ConfigManager getConfigManager() { return configManager; }
+    public ColorManager getColorManager() { return colorManager; }
+    public MessageManager getMessageManager() { return messageManager; }
+    public GuiManager getGuiManager() { return guiManager; }
+    public PatternManager getPatternManager() { return patternManager; }
+    public PlayerDataManager getPlayerDataManager() { return playerDataManager; }
+    public ChatColorAPI getChatColorAPI() { return chatColorAPI; }
+    public EventPriority getActivePriority() { return activePriority; }
+    public BStatsManager getBStatsManager() { return bStatsManager; }
+    public FastStatsManager getFastStatsManager() { return fastStatsManager; }
 
     @Override
     public void onEnable() {

@@ -29,6 +29,7 @@ public class ChatListener implements Listener {
     public void onChat(AsyncChatEvent event) {
         Player player = event.getPlayer();
         Component currentComponent = event.message();
+        
         String plainMessage = PlainTextComponentSerializer.plainText().serialize(currentComponent);
         lastMessages.put(player.getUniqueId(), plainMessage);
 

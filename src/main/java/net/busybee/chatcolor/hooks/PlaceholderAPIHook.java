@@ -2,8 +2,6 @@ package net.busybee.chatcolor.hooks;
 
 import net.busybee.chatcolor.ChatColor;
 import net.busybee.chatcolor.data.PlayerColorData;
-import net.busybee.chatcolor.models.ColorEntry;
-import net.busybee.chatcolor.models.GradientEntry;
 import net.busybee.chatcolor.models.PatternEntry;
 import net.busybee.chatcolor.utils.ColorUtil;
 import net.busybee.chatcolor.utils.PatternApplier;
@@ -42,113 +40,52 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
     }
 
     @Override
+    public boolean canRegister() {
+        return true;
+    }
+
+    @Override
     public String onRequest(OfflinePlayer player, @NotNull String params) {
         if (player == null) return "";
 
         PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
 
-        if (params.equalsIgnoreCase("color")) {
-            String tag = getTag(data);
-            return (tag == null || tag.equalsIgnoreCase("NONE")) ? "" : tag;
-        }
-
-        if (params.equalsIgnoreCase("color_legacy")) {
-            String tag = getTag(data);
-            if (tag == null || tag.isEmpty() || tag.equalsIgnoreCase("NONE")) return "";
-
-            Component comp = ColorUtil.colorize(tag + "X");
-            String legacy = ColorUtil.getLegacySerializer().serialize(comp);
-            return legacy.substring(0, legacy.length() - 1);
-        }
-
-        if (params.equalsIgnoreCase("color_key")) {
-            return data != null && data.getColorKey() != null ? data.getColorKey() : "";
-        }
-
-        if (params.equalsIgnoreCase("color_type")) {
-            return data != null && data.getColorType() != null ? data.getColorType() : "NONE";
-        }
-
-        boolean mm = false;
-        String processingParams = params;
-        if (processingParams.startsWith("mm_")) {
-            mm = true;
-            processingParams = processingParams.substring(3);
-        } else if (processingParams.endsWith("_mm")) {
-            mm = true;
-            processingParams = processingParams.substring(0, processingParams.length() - 3);
-        }
-
-        if (processingParams.equalsIgnoreCase("message")) {
-            String message = ChatListener.getLastMessage(player.getUniqueId());
-            if (message == null || message.isEmpty()) return "%message%";
-            Component colored = buildColored(data, message);
-            return mm ? ColorUtil.toMiniMessage(colored) : ColorUtil.getLegacySerializer().serialize(colored);
-        }
-
-        if (processingParams.startsWith("formatted_msg_")) {
-            processingParams = processingParams.substring("formatted_msg_".length());
-        }
-
-        if (processingParams.isEmpty()) return "";
-
-        if (processingParams.contains("_")) {
-            String[] parts = processingParams.split("_", 2);
-            String colorName = parts[0];
-            String text = parts[1];
-
-            if (isValidColor(colorName)) {
-                Component colored = buildColoredWithOverride(colorName, text);
-                return mm ? ColorUtil.toMiniMessage(colored) : ColorUtil.getLegacySerializer().serialize(colored);
+        if (params.equalsIgnoreCase("color") || params.equalsIgnoreCase("prefix") || params.equalsIgnoreCase("tag")) {
+            if (data == null || !data.hasColor()) {
+                String def = plugin.getConfigManager().getDefaultColor();
+                return (def == null || "NONE".equalsIgnoreCase(def)) ? "" : def;
             }
+            return data.getColorTag() != null ? data.getColorTag() : "";
         }
 
-        Component colored = buildColored(data, processingParams);
-        return mm ? ColorUtil.toMiniMessage(colored) : ColorUtil.getLegacySerializer().serialize(colored);
-    }
+        if (params.equalsIgnoreCase("message")) {
+            String msg = ChatListener.getLastMessage(player.getUniqueId());
+            if (msg == null || msg.isEmpty()) return "";
+            return ColorUtil.toMiniMessage(buildColored(data, msg));
+        }
 
-    private String getTag(PlayerColorData data) {
-        if (data == null || !data.hasColor()) {
-            return plugin.getConfigManager().getDefaultColor();
+        if (params.equalsIgnoreCase("key")) {
+            return (data != null && data.getColorKey() != null) ? data.getColorKey() : "";
         }
-        if ("PATTERN".equals(data.getColorType())) return null;
 
-        String tag = data.getColorTag();
-        if (tag == null || tag.isEmpty()) {
-            if (data.getColorKey() != null) {
-                ColorEntry entry = plugin.getColorManager().getColor(data.getColorKey());
-                if (entry != null) {
-                    tag = entry.getTag();
-                } else {
-                    GradientEntry gradient = plugin.getColorManager().getGradient(data.getColorKey());
-                    if (gradient != null) tag = gradient.getTag();
-                }
-            }
+        if (params.equalsIgnoreCase("type")) {
+            return (data != null && data.getColorType() != null) ? data.getColorType() : "NONE";
         }
-        return tag;
-    }
 
-    private boolean isValidColor(String name) {
-        if (plugin.getColorManager().getColor(name) != null) return true;
-        if (plugin.getColorManager().getGradient(name) != null) return true;
-        if (plugin.getPatternManager().getPattern(name) != null) return true;
-        return false;
-    }
+        if (params.equalsIgnoreCase("name")) {
+            String name = player.getName();
+            if (name == null) return "";
+            return ColorUtil.toMiniMessage(buildColored(data, name));
+        }
 
-    private Component buildColoredWithOverride(String colorName, String text) {
-        ColorEntry color = plugin.getColorManager().getColor(colorName);
-        if (color != null) {
-            return ColorUtil.applyTagToText(color.getTag(), text, false);
+        if (params.startsWith("apply_")) {
+            return ColorUtil.toMiniMessage(buildColored(data, params.substring(6)));
         }
-        GradientEntry gradient = plugin.getColorManager().getGradient(colorName);
-        if (gradient != null) {
-            return ColorUtil.applyTagToText(gradient.getTag(), text, false);
+        if (params.startsWith("apply:")) {
+            return ColorUtil.toMiniMessage(buildColored(data, params.substring(6)));
         }
-        PatternEntry pattern = plugin.getPatternManager().getPattern(colorName);
-        if (pattern != null) {
-            return PatternApplier.apply(text, pattern.getColors(), false);
-        }
-        return Component.text(text);
+
+        return null;
     }
 
     private Component buildColored(PlayerColorData data, String text) {
