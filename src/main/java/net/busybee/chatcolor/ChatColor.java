@@ -11,6 +11,7 @@ import net.busybee.chatcolor.data.PlayerDataManager;
 import net.busybee.chatcolor.hooks.PlaceholderAPIHook;
 import fr.mrmicky.fastinv.FastInvManager;
 import net.busybee.chatcolor.listeners.ChatListener;
+import net.busybee.chatcolor.utils.Warning;
 import net.busybee.chatcolor.utils.BStatsManager;
 import net.busybee.chatcolor.utils.ColorUtil;
 import net.busybee.chatcolor.utils.FastStatsManager;
@@ -85,6 +86,7 @@ public class ChatColor extends JavaPlugin {
         registerCommands();
         registerHooks();
         setupConsoleFilter();
+        Warning.send(this);
 
         getLogger().info("ChatColor enabled successfully by BusyBee.");
     }
