@@ -93,6 +93,12 @@ public class ChatColor extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        // Unregister console filters to avoid ZipFile closed errors on shutdown
+        try {
+            Bukkit.getLogger().setFilter(null);
+            java.util.logging.Logger.getLogger("Minecraft").setFilter(null);
+        } catch (Exception ignored) {}
+
         if (originalOut != null) {
             System.setOut(originalOut);
             originalOut = null;
