@@ -6,7 +6,7 @@
 
     <groupId>net.busybee</groupId>
     <artifactId>ChatColor</artifactId>
-    <version>26.7.3</version>
+    <version>26.7.4</version>
     <packaging>jar</packaging>
 
     <properties>
