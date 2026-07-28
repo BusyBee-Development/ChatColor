@@ -54,15 +54,11 @@ public class ColorUtil {
     public static String translateLegacyToMiniMessage(String text) {
         if (text == null) return "";
         String result = text;
-        
-        // Handle hex formats:
-        // 1. &#RRGGBB and §#RRGGBB
+
         result = result.replaceAll("(?i)[&§]#([A-Fa-f0-9]{6})", "<#$1>");
-        
-        // 2. §x§r§r§g§g§b§b and &x&r&r&g&g&b&b (and combinations)
+
         result = result.replaceAll("(?i)[&§]x[&§]([A-Fa-f0-9])[&§]([A-Fa-f0-9])[&§]([A-Fa-f0-9])[&§]([A-Fa-f0-9])[&§]([A-Fa-f0-9])[&§]([A-Fa-f0-9])", "<#$1$2$3$4$5$6>");
 
-        // 3. §xRRGGBB and &xRRGGBB
         result = result.replaceAll("(?i)[&§]x([A-Fa-f0-9]{6})", "<#$1>");
 
         String[][] colors = {
