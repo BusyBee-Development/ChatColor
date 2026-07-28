@@ -15,7 +15,16 @@ public class ColorUtil {
 
     public static Component colorize(String text) {
         if (text == null) return Component.empty();
-        return MINI_MESSAGE.deserialize(text);
+        try {
+            String translated = translateLegacyToMiniMessage(text);
+            return MINI_MESSAGE.deserialize(translated);
+        } catch (Exception e) {
+            try {
+                return LEGACY.deserialize(text);
+            } catch (Exception e2) {
+                return Component.text(text);
+            }
+        }
     }
 
     public static Component applyTagToText(String tag, String rawText) {
@@ -33,23 +42,28 @@ public class ColorUtil {
             }
         }
 
-        String processedText = translateLegacyToMiniMessage(rawText);
-        String formatted = processedTag + (escape ? escape(processedText) : processedText);
-        
         try {
+            String processedText = translateLegacyToMiniMessage(rawText);
+            String formatted = processedTag + (escape ? escape(processedText) : processedText);
             return MINI_MESSAGE.deserialize(formatted);
         } catch (Exception e) {
-            return Component.text(rawText);
+            return LEGACY.deserialize(rawText);
         }
     }
 
     public static String translateLegacyToMiniMessage(String text) {
         if (text == null) return "";
         String result = text;
-
-        // Only translate hex if it has a prefix and isn't already in a tag
+        
+        // Handle hex formats:
+        // 1. &#RRGGBB and §#RRGGBB
         result = result.replaceAll("(?i)[&§]#([A-Fa-f0-9]{6})", "<#$1>");
-        result = result.replaceAll("(?i)§x§([A-Fa-f0-9])§([A-Fa-f0-9])§([A-Fa-f0-9])§([A-Fa-f0-9])§([A-Fa-f0-9])§([A-Fa-f0-9])", "<#$1$2$3$4$5$6>");
+        
+        // 2. §x§r§r§g§g§b§b and &x&r&r&g&g&b&b (and combinations)
+        result = result.replaceAll("(?i)[&§]x[&§]([A-Fa-f0-9])[&§]([A-Fa-f0-9])[&§]([A-Fa-f0-9])[&§]([A-Fa-f0-9])[&§]([A-Fa-f0-9])[&§]([A-Fa-f0-9])", "<#$1$2$3$4$5$6>");
+
+        // 3. §xRRGGBB and &xRRGGBB
+        result = result.replaceAll("(?i)[&§]x([A-Fa-f0-9]{6})", "<#$1>");
 
         String[][] colors = {
                 {"0", "black"}, {"1", "dark_blue"}, {"2", "dark_green"}, {"3", "dark_aqua"},

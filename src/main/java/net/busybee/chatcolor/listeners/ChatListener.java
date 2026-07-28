@@ -41,7 +41,10 @@ public class ChatListener implements Listener {
         PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
         boolean canUseMiniMessage = player.hasPermission("chatcolor.minimessage");
 
-        if (!canUseMiniMessage) {
+        if (canUseMiniMessage) {
+            String mm = ColorUtil.toMiniMessage(currentComponent);
+            currentComponent = ColorUtil.colorize(mm);
+        } else {
             currentComponent = ColorUtil.escapeTags(currentComponent);
         }
 
@@ -99,6 +102,10 @@ public class ChatListener implements Listener {
             }
         }
 
+        if (plugin.isPaper()) {
+            return;
+        }
+
         lastMessages.put(player.getUniqueId(), rawMessage);
 
         if (plugin.getConfigManager().isLateBind()) {
@@ -108,8 +115,11 @@ public class ChatListener implements Listener {
         PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
         boolean canUseMiniMessage = player.hasPermission("chatcolor.minimessage");
 
-        Component component = ColorUtil.colorize(rawMessage);
-        if (!canUseMiniMessage) {
+        Component component;
+        if (canUseMiniMessage) {
+            component = ColorUtil.colorize(rawMessage);
+        } else {
+            component = Component.text(rawMessage);
             component = ColorUtil.escapeTags(component);
         }
 
