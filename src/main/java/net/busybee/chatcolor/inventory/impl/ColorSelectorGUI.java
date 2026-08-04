@@ -95,7 +95,7 @@ public class ColorSelectorGUI extends FastInv {
 
         ItemStack filler = plugin.getGuiManager().getFillerItem();
         for (int i = navRowStart; i < guiSize; i++) {
-            setItem(i, filler);
+            safeSetItem(i, filler);
         }
 
         for (int i = start; i < end; i++) {
@@ -105,7 +105,7 @@ public class ColorSelectorGUI extends FastInv {
             final PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
             final boolean isSelected = entry.getKey().equalsIgnoreCase(data.getColorKey()) && entry.getEntryType().equalsIgnoreCase(data.getColorType());
 
-            setItem(slot, createEntryIcon(entry, hasPermission, isSelected), event -> {
+            safeSetItem(slot, createEntryIcon(entry, hasPermission, isSelected), event -> {
                 Player clicker = (Player) event.getWhoClicked();
                 if (!clicker.hasPermission(entry.getPermission())) {
                     plugin.getMessageManager().send(clicker, "no-permission");
@@ -117,7 +117,7 @@ public class ColorSelectorGUI extends FastInv {
         }
 
         if (this.page > 0) {
-            setItem(prevSlot, createNavItem(
+            safeSetItem(prevSlot, createNavItem(
                             new ItemStack(plugin.getGuiManager().getMaterial("items.previous-page.material", Material.ARROW)),
                             plugin.getGuiManager().getRaw("items.previous-page.name"),
                             "items.previous-page.lore",
@@ -130,10 +130,10 @@ public class ColorSelectorGUI extends FastInv {
                     }
             );
         } else {
-            setItem(prevSlot, filler);
+            safeSetItem(prevSlot, filler);
         }
 
-        setItem(backSlot, createNavItem(
+        safeSetItem(backSlot, createNavItem(
                         new ItemStack(plugin.getGuiManager().getMaterial("items.back-menu.material", Material.DARK_OAK_DOOR)),
                         plugin.getGuiManager().getRaw("items.back-menu.name"),
                         "items.back-menu.lore",
@@ -146,7 +146,7 @@ public class ColorSelectorGUI extends FastInv {
         );
 
         if (this.page < getTotalPages() - 1) {
-            setItem(nextSlot, createNavItem(
+            safeSetItem(nextSlot, createNavItem(
                             new ItemStack(plugin.getGuiManager().getMaterial("items.next-page.material", Material.ARROW)),
                             plugin.getGuiManager().getRaw("items.next-page.name"),
                             "items.next-page.lore",
@@ -159,7 +159,17 @@ public class ColorSelectorGUI extends FastInv {
                     }
             );
         } else {
-            setItem(nextSlot, filler);
+            safeSetItem(nextSlot, filler);
+        }
+    }
+
+    private void safeSetItem(int slot, ItemStack item) {
+        safeSetItem(slot, item, null);
+    }
+
+    private void safeSetItem(int slot, ItemStack item, java.util.function.Consumer<org.bukkit.event.inventory.InventoryClickEvent> handler) {
+        if (slot >= 0 && slot < getInventory().getSize()) {
+            setItem(slot, item, handler);
         }
     }
 

@@ -24,11 +24,11 @@ public class MainMenuGUI extends FastInv {
     private void decorate(Player player) {
         ItemStack filler = plugin.getGuiManager().getFillerItem();
         for (int slot : plugin.getGuiManager().getIntList("layouts.main.filler-slots")) {
-            setItem(slot, filler);
+            safeSetItem(slot, filler);
         }
 
         if (player.hasPermission("chatcolor.gui.solid")) {
-            setItem(plugin.getGuiManager().getInt("layouts.main.solid-slot", 10), 
+            safeSetItem(plugin.getGuiManager().getInt("layouts.main.solid-slot", 10), 
                     plugin.getGuiManager().getItemStack("items.solid", Material.LIME_DYE),
                     event -> {
                         Player clicker = (Player) event.getWhoClicked();
@@ -38,7 +38,7 @@ public class MainMenuGUI extends FastInv {
         }
 
         if (player.hasPermission("chatcolor.gui.gradient")) {
-            setItem(plugin.getGuiManager().getInt("layouts.main.gradient-slot", 12), 
+            safeSetItem(plugin.getGuiManager().getInt("layouts.main.gradient-slot", 12), 
                     plugin.getGuiManager().getItemStack("items.gradient", Material.MAGMA_CREAM),
                     event -> {
                         Player clicker = (Player) event.getWhoClicked();
@@ -48,7 +48,7 @@ public class MainMenuGUI extends FastInv {
         }
 
         if (player.hasPermission("chatcolor.gui.pattern")) {
-            setItem(plugin.getGuiManager().getInt("layouts.main.pattern-slot", 14), 
+            safeSetItem(plugin.getGuiManager().getInt("layouts.main.pattern-slot", 14), 
                     plugin.getGuiManager().getItemStack("items.pattern", Material.NETHER_STAR),
                     event -> {
                         Player clicker = (Player) event.getWhoClicked();
@@ -57,7 +57,7 @@ public class MainMenuGUI extends FastInv {
             );
         }
 
-        setItem(plugin.getGuiManager().getInt("layouts.main.reset-slot", 16), 
+        safeSetItem(plugin.getGuiManager().getInt("layouts.main.reset-slot", 16), 
                 plugin.getGuiManager().getItemStack("items.reset", Material.BARRIER),
                 event -> {
                     Player clicker = (Player) event.getWhoClicked();
@@ -66,5 +66,15 @@ public class MainMenuGUI extends FastInv {
                     plugin.getMessageManager().send(clicker, "color-reset");
                 }
         );
+    }
+
+    private void safeSetItem(int slot, ItemStack item) {
+        safeSetItem(slot, item, null);
+    }
+
+    private void safeSetItem(int slot, ItemStack item, java.util.function.Consumer<org.bukkit.event.inventory.InventoryClickEvent> handler) {
+        if (slot >= 0 && slot < getInventory().getSize()) {
+            setItem(slot, item, handler);
+        }
     }
 }

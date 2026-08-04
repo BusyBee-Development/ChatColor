@@ -8,7 +8,7 @@ public class ColorUtil {
 
     private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
     private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.builder()
-            .character('§')
+            .character('\u00A7')
             .hexColors()
             .useUnusualXRepeatedCharacterHexFormat()
             .build();
@@ -18,10 +18,10 @@ public class ColorUtil {
         try {
             String translated = translateLegacyToMiniMessage(text);
             return MINI_MESSAGE.deserialize(translated);
-        } catch (Exception e) {
+        } catch (Throwable t) {
             try {
                 return LEGACY.deserialize(text);
-            } catch (Exception e2) {
+            } catch (Throwable t2) {
                 return Component.text(text);
             }
         }
@@ -46,7 +46,7 @@ public class ColorUtil {
             String processedText = translateLegacyToMiniMessage(rawText);
             String formatted = processedTag + (escape ? escape(processedText) : processedText);
             return MINI_MESSAGE.deserialize(formatted);
-        } catch (Exception e) {
+        } catch (Throwable t) {
             return LEGACY.deserialize(rawText);
         }
     }
@@ -55,22 +55,23 @@ public class ColorUtil {
         if (text == null) return "";
         String result = text;
 
-        result = result.replaceAll("(?i)[&§]#([A-Fa-f0-9]{6})", "<#$1>");
+        result = result.replaceAll("(?i)[&\u00A7]#([A-Fa-f0-9]{6})", "<#$1>");
 
-        result = result.replaceAll("(?i)[&§]x[&§]([A-Fa-f0-9])[&§]([A-Fa-f0-9])[&§]([A-Fa-f0-9])[&§]([A-Fa-f0-9])[&§]([A-Fa-f0-9])[&§]([A-Fa-f0-9])", "<#$1$2$3$4$5$6>");
+        result = result.replaceAll("(?i)[&\u00A7]x[&\u00A7]([A-Fa-f0-9])[&\u00A7]([A-Fa-f0-9])[&\u00A7]([A-Fa-f0-9])[&\u00A7]([A-Fa-f0-9])[&\u00A7]([A-Fa-f0-9])[&\u00A7]([A-Fa-f0-9])", "<#$1$2$3$4$5$6>");
 
-        result = result.replaceAll("(?i)[&§]x([A-Fa-f0-9]{6})", "<#$1>");
+        result = result.replaceAll("(?i)[&\u00A7]x([A-Fa-f0-9]{6})", "<#$1>");
 
         String[][] colors = {
                 {"0", "black"}, {"1", "dark_blue"}, {"2", "dark_green"}, {"3", "dark_aqua"},
                 {"4", "dark_red"}, {"5", "dark_purple"}, {"6", "gold"}, {"7", "gray"},
                 {"8", "dark_gray"}, {"9", "blue"}, {"a", "green"}, {"b", "aqua"},
                 {"c", "red"}, {"d", "light_purple"}, {"e", "yellow"}, {"f", "white"},
-                {"l", "bold"}, {"m", "strikethrough"}, {"n", "underlined"}, {"o", "italic"}, {"r", "reset"}
+                {"l", "bold"}, {"m", "strikethrough"}, {"n", "underlined"}, {"o", "italic"}, {"r", "reset"},
+                {"k", "obfuscated"}
         };
 
         for (String[] color : colors) {
-            result = result.replaceAll("(?i)[&§]" + color[0], "<" + color[1] + ">");
+            result = result.replaceAll("(?i)[&\u00A7]" + color[0], "<" + color[1] + ">");
         }
 
         return result;
@@ -107,14 +108,14 @@ public class ColorUtil {
         String mm = toMiniMessage(component);
         try {
             return MINI_MESSAGE.deserialize(processedTag + mm);
-        } catch (Exception e) {
+        } catch (Throwable t) {
             return component;
         }
     }
 
     public static String stripLegacy(String text) {
         if (text == null) return "";
-        return text.replaceAll("(?i)§[0-9A-FK-ORX]", "").replaceAll("(?i)§x(§[0-9A-F]){6}", "");
+        return text.replaceAll("(?i)\u00A7[0-9A-FK-ORX]", "").replaceAll("(?i)\u00A7x(\u00A7[0-9A-F]){6}", "");
     }
 
     public static String stripAll(String text) {
