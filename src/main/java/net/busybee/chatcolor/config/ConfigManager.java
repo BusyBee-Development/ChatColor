@@ -4,6 +4,8 @@ import net.busybee.chatcolor.ChatColor;
 import net.busybee.chatcolor.models.ColorEntry;
 import net.busybee.chatcolor.models.GradientEntry;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,17 +13,17 @@ public class ConfigManager {
 
     private final ChatColor plugin;
 
-    private boolean applyToMessage;
-    private boolean applyToName;
-    private String eventPriority;
-    private String chatHook;
-    private String defaultColor;
-    private java.util.LinkedHashMap<String, String> groupDefaults = new java.util.LinkedHashMap<>();
-    private boolean lateBind;
-    private boolean cleanConsole;
-    private boolean showStandardColors;
-    private boolean showStandardGradients;
-    private boolean showStandardPatterns;
+    private volatile boolean applyToMessage;
+    private volatile boolean applyToName;
+    private volatile String eventPriority;
+    private volatile String chatHook;
+    private volatile String defaultColor;
+    private volatile Map<String, String> groupDefaults = Collections.emptyMap();
+    private volatile boolean lateBind;
+    private volatile boolean cleanConsole;
+    private volatile boolean showStandardColors;
+    private volatile boolean showStandardGradients;
+    private volatile boolean showStandardPatterns;
 
     public ConfigManager(ChatColor plugin) {
         this.plugin = plugin;
@@ -39,14 +41,15 @@ public class ConfigManager {
         this.applyToMessage = config.getBoolean("settings.apply-to-message", true);
         this.applyToName = config.getBoolean("settings.apply-to-name", false);
         this.defaultColor = config.getString("settings.default-color", "NONE");
-        
-        this.groupDefaults.clear();
+
+        LinkedHashMap<String, String> defaults = new LinkedHashMap<>();
         org.bukkit.configuration.ConfigurationSection groupSection = config.getConfigurationSection("settings.group-defaults");
         if (groupSection != null) {
             for (String key : groupSection.getKeys(false)) {
-                this.groupDefaults.put(key, groupSection.getString(key));
+                defaults.put(key, groupSection.getString(key));
             }
         }
+        this.groupDefaults = Collections.unmodifiableMap(defaults);
 
         this.eventPriority = config.getString("settings.event-priority", "DEFAULT");
         this.chatHook = config.getString("settings.chat-hook", "AUTO");
@@ -57,7 +60,7 @@ public class ConfigManager {
         this.showStandardPatterns = config.getBoolean("settings.show-standard-patterns", true);
     }
 
-    public java.util.Map<String, String> getGroupDefaults() {
+    public Map<String, String> getGroupDefaults() {
         return this.groupDefaults;
     }
 

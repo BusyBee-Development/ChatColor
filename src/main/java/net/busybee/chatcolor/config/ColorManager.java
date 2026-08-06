@@ -9,6 +9,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,10 +19,9 @@ public class ColorManager {
     private final ChatColor plugin;
     private final File file;
     private FileConfiguration config;
-
-    private final Map<String, ColorEntry> colors = new LinkedHashMap<>();
-    private final Map<String, GradientEntry> gradients = new LinkedHashMap<>();
-    private final Map<String, ColorEntry> customColors = new LinkedHashMap<>();
+    private volatile Map<String, ColorEntry> colors = Collections.emptyMap();
+    private volatile Map<String, GradientEntry> gradients = Collections.emptyMap();
+    private volatile Map<String, ColorEntry> customColors = Collections.emptyMap();
 
     public ColorManager(ChatColor plugin) {
         this.plugin = plugin;
@@ -30,20 +30,24 @@ public class ColorManager {
 
     public void load() {
         this.config = new net.busybee.chatcolor.utils.ConfigMigrator(plugin).setReaddMissingKeys(false).migrate("colors/colors.yml");
-        
-        this.colors.clear();
-        this.gradients.clear();
-        this.customColors.clear();
+
+        Map<String, ColorEntry> loadedColors = new LinkedHashMap<>();
+        Map<String, GradientEntry> loadedGradients = new LinkedHashMap<>();
+        Map<String, ColorEntry> loadedCustom = new LinkedHashMap<>();
 
         if (plugin.getConfigManager().isShowStandardColors()) {
-            loadSection(config.getConfigurationSection("colors"), colors, ColorEntry.class, "chatcolor.color.");
+            loadSection(config.getConfigurationSection("colors"), loadedColors, ColorEntry.class, "chatcolor.color.");
         }
-        
+
         if (plugin.getConfigManager().isShowStandardGradients()) {
-            loadSection(config.getConfigurationSection("gradients"), gradients, GradientEntry.class, "chatcolor.gradient.");
+            loadSection(config.getConfigurationSection("gradients"), loadedGradients, GradientEntry.class, "chatcolor.gradient.");
         }
-        
-        loadSection(config.getConfigurationSection("custom-colors"), customColors, ColorEntry.class, "chatcolor.custom.");
+
+        loadSection(config.getConfigurationSection("custom-colors"), loadedCustom, ColorEntry.class, "chatcolor.custom.");
+
+        this.colors = Collections.unmodifiableMap(loadedColors);
+        this.gradients = Collections.unmodifiableMap(loadedGradients);
+        this.customColors = Collections.unmodifiableMap(loadedCustom);
     }
 
     private <T> void loadSection(ConfigurationSection section, Map<String, T> map, Class<T> clazz, String defaultPermPrefix) {
