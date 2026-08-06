@@ -117,7 +117,9 @@ public class ChatColorAPI {
         PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
         if (!data.hasColor()) {
             String defaultTag = getDefaultColorForPlayer(player);
-            if (defaultTag.equalsIgnoreCase("NONE")) {
+            // A group-default can be null if the key is present but empty in YAML, and
+            // this runs for every chat message, so don't trust it.
+            if (defaultTag == null || defaultTag.isBlank() || defaultTag.equalsIgnoreCase("NONE")) {
                 return component;
             }
             return ColorUtil.applyTagToComponent(defaultTag, component);

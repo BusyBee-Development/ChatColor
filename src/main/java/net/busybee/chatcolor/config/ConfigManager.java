@@ -14,6 +14,7 @@ public class ConfigManager {
     private boolean applyToMessage;
     private boolean applyToName;
     private String eventPriority;
+    private String chatHook;
     private String defaultColor;
     private java.util.LinkedHashMap<String, String> groupDefaults = new java.util.LinkedHashMap<>();
     private boolean lateBind;
@@ -48,6 +49,7 @@ public class ConfigManager {
         }
 
         this.eventPriority = config.getString("settings.event-priority", "DEFAULT");
+        this.chatHook = config.getString("settings.chat-hook", "AUTO");
         this.lateBind = config.getBoolean("settings.late-bind", false);
         this.cleanConsole = config.getBoolean("settings.clean-console", true);
         this.showStandardColors = config.getBoolean("settings.show-standard-colors", true);
@@ -85,6 +87,9 @@ public class ConfigManager {
     }
     public String getEventPriority() {
         return this.eventPriority;
+    }
+    public String getChatHook() {
+        return this.chatHook;
     }
     public String getDefaultColor() {
         return this.defaultColor;

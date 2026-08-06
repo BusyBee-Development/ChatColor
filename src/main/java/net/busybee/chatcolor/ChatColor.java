@@ -11,13 +11,18 @@ import net.busybee.chatcolor.data.PlayerDataManager;
 import net.busybee.chatcolor.hooks.PlaceholderAPIHook;
 import fr.mrmicky.fastinv.FastInvManager;
 import net.busybee.chatcolor.listeners.ChatListener;
+import net.busybee.chatcolor.listeners.PlayerListener;
 import net.busybee.chatcolor.utils.Warning;
 import net.busybee.chatcolor.utils.BStatsManager;
 import net.busybee.chatcolor.utils.ColorUtil;
+import net.busybee.chatcolor.utils.DisplayNameService;
 import net.busybee.chatcolor.utils.FastStatsManager;
+import net.busybee.chatcolor.utils.SchedulerUtil;
 import net.busybee.chatcolor.utils.VersionCheck;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
+import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.plugin.java.JavaPlugin;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
@@ -38,7 +43,9 @@ public class ChatColor extends JavaPlugin {
     private PatternManager patternManager;
     private PlayerDataManager playerDataManager;
     private ChatColorAPI chatColorAPI;
+    private DisplayNameService displayNameService;
 
+    private ChatListener chatListener;
     private EventPriority activePriority;
 
     private BStatsManager bStatsManager;
@@ -51,6 +58,7 @@ public class ChatColor extends JavaPlugin {
     public PatternManager getPatternManager() { return patternManager; }
     public PlayerDataManager getPlayerDataManager() { return playerDataManager; }
     public ChatColorAPI getChatColorAPI() { return chatColorAPI; }
+    public DisplayNameService getDisplayNameService() { return displayNameService; }
     public EventPriority getActivePriority() { return activePriority; }
     public BStatsManager getBStatsManager() { return bStatsManager; }
     public FastStatsManager getFastStatsManager() { return fastStatsManager; }
@@ -68,6 +76,7 @@ public class ChatColor extends JavaPlugin {
         this.patternManager = new PatternManager(this);
         this.playerDataManager = new PlayerDataManager(this);
         this.chatColorAPI = new ChatColorAPI(this);
+        this.displayNameService = new DisplayNameService(this);
 
         FastInvManager.register(this);
 
@@ -93,7 +102,6 @@ public class ChatColor extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        // Unregister console filters to avoid ZipFile closed errors on shutdown
         try {
             Bukkit.getLogger().setFilter(null);
             java.util.logging.Logger.getLogger("Minecraft").setFilter(null);
@@ -117,38 +125,89 @@ public class ChatColor extends JavaPlugin {
     }
 
     private void registerListeners() {
-        activePriority = EventPriority.HIGHEST;
+        resolveActivePriority();
 
-        String configPriority = configManager.getEventPriority();
-        if (configPriority != null && !configPriority.equalsIgnoreCase("DEFAULT")) {
-            try {
-                activePriority = EventPriority.valueOf(configPriority.toUpperCase());
-            } catch (IllegalArgumentException e) {
-                getLogger().warning("Invalid event-priority in config.yml: " + configPriority + ", using auto-detection.");
-                activePriority = autoDetectPriority();
-            }
-        } else {
-            activePriority = autoDetectPriority();
+        this.chatListener = new ChatListener(this);
+
+        Bukkit.getPluginManager().registerEvents(new VersionCheck(this), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerListener(this), this);
+        SchedulerUtil.runDelayedSync(this, this::bindChatListener, 1L);
+    }
+
+    public void bindChatListener() {
+        if (!isEnabled() || chatListener == null) {
+            return;
         }
 
-        getLogger().info("Chat listener registered with priority: " + activePriority.name());
+        unbindChatListener();
 
-        ChatListener chatListener = new ChatListener(this);
-        if (isPaper()) {
-             Bukkit.getPluginManager().registerEvent(AsyncChatEvent.class, chatListener, activePriority, (listener, event) -> {
+        boolean legacy = resolveLegacyChatHook();
+
+        if (legacy) {
+            Bukkit.getPluginManager().registerEvent(AsyncPlayerChatEvent.class, chatListener, activePriority, (listener, event) -> {
+                if (event instanceof AsyncPlayerChatEvent chatEvent) {
+                    ((ChatListener) listener).onLegacyChat(chatEvent);
+                }
+            }, this, true);
+        } else {
+            Bukkit.getPluginManager().registerEvent(AsyncChatEvent.class, chatListener, activePriority, (listener, event) -> {
                 if (event instanceof AsyncChatEvent chatEvent) {
                     ((ChatListener) listener).onChat(chatEvent);
                 }
             }, this, true);
         }
 
-        Bukkit.getPluginManager().registerEvent(AsyncPlayerChatEvent.class, chatListener, activePriority, (listener, event) -> {
-            if (event instanceof AsyncPlayerChatEvent chatEvent) {
-                ((ChatListener) listener).onLegacyChat(chatEvent);
-            }
-        }, this, true);
+        getLogger().info("Chat hook: " + (legacy ? "LEGACY (AsyncPlayerChatEvent)" : "MODERN (AsyncChatEvent)")
+                + ", priority " + activePriority.name());
 
-        Bukkit.getPluginManager().registerEvents(new VersionCheck(this), this);
+        if (legacy && isPaper() && !ColorUtil.platformLegacySupportsHex()) {
+            getLogger().warning("======================================================");
+            getLogger().warning("[ChatColor] Gradients will be approximated in chat.");
+            getLogger().warning("Another plugin owns your chat format, so Paper renders every message");
+            getLogger().warning("through its legacy serializer - and this server's build of that");
+            getLogger().warning("serializer has no hex support, so #FF7F00 arrives as the nearest of");
+            getLogger().warning("the 16 named colours (gold). Solid colours are unaffected.");
+            getLogger().warning("For exact gradients, set settings.chat-hook to MODERN and let");
+            getLogger().warning("ChatColor own the format instead of that plugin.");
+            getLogger().warning("======================================================");
+        }
+    }
+
+    private void unbindChatListener() {
+        if (isPaper()) {
+            AsyncChatEvent.getHandlerList().unregister(this);
+        }
+        AsyncPlayerChatEvent.getHandlerList().unregister(this);
+    }
+
+    private boolean resolveLegacyChatHook() {
+        if (!isPaper()) {
+            return true;
+        }
+
+        String configured = configManager.getChatHook();
+        if ("MODERN".equalsIgnoreCase(configured)) return false;
+        if ("LEGACY".equalsIgnoreCase(configured)) return true;
+
+        if (configured != null && !"AUTO".equalsIgnoreCase(configured)) {
+            getLogger().warning("Invalid chat-hook in config.yml: " + configured + ", using AUTO.");
+        }
+        return hasForeignLegacyChatListener();
+    }
+
+    @SuppressWarnings("deprecation") // PlayerChatEvent: we only read its handler list
+    private boolean hasForeignLegacyChatListener() {
+        return hasForeignListener(AsyncPlayerChatEvent.getHandlerList())
+                || hasForeignListener(org.bukkit.event.player.PlayerChatEvent.getHandlerList());
+    }
+
+    private boolean hasForeignListener(HandlerList handlers) {
+        for (RegisteredListener registered : handlers.getRegisteredListeners()) {
+            if (registered.getPlugin() != this) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private EventPriority autoDetectPriority() {
@@ -157,7 +216,6 @@ public class ChatColor extends JavaPlugin {
             Bukkit.getPluginManager().isPluginEnabled("EssentialsChat")) {
             return EventPriority.HIGHEST;
         }
-        // Default to NORMAL for standard behavior
         return EventPriority.NORMAL;
     }
 
@@ -217,6 +275,27 @@ public class ChatColor extends JavaPlugin {
         this.playerDataManager.saveAll();
         this.playerDataManager.load();
         setupConsoleFilter();
+
+        registerListenersOnReload();
+        this.displayNameService.refreshAll();
+    }
+
+    private void registerListenersOnReload() {
+        resolveActivePriority();
+        SchedulerUtil.runSync(this, this::bindChatListener);
+    }
+
+    private void resolveActivePriority() {
+        String configPriority = configManager.getEventPriority();
+        if (configPriority != null && !configPriority.equalsIgnoreCase("DEFAULT")) {
+            try {
+                activePriority = EventPriority.valueOf(configPriority.toUpperCase());
+                return;
+            } catch (IllegalArgumentException e) {
+                getLogger().warning("Invalid event-priority in config.yml: " + configPriority + ", using auto-detection.");
+            }
+        }
+        activePriority = autoDetectPriority();
     }
 
     public boolean isPaper() {

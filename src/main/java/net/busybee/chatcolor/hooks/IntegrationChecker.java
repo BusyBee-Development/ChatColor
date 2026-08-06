@@ -28,8 +28,8 @@ public class IntegrationChecker {
                 plugin.getLogger().info("------------------------------------------------------");
                 plugin.getLogger().info("Compatibility Tip:");
                 plugin.getLogger().info("1. Use the standard {MESSAGE} tag in Essentials config.");
-                plugin.getLogger().info("2. Do NOT use %chatcolor_message% in Essentials format;");
-                plugin.getLogger().info("   it only works in plugins with PAPI support (like LPC).");
+                plugin.getLogger().info("2. No placeholder is needed. ChatColor colours the message");
+                plugin.getLogger().info("   before Essentials formats it.");
                 plugin.getLogger().info("3. Hex colors and gradients will work automatically.");
                 plugin.getLogger().info("======================================================");
             }

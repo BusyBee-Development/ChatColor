@@ -67,6 +67,9 @@ public class PlayerDataManager {
     public synchronized void save(UUID uuid) {
         PlayerColorData data = this.dataMap.get(uuid);
         if (data == null || this.dataConfig == null) return;
+        if (plugin.getDisplayNameService() != null) {
+            plugin.getDisplayNameService().refresh(uuid);
+        }
 
         String path = uuid.toString();
         this.dataConfig.set(path + ".type", data.getColorType());

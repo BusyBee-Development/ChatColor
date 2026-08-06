@@ -42,7 +42,7 @@ public class PatternApplier {
                     String c = matchResult.group();
                     if (c.equals(" ")) return Component.text(" ");
                     String colorTag = colors.get(colorIndex.getAndIncrement() % colors.size());
-                    return ColorUtil.colorize(colorTag + c);
+                    return ColorUtil.applyTagToText(colorTag, c);
                 })
                 .build());
     }
