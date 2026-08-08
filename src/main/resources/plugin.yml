@@ -11,7 +11,7 @@ description: Advanced chat color plugin with gradient and pattern support.
 commands:
   color:
     description: Open the color selector GUI or manage your chat color.
-    usage: /color [set <type> <key> | reset | reload | create | gui]
+    usage: /color [set <type> <key> | reset | list | reload | create | delete | gui]
     permission: chatcolor.use
     aliases:
       - chatcolor
@@ -35,17 +35,30 @@ permissions:
     description: Allows reloading the plugin configuration.
     default: op
   chatcolor.create:
-    description: Allows creating custom colors via command.
+    description: Allows creating and deleting custom colors via command.
     default: op
+  chatcolor.admin:
+    description: Allows setting or resetting another player's color.
+    default: op
+
+  # The wildcards below are filled in at runtime. Every color, gradient, pattern and
+  # custom color defined in colors/colors.yml and colors/patterns.yml is registered as a
+  # real permission on startup and added as a child of its wildcard, so owners can define
+  # their own colors without touching this file and "chatcolor.custom.*" still works in
+  # LuckPerms.
   chatcolor.color.*:
-    description: Access to all solid colors.
+    description: Access to all standard solid colors.
     default: op
   chatcolor.gradient.*:
-    description: Access to all gradients.
+    description: Access to all standard gradients.
     default: op
   chatcolor.pattern.*:
     description: Access to all patterns.
     default: op
+  chatcolor.custom.*:
+    description: Access to all custom colors defined in colors.yml.
+    default: op
+
   chatcolor.minimessage:
     description: Allows using MiniMessage tags and legacy color codes in chat.
     default: false
