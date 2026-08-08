@@ -3,8 +3,23 @@
 ############################################################
 
 # Define solid colors and gradients here.
-# icon: The material to show in the GUI.
-# tag: MiniMessage format tag.
+#
+# Every entry supports these fields:
+#   display-name : The name shown in the GUI.
+#   tag          : The color itself. Any MiniMessage tag works - "<red>", "<#FF69B4>" or
+#                  "<gradient:red:gold>". Legacy codes like "&c" are accepted too.
+#   icon         : The material to show in the GUI.
+#   permission   : The node a player needs. Leave it empty ("") to let EVERYONE use the
+#                  entry with no permission at all. It does not have to start with
+#                  "chatcolor." - "vip.colors.royal" works just as well.
+#   default      : Optional. Who holds the node when nobody has granted or revoked it.
+#                    true  - everyone has it unless you revoke it
+#                    op    - operators only (this is the default)
+#                    false - nobody has it until you grant it
+#
+# Every node listed in this file is registered with the server on startup, so wildcard
+# grants such as "chatcolor.color.*" and "chatcolor.custom.*" work in LuckPerms and
+# friends, and the nodes show up in permission tab-completion.
 
 # Standard Colors
 colors:
@@ -193,5 +208,23 @@ gradients:
     icon: "MAGMA_BLOCK"
 
 # User Created Colors
-custom-colors:
-# This section will be populated via the /color create command
+#
+# Add your own colors here, or use:
+#   /color create <name> <tag> <icon> [permission|none] [true|op|false]
+#   /color delete <name>
+#   /color list custom
+#
+# Example - a VIP-only gradient, and a color anyone can use:
+#
+#   royal:
+#     display-name: "Royal"
+#     tag: "<gradient:#4B0082:#9370DB>"
+#     icon: "PURPLE_WOOL"
+#     permission: "vip.colors.royal"
+#     default: "false"
+#   plain:
+#     display-name: "Plain"
+#     tag: "<#DDDDDD>"
+#     icon: "WHITE_WOOL"
+#     permission: ""
+custom-colors: {}

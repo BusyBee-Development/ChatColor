@@ -101,13 +101,13 @@ public class ColorSelectorGUI extends FastInv {
         for (int i = start; i < end; i++) {
             int slot = i - start;
             final SelectableEntry entry = all.get(i);
-            final boolean hasPermission = player.hasPermission(entry.getPermission());
+            final boolean hasPermission = entry.isAllowed(player);
             final PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
             final boolean isSelected = entry.getKey().equalsIgnoreCase(data.getColorKey()) && entry.getEntryType().equalsIgnoreCase(data.getColorType());
 
             safeSetItem(slot, createEntryIcon(entry, hasPermission, isSelected), event -> {
                 Player clicker = (Player) event.getWhoClicked();
-                if (!clicker.hasPermission(entry.getPermission())) {
+                if (!entry.isAllowed(clicker)) {
                     plugin.getMessageManager().send(clicker, "no-permission");
                     return;
                 }

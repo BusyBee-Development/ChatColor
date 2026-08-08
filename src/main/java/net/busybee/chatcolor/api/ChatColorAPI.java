@@ -5,6 +5,7 @@ import net.busybee.chatcolor.data.PlayerColorData;
 import net.busybee.chatcolor.models.ColorEntry;
 import net.busybee.chatcolor.models.GradientEntry;
 import net.busybee.chatcolor.models.PatternEntry;
+import net.busybee.chatcolor.models.SelectableEntry;
 import net.kyori.adventure.text.Component;
 import net.busybee.chatcolor.utils.ColorUtil;
 import net.busybee.chatcolor.utils.PatternApplier;
@@ -114,22 +115,81 @@ public class ChatColorAPI {
      * @return A colorized Component.
      */
     public Component applyColorToComponent(Player player, Component component) {
-        PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
-        if (!data.hasColor()) {
-            String defaultTag = getDefaultColorForPlayer(player);
-            // A group-default can be null if the key is present but empty in YAML, and
-            // this runs for every chat message, so don't trust it.
-            if (defaultTag == null || defaultTag.isBlank() || defaultTag.equalsIgnoreCase("NONE")) {
-                return component;
-            }
-            return ColorUtil.applyTagToComponent(defaultTag, component);
+        PatternEntry pattern = resolveActivePattern(player);
+        if (pattern != null) {
+            return PatternApplier.apply(component, pattern.getColors());
         }
-        if (data.getColorType().equals("PATTERN")) {
-            PatternEntry pattern = plugin.getPatternManager().getPattern(data.getColorKey());
-            if (pattern != null) return PatternApplier.apply(component, pattern.getColors());
+
+        String tag = resolveActiveTag(player);
+        if (tag == null) {
             return component;
         }
-        return ColorUtil.applyTagToComponent(data.getColorTag(), component);
+        return ColorUtil.applyTagToComponent(tag, component);
+    }
+
+    /**
+     * The color tag that currently applies to a player, or null when none does.
+     *
+     * <p>The entry is looked up fresh rather than trusting the tag stored when the player
+     * picked it, so edits to colors.yml take effect and a revoked permission actually
+     * stops applying. Returns null while an active pattern is in use, since a pattern is
+     * a list of colors rather than one tag - see {@link #resolveActivePattern(Player)}.
+     *
+     * @param player The player to resolve for.
+     * @return A MiniMessage tag, or null.
+     */
+    public String resolveActiveTag(Player player) {
+        PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
+        if (!data.hasColor()) {
+            return defaultTagFor(player);
+        }
+
+        String type = data.getColorType();
+        String key = data.getColorKey();
+
+        if ("PATTERN".equals(type)) {
+            PatternEntry pattern = plugin.getPatternManager().getPattern(key);
+            if (pattern != null && pattern.isAllowed(player)) return null;
+            return defaultTagFor(player);
+        }
+
+        SelectableEntry entry = "GRADIENT".equals(type)
+                ? plugin.getColorManager().getGradient(key)
+                : plugin.getColorManager().getColor(key);
+
+        if (entry != null) {
+            return entry.isAllowed(player) ? entry.getTag() : defaultTagFor(player);
+        }
+
+        // The entry is no longer in colors.yml, so fall back to the tag we stored.
+        return data.getColorTag();
+    }
+
+    /**
+     * The pattern a player currently has applied, or null when they have none or may no
+     * longer use the one they picked.
+     *
+     * @param player The player to resolve for.
+     * @return A PatternEntry, or null.
+     */
+    public PatternEntry resolveActivePattern(Player player) {
+        PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
+        if (!data.hasColor() || !"PATTERN".equals(data.getColorType())) {
+            return null;
+        }
+
+        PatternEntry pattern = plugin.getPatternManager().getPattern(data.getColorKey());
+        return (pattern != null && pattern.isAllowed(player)) ? pattern : null;
+    }
+
+    private String defaultTagFor(Player player) {
+        String defaultTag = getDefaultColorForPlayer(player);
+        // A group-default can be null if the key is present but empty in YAML, and
+        // this runs for every chat message, so don't trust it.
+        if (defaultTag == null || defaultTag.isBlank() || defaultTag.equalsIgnoreCase("NONE")) {
+            return null;
+        }
+        return defaultTag;
     }
 
     /**
@@ -148,11 +208,23 @@ public class ChatColorAPI {
     }
 
     /**
-     * Gets all registered solid colors.
+     * Gets the standard solid colors from the colors section of colors.yml.
+     * Use {@link #getAllColors()} if you also want the owner-defined custom colors.
+     *
      * @return A collection of ColorEntry.
      */
     public Collection<ColorEntry> getAvailableColors() {
         return plugin.getColorManager().getColors().values();
+    }
+
+    /**
+     * Gets every solid color a player could select: the standard ones followed by the
+     * custom colors defined in the custom-colors section.
+     *
+     * @return A collection of ColorEntry.
+     */
+    public Collection<ColorEntry> getAllColors() {
+        return plugin.getColorManager().getColorList();
     }
 
     /**

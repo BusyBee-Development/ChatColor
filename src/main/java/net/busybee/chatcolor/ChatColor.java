@@ -17,6 +17,7 @@ import net.busybee.chatcolor.utils.BStatsManager;
 import net.busybee.chatcolor.utils.ColorUtil;
 import net.busybee.chatcolor.utils.DisplayNameService;
 import net.busybee.chatcolor.utils.FastStatsManager;
+import net.busybee.chatcolor.utils.PermissionRegistrar;
 import net.busybee.chatcolor.utils.SchedulerUtil;
 import net.busybee.chatcolor.utils.VersionCheck;
 import org.bukkit.Bukkit;
@@ -44,10 +45,9 @@ public class ChatColor extends JavaPlugin {
     private PlayerDataManager playerDataManager;
     private ChatColorAPI chatColorAPI;
     private DisplayNameService displayNameService;
-
+    private PermissionRegistrar permissionRegistrar;
     private ChatListener chatListener;
     private EventPriority activePriority;
-
     private BStatsManager bStatsManager;
     private FastStatsManager fastStatsManager;
 
@@ -59,6 +59,7 @@ public class ChatColor extends JavaPlugin {
     public PlayerDataManager getPlayerDataManager() { return playerDataManager; }
     public ChatColorAPI getChatColorAPI() { return chatColorAPI; }
     public DisplayNameService getDisplayNameService() { return displayNameService; }
+    public PermissionRegistrar getPermissionRegistrar() { return permissionRegistrar; }
     public EventPriority getActivePriority() { return activePriority; }
     public BStatsManager getBStatsManager() { return bStatsManager; }
     public FastStatsManager getFastStatsManager() { return fastStatsManager; }
@@ -77,6 +78,7 @@ public class ChatColor extends JavaPlugin {
         this.playerDataManager = new PlayerDataManager(this);
         this.chatColorAPI = new ChatColorAPI(this);
         this.displayNameService = new DisplayNameService(this);
+        this.permissionRegistrar = new PermissionRegistrar(this);
 
         FastInvManager.register(this);
 
@@ -86,6 +88,8 @@ public class ChatColor extends JavaPlugin {
         this.guiManager.load();
         this.patternManager.load();
         this.playerDataManager.load();
+
+        refreshPermissions();
 
         this.bStatsManager = new BStatsManager(this);
         this.fastStatsManager = new FastStatsManager(this);
@@ -117,6 +121,12 @@ public class ChatColor extends JavaPlugin {
         }
         if (this.fastStatsManager != null) {
             this.fastStatsManager.onDisable();
+        }
+        if (this.permissionRegistrar != null) {
+            this.permissionRegistrar.clear();
+        }
+        if (this.colorManager != null) {
+            this.colorManager.flush();
         }
         if (this.playerDataManager != null) {
             this.playerDataManager.saveAll();
@@ -276,8 +286,15 @@ public class ChatColor extends JavaPlugin {
         this.playerDataManager.load();
         setupConsoleFilter();
 
+        refreshPermissions();
         registerListenersOnReload();
         this.displayNameService.refreshAll();
+    }
+
+    public void refreshPermissions() {
+        if (this.permissionRegistrar != null) {
+            this.permissionRegistrar.refresh();
+        }
     }
 
     private void registerListenersOnReload() {

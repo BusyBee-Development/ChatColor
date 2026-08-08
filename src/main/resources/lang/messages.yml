@@ -9,6 +9,10 @@ prefix: "<dark_gray>[<gradient:blue:aqua>ChatColor<dark_gray>] "
 color-applied: "<prefix><green>Color <reset><color> <gray>has been applied!"
 color-applied-other: "<prefix><green>Color <reset><color> <gray>has been applied to <white><player><gray>!"
 color-created: "<prefix><green>Custom color '<gray><name><green>' has been created!"
+color-updated: "<prefix><green>Custom color '<gray><name><green>' has been updated!"
+color-deleted: "<prefix><gray>Custom color '<white><name><gray>' deleted. <dark_gray>(reset for <cleared> player(s))"
+color-permission-info: "<prefix><gray>Required permission: <white><permission>"
+color-permission-everyone: "everyone (no permission needed)"
 color-reset: "<prefix><gray>Your chat color has been <red>reset<gray>."
 color-reset-other: "<prefix><gray>Chat color for <white><player> <gray>has been <red>reset<gray>."
 
@@ -22,9 +26,26 @@ invalid-usage: "<prefix><red>Usage: <gray><usage>"
 player-only: "<prefix><red>This command can only be used by players."
 console-must-specify-player: "<prefix><red>You must specify a player when running this command from console."
 
+# Custom color creation errors
+color-invalid-name: "<prefix><red>'<gray><name><red>' has no usable characters. Use letters, numbers, - or _."
+color-invalid-tag: "<prefix><red>That is not a valid color tag. Use a MiniMessage tag or a hex code."
+color-invalid-icon: "<prefix><red>Unknown item material: <gray><icon>"
+color-reserved-key: "<prefix><red>'<gray><key><red>' is already a built-in color or gradient. Pick another name."
+color-save-failed: "<prefix><red>Could not save that color. Check the server console."
+
+# /color list
+color-list-header: "<prefix><gray>Available <white><type> <dark_gray>(<count>)<gray>:"
+color-list-entry: "<dark_gray>- <tag><name><reset> <dark_gray>[<gray><key><dark_gray>] <access>"
+color-list-access-allowed: "<green>unlocked"
+color-list-access-everyone: "<aqua>everyone"
+color-list-access-denied: "<red>needs <gray><permission>"
+color-list-empty: "<prefix><gray>There is nothing to show there."
+
 # Usage hints
 usage-set: "/color set <color|gradient|pattern> <key> [player]"
-usage-create: "/color create <name> <tag> <icon> [permission]"
+usage-create: "/color create <name> <tag> <icon> [permission|none] [true|op|false]"
+usage-delete: "/color delete <name>"
+usage-list: "/color list [colors|gradients|patterns|custom]"
 usage-reset: "/color reset [player]"
 
 # Update notification

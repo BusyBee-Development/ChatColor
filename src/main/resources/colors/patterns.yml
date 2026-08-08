@@ -4,6 +4,10 @@
 
 # Define multi-color patterns here.
 # Colors are applied character-by-character.
+#
+# Like colors.yml, each entry takes an optional 'permission' (leave it empty to let
+# everyone use the pattern) and an optional 'default' of true, op or false. Every node
+# is registered with the server on startup so "chatcolor.pattern.*" works in LuckPerms.
 
 patterns:
   rainbow:

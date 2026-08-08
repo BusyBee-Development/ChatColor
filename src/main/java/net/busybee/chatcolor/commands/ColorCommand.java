@@ -1,10 +1,12 @@
 package net.busybee.chatcolor.commands;
 
 import net.busybee.chatcolor.ChatColor;
+import net.busybee.chatcolor.config.ColorManager;
 import net.busybee.chatcolor.inventory.impl.MainMenuGUI;
 import net.busybee.chatcolor.models.ColorEntry;
 import net.busybee.chatcolor.models.GradientEntry;
 import net.busybee.chatcolor.models.PatternEntry;
+import net.busybee.chatcolor.models.SelectableEntry;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -135,16 +137,28 @@ public class ColorCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 if (args.length < 4) {
-                    String usageHint = plugin.getMessageManager().getRaw("usage-create");
-                    sender.sendMessage(plugin.getMessageManager().get("invalid-usage", java.util.Map.of("usage", usageHint)));
+                    sendUsage(sender, "usage-create");
                     return true;
                 }
-                String name = args[1];
-                String tag = args[2];
-                String icon = args[3].toUpperCase();
-                String permission = args.length > 4 ? args[4] : null;
-                plugin.getColorManager().saveCustomColor(name, tag, icon, permission);
-                plugin.getMessageManager().send(sender, "color-created", "name", name);
+                handleCreate(sender, args);
+            }
+            case "delete", "remove" -> {
+                if (!sender.hasPermission("chatcolor.create")) {
+                    plugin.getMessageManager().send(sender, "no-permission-command");
+                    return true;
+                }
+                if (args.length < 2) {
+                    sendUsage(sender, "usage-delete");
+                    return true;
+                }
+                handleDelete(sender, args[1]);
+            }
+            case "list" -> {
+                if (!sender.hasPermission("chatcolor.use")) {
+                    plugin.getMessageManager().send(sender, "no-permission-command");
+                    return true;
+                }
+                handleList(sender, args.length > 1 ? args[1].toLowerCase() : "colors");
             }
             default -> {
                 if (sender instanceof Player player) {
@@ -163,6 +177,109 @@ public class ColorCommand implements CommandExecutor, TabCompleter {
         return true;
     }
 
+    private void sendUsage(CommandSender sender, String usageKey) {
+        String usageHint = plugin.getMessageManager().getRaw(usageKey);
+        sender.sendMessage(plugin.getMessageManager().get("invalid-usage", java.util.Map.of("usage", usageHint)));
+    }
+
+    private void handleCreate(CommandSender sender, String[] args) {
+        String name = args[1];
+        String tag = args[2];
+        String icon = args[3].toUpperCase();
+        String permission = args.length > 4 ? args[4] : null;
+        String permissionDefault = args.length > 5 ? args[5] : null;
+
+        ColorManager.SaveResult result =
+                plugin.getColorManager().saveCustomColor(name, tag, icon, permission, permissionDefault);
+
+        switch (result) {
+            case CREATED, UPDATED -> {
+                plugin.refreshPermissions();
+                plugin.getMessageManager().send(sender,
+                        result == ColorManager.SaveResult.CREATED ? "color-created" : "color-updated",
+                        "name", name);
+
+                ColorEntry entry = plugin.getColorManager().getColor(ColorManager.sanitizeKey(name));
+                if (entry != null) {
+                    String node = entry.isPublic()
+                            ? plugin.getMessageManager().getRaw("color-permission-everyone")
+                            : entry.getPermission();
+                    plugin.getMessageManager().send(sender, "color-permission-info", "permission", node);
+                }
+            }
+            case INVALID_NAME -> plugin.getMessageManager().send(sender, "color-invalid-name", "name", name);
+            case INVALID_TAG -> plugin.getMessageManager().send(sender, "color-invalid-tag", "tag", tag);
+            case INVALID_ICON -> plugin.getMessageManager().send(sender, "color-invalid-icon", "icon", icon);
+            case RESERVED_KEY -> plugin.getMessageManager().send(sender, "color-reserved-key",
+                    "key", ColorManager.sanitizeKey(name));
+            default -> plugin.getMessageManager().send(sender, "color-save-failed");
+        }
+    }
+
+    private void handleDelete(CommandSender sender, String name) {
+        String key = ColorManager.sanitizeKey(name);
+        ColorManager.SaveResult result = plugin.getColorManager().deleteCustomColor(name);
+
+        if (result == ColorManager.SaveResult.NOT_FOUND) {
+            plugin.getMessageManager().send(sender, "unknown-color", "key", key);
+            return;
+        }
+        if (!result.isSuccess()) {
+            plugin.getMessageManager().send(sender, "color-save-failed");
+            return;
+        }
+
+        int cleared = plugin.getPlayerDataManager().clearColor("SOLID", key);
+        plugin.refreshPermissions();
+        plugin.getMessageManager().send(sender, "color-deleted", java.util.Map.of(
+                "name", key,
+                "cleared", String.valueOf(cleared)
+        ));
+    }
+
+    private void handleList(CommandSender sender, String type) {
+        List<? extends SelectableEntry> entries = switch (type) {
+            case "gradient", "gradients" -> plugin.getColorManager().getGradientList();
+            case "pattern", "patterns" -> plugin.getPatternManager().getPatternList();
+            case "custom", "custom-colors" -> new ArrayList<>(plugin.getColorManager().getCustomColors().values());
+            case "color", "colors", "solid" -> plugin.getColorManager().getColorList();
+            default -> null;
+        };
+
+        if (entries == null) {
+            sendUsage(sender, "usage-list");
+            return;
+        }
+        if (entries.isEmpty()) {
+            plugin.getMessageManager().send(sender, "color-list-empty");
+            return;
+        }
+
+        plugin.getMessageManager().send(sender, "color-list-header", java.util.Map.of(
+                "type", type,
+                "count", String.valueOf(entries.size())
+        ));
+
+        for (SelectableEntry entry : entries) {
+            String access;
+            if (entry.isPublic()) {
+                access = plugin.getMessageManager().getRaw("color-list-access-everyone");
+            } else if (entry.isAllowed(sender)) {
+                access = plugin.getMessageManager().getRaw("color-list-access-allowed");
+            } else {
+                access = plugin.getMessageManager().getRaw("color-list-access-denied")
+                        .replace("<permission>", entry.getPermission());
+            }
+
+            plugin.getMessageManager().send(sender, "color-list-entry", java.util.Map.of(
+                    "tag", entry.getTag() == null ? "" : entry.getTag(),
+                    "name", entry.getDisplayName(),
+                    "key", entry.getKey(),
+                    "access", access
+            ));
+        }
+    }
+
     private void handleSet(CommandSender sender, Player target, String type, String key) {
         switch (type) {
             case "color", "solid" -> {
@@ -171,7 +288,7 @@ public class ColorCommand implements CommandExecutor, TabCompleter {
                     plugin.getMessageManager().send(sender, "unknown-color", "key", key);
                     return;
                 }
-                if (target == sender && !target.hasPermission(entry.getPermission())) {
+                if (target == sender && !entry.isAllowed(target)) {
                     plugin.getMessageManager().send(sender, "no-permission");
                     return;
                 }
@@ -191,7 +308,7 @@ public class ColorCommand implements CommandExecutor, TabCompleter {
                     plugin.getMessageManager().send(sender, "unknown-color", "key", key);
                     return;
                 }
-                if (target == sender && !target.hasPermission(entry.getPermission())) {
+                if (target == sender && !entry.isAllowed(target)) {
                     plugin.getMessageManager().send(sender, "no-permission");
                     return;
                 }
@@ -211,7 +328,7 @@ public class ColorCommand implements CommandExecutor, TabCompleter {
                     plugin.getMessageManager().send(sender, "unknown-color", "key", key);
                     return;
                 }
-                if (target == sender && !target.hasPermission(entry.getPermission())) {
+                if (target == sender && !entry.isAllowed(target)) {
                     plugin.getMessageManager().send(sender, "no-permission");
                     return;
                 }
@@ -237,7 +354,7 @@ public class ColorCommand implements CommandExecutor, TabCompleter {
         List<String> completions = new ArrayList<>();
 
         if (args.length == 1) {
-            completions.addAll(Arrays.asList("set", "reset", "gui", "reload", "create"));
+            completions.addAll(Arrays.asList("set", "reset", "gui", "list", "reload", "create", "delete"));
             return filter(completions, args[0]);
         }
 
@@ -248,14 +365,20 @@ public class ColorCommand implements CommandExecutor, TabCompleter {
                 }
             } else if (args[0].equalsIgnoreCase("set")) {
                 completions.addAll(Arrays.asList("color", "gradient", "pattern"));
+            } else if (args[0].equalsIgnoreCase("list")) {
+                completions.addAll(Arrays.asList("colors", "gradients", "patterns", "custom"));
+            } else if (args[0].equalsIgnoreCase("delete") || args[0].equalsIgnoreCase("remove")) {
+                completions.addAll(plugin.getColorManager().getCustomColors().keySet());
             }
             return filter(completions, args[1]);
         }
 
         if (args.length == 3 && args[0].equalsIgnoreCase("set")) {
             switch (args[1].toLowerCase()) {
-                case "color", "solid" -> completions.addAll(plugin.getConfigManager().getColors().keySet());
-                case "gradient" -> completions.addAll(plugin.getConfigManager().getGradients().keySet());
+                // getColorList covers the custom colours too, which getColors would miss.
+                case "color", "solid" -> plugin.getColorManager().getColorList()
+                        .forEach(entry -> completions.add(entry.getKey()));
+                case "gradient" -> completions.addAll(plugin.getColorManager().getGradients().keySet());
                 case "pattern" -> completions.addAll(plugin.getPatternManager().getPatterns().keySet());
             }
             return filter(completions, args[2]);
@@ -268,17 +391,24 @@ public class ColorCommand implements CommandExecutor, TabCompleter {
             return filter(completions, args[3]);
         }
 
-        if (args.length == 4 && args[0].equalsIgnoreCase("create")) {
-            completions.add("RED_WOOL");
-            completions.add("BLUE_WOOL");
-            completions.add("GREEN_WOOL");
-            completions.add("YELLOW_WOOL");
-            return filter(completions, args[3]);
-        }
-
-        if (args.length == 5 && args[0].equalsIgnoreCase("create")) {
-            completions.add("chatcolor.custom." + args[1].toLowerCase().replace(" ", "_"));
-            return filter(completions, args[4]);
+        if (args[0].equalsIgnoreCase("create")) {
+            if (args.length == 3) {
+                completions.addAll(Arrays.asList("<red>", "<#FF69B4>", "<gradient:red:gold>"));
+                return filter(completions, args[2]);
+            }
+            if (args.length == 4) {
+                completions.addAll(Arrays.asList("WHITE_WOOL", "RED_WOOL", "BLUE_WOOL", "GREEN_WOOL", "YELLOW_WOOL"));
+                return filter(completions, args[3]);
+            }
+            if (args.length == 5) {
+                completions.add("chatcolor.custom." + ColorManager.sanitizeKey(args[1]));
+                completions.add("none");
+                return filter(completions, args[4]);
+            }
+            if (args.length == 6) {
+                completions.addAll(Arrays.asList("op", "true", "false"));
+                return filter(completions, args[5]);
+            }
         }
 
         return completions;

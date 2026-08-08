@@ -5,6 +5,7 @@ import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 public class ColorUtil {
 
@@ -117,7 +118,8 @@ public class ColorUtil {
         }
     }
 
-    private static String normalizeTag(String tag) {
+    public static String normalizeTag(String tag) {
+        if (tag == null || tag.isBlank()) return "";
         if (tag.startsWith("<") && tag.endsWith(">")) return tag;
 
         String processed = translateLegacyToMiniMessage(tag);
@@ -125,6 +127,16 @@ public class ColorUtil {
             processed = "<" + processed + ">";
         }
         return processed;
+    }
+
+    public static boolean isValidTag(String tag) {
+        if (tag == null || tag.isBlank()) return false;
+        try {
+            Component probe = MINI_MESSAGE.deserialize(normalizeTag(tag) + "x");
+            return "x".equals(PlainTextComponentSerializer.plainText().serialize(probe));
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public static String stripLegacy(String text) {

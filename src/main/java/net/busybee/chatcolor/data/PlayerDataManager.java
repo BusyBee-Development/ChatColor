@@ -61,6 +61,21 @@ public class PlayerDataManager {
         this.dataMap.put(uuid, data);
     }
 
+    public int clearColor(String colorType, String colorKey) {
+        if (colorType == null || colorKey == null) return 0;
+
+        int cleared = 0;
+        for (Map.Entry<UUID, PlayerColorData> entry : this.dataMap.entrySet()) {
+            PlayerColorData data = entry.getValue();
+            if (colorType.equals(data.getColorType()) && colorKey.equalsIgnoreCase(data.getColorKey())) {
+                data.reset();
+                save(entry.getKey());
+                cleared++;
+            }
+        }
+        return cleared;
+    }
+
     public void save(UUID uuid) {
         PlayerColorData data = this.dataMap.get(uuid);
         if (data == null) return;

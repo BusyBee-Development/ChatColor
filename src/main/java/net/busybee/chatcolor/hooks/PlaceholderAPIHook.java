@@ -55,12 +55,16 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
 
         PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
         String result = null;
-
-        // Simplify and unify logic: default to "color" if params is empty
         String action = params.isEmpty() ? "color" : params;
 
         if (action.equalsIgnoreCase("color") || action.equalsIgnoreCase("prefix") || action.equalsIgnoreCase("tag")) {
-            String tag = (data != null && data.hasColor()) ? data.getColorTag() : plugin.getConfigManager().getDefaultColor();
+            String tag;
+            if (player instanceof org.bukkit.entity.Player online) {
+                tag = plugin.getChatColorAPI().resolveActiveTag(online);
+            } else {
+                tag = (data != null && data.hasColor())
+                        ? data.getColorTag() : plugin.getConfigManager().getDefaultColor();
+            }
             if (tag == null || tag.equalsIgnoreCase("NONE")) return "";
             
             if (tag.startsWith("<") && tag.endsWith(">")) {
@@ -72,16 +76,16 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
             }
         } else if (action.equalsIgnoreCase("message")) {
             String msg = ChatListener.getLastMessage(player.getUniqueId());
-            result = (msg != null && !msg.isEmpty()) ? ColorUtil.toLegacy(buildColored(data, msg)) : "";
+            result = (msg != null && !msg.isEmpty()) ? ColorUtil.toLegacy(buildColored(player, data, msg)) : "";
         } else if (action.equalsIgnoreCase("name")) {
             String name = player.getName();
-            result = (name != null) ? ColorUtil.toLegacy(buildColored(data, name)) : "";
+            result = (name != null) ? ColorUtil.toLegacy(buildColored(player, data, name)) : "";
         } else if (action.startsWith("apply_")) {
             String text = action.substring(6);
-            result = ColorUtil.toLegacy(buildColored(data, text));
+            result = ColorUtil.toLegacy(buildColored(player, data, text));
         } else if (action.startsWith("apply:")) {
             String text = action.substring(6);
-            result = ColorUtil.toLegacy(buildColored(data, text));
+            result = ColorUtil.toLegacy(buildColored(player, data, text));
         } else if (action.equalsIgnoreCase("key")) {
             result = (data != null && data.getColorKey() != null) ? data.getColorKey() : "";
         } else if (action.equalsIgnoreCase("type")) {
@@ -91,7 +95,15 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
         return result;
     }
 
-    private Component buildColored(PlayerColorData data, String text) {
+    private Component buildColored(OfflinePlayer player, PlayerColorData data, String text) {
+        if (player instanceof org.bukkit.entity.Player online) {
+            PatternEntry pattern = plugin.getChatColorAPI().resolveActivePattern(online);
+            if (pattern != null) return PatternApplier.apply(text, pattern.getColors(), false);
+
+            String tag = plugin.getChatColorAPI().resolveActiveTag(online);
+            return tag == null ? Component.text(text) : ColorUtil.applyTagToText(tag, text, false);
+        }
+
         if (data == null || !data.hasColor()) {
             String defaultColor = plugin.getConfigManager().getDefaultColor();
             if (defaultColor == null || defaultColor.equalsIgnoreCase("NONE")) {
