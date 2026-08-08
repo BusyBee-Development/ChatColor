@@ -1,6 +1,6 @@
 # 🌈 ChatColor
 
-**ChatColor** is an advanced Minecraft chat color plugin built for **Paper 1.21+** that lets players personalize their chat messages with solid colors, multi-stop gradients, and character-cycling patterns — all through a sleek GUI or simple commands.
+**ChatColor** is an advanced Minecraft chat color plugin built for **Paper 1.21+** (with full **Folia** support) that lets players personalize their chat messages with solid colors, multi-stop gradients, and character-cycling patterns — all through a sleek GUI or simple commands.
 
 ---
 
@@ -12,26 +12,45 @@
 - 🛠️ **Custom Color Creation** — Create your own custom colors with simple commands.
 - 🖥️ **Interactive GUI** — Full inventory-based color selector with a main menu and category pages.
 - ⌨️ **Command Support** — Set, reset, and manage colors entirely from the command line.
-- 🔒 **Per-Entry Permissions** — Grant or restrict individual colors, gradients, and patterns per player/group.
+- 🔒 **Per-Entry Permissions** — Grant or restrict individual colors, gradients, and patterns per player/group, registered with the server at runtime so LuckPerms wildcards actually work.
+- 🤝 **Drop-In Compatibility** — Colors are applied from a chat renderer that runs after every other listener, so EssentialsChat and friends can't strip them.
+- 🩺 **Built-In Diagnostics** — `/color debug` traces the whole chat pipeline into the console.
+- 🧵 **Folia Ready** — Region-thread safe, with Folia-aware scheduling throughout.
 - 💾 **Persistent Data** — Player color selections are saved to disk and restored on rejoin.
 - 🔌 **PlaceholderAPI Support** — Expose player color data as placeholders for use in other plugins.
 - 🛠️ **Developer API** — Clean `ChatColorAPI` class for third-party plugin integration.
 - ⚡ **Hot Reload** — Reload all configuration files at runtime without restarting.
-- 📊 **bStats** — Anonymized usage statistics.
-- 📊 **FastStats** — Anonymized usage statistics.
+- 📊 **Metrics** — Anonymized usage statistics via bStats and FastStats.
+
+---
+
+## 📚 Documentation
+
+| Page                                                                     | Covers                                                    |
+|--------------------------------------------------------------------------|-----------------------------------------------------------|
+| [Installation](docs/gettingstarted/installation.md)                      | Requirements, platform support, verifying the install     |
+| [Commands & Permissions](docs/userguide/commands-and-permissions.md)     | Every command, every permission node                      |
+| [Configuration](docs/userguide/configuration.md)                         | All config files, settings reference, troubleshooting     |
+| [GUI Customization](docs/userguide/gui-customization.md)                 | Titles, layouts, items, status lore                       |
+| [Placeholders](docs/userguide/placeholders.md)                           | PlaceholderAPI expansion and chat plugin integration      |
+| [Chat Compatibility](docs/advanced/chat-compatibility.md)                | How coloring works, `/color debug`, Folia, known plugins  |
+| [Developer API](docs/advanced/developer-api.md)                          | `ChatColorAPI` reference and thread safety                |
 
 ---
 
 ## 🕹️ Commands
 
-| Command                                            | Description                                 | Permission          |
-|----------------------------------------------------|---------------------------------------------|---------------------|
-| `/color`                                           | Opens the main color selector GUI           | `chatcolor.use`     |
-| `/color gui [player]`                              | Opens the color selector for you or others  | `chatcolor.use`*    |
-| `/color reset [player]`                            | Removes active chat color                   | `chatcolor.use`*    |
-| `/color set <type> <key> [player]`                 | Sets a color, gradient, or pattern by key   | `chatcolor.use`*    |
-| `/color create <name> <tag> <icon> [permission]`   | Create a new custom color                   | `chatcolor.create`  |
-| `/color reload`                                    | Reloads all plugin configuration            | `chatcolor.reload`  |
+| Command                                                    | Description                                | Permission          |
+|-------------------------------------------------------------|----------------------------------------------|---------------------|
+| `/color`                                                   | Opens the main color selector GUI          | `chatcolor.use`     |
+| `/color gui [player]`                                      | Opens the color selector for you or others | `chatcolor.use`*    |
+| `/color reset [player]`                                    | Removes active chat color                  | `chatcolor.use`*    |
+| `/color set <type> <key> [player]`                         | Sets a color, gradient, or pattern by key  | `chatcolor.use`*    |
+| `/color list [type]`                                       | Lists colors, gradients, patterns, custom  | `chatcolor.use`     |
+| `/color create <name> <tag> <icon> [permission] [default]` | Create or update a custom color            | `chatcolor.create`  |
+| `/color delete <name>`                                     | Delete a custom color                      | `chatcolor.create`  |
+| `/color reload`                                            | Reloads all plugin configuration           | `chatcolor.reload`  |
+| `/color debug [off\|pipeline\|all]`                        | Trace the chat pipeline in the console     | `chatcolor.debug`   |
 
 *\*Using `[player]` argument (or running from console) requires `chatcolor.admin`.*
 
@@ -49,6 +68,7 @@
 | `chatcolor.reload`       | Reload the plugin config               | `op`    |
 | `chatcolor.create`       | Create custom colors                   | `op`    |
 | `chatcolor.admin`        | Use admin command arguments & console  | `op`    |
+| `chatcolor.debug`        | Trace the chat pipeline in the console | `op`    |
 | `chatcolor.minimessage`  | Use MiniMessage & legacy codes in chat | `false` |
 | `chatcolor.gui.solid`    | Access to Solid Colors section         | `true`  |
 | `chatcolor.gui.gradient` | Access to Gradients section            | `true`  |
@@ -56,12 +76,18 @@
 | `chatcolor.color.*`      | Access to all solid colors             | `op`    |
 | `chatcolor.gradient.*`   | Access to all gradients                | `op`    |
 | `chatcolor.pattern.*`    | Access to all patterns                 | `op`    |
+| `chatcolor.custom.*`     | Access to all custom colors            | `op`    |
 | `chatcolor.group.<name>` | Apply group-based default colors       | `false` |
 
 Individual entries have their own permission nodes, for example:
 - `chatcolor.color.red`
 - `chatcolor.gradient.sunset`
 - `chatcolor.pattern.rainbow`
+- `chatcolor.custom.pastel-pink`
+
+Every entry from `colors.yml` and `patterns.yml` is registered with the server as a real
+permission at runtime, so LuckPerms can tab-complete your custom nodes and the `*` wildcards
+genuinely expand over them. Entries with no `permission:` set are public.
 
 ---
 
@@ -79,7 +105,8 @@ settings:
     admin: "<gradient:red:gold>"
     vip: "<aqua>"
   event-priority: "DEFAULT" # Options: HIGHEST, LOWEST, etc. or DEFAULT (auto-detect)
-  late-bind: false         # Use for compatibility issues
+  chat-hook: "AUTO"        # Chat event to hook: AUTO / MODERN / LEGACY
+  late-bind: false         # Only for placeholder-driven formats like LPC
   clean-console: true      # Strip colors from console logs
   show-standard-colors: true # Toggle visibility of standard colors
   show-standard-gradients: true # Toggle visibility of standard gradients
@@ -148,11 +175,26 @@ When PlaceholderAPI is installed, the following placeholders are available. All 
 
 ## 🛠️ Integration Tips
 
+Most setups need **no configuration at all**. On Paper, ChatColor applies color from a chat
+renderer that runs after every other listener, so plugins that format or strip chat can't
+interfere with it.
+
+### EssentialsChat
+- Works out of the box. Use the standard `{MESSAGE}` tag in your Essentials format.
+- **No `essentials.chat.color` / `essentials.chat.rgb` grants required** — those only control
+  whether players may type their own `&` codes.
+
 ### LuckPermsChat (LPC)
-To use gradients or patterns with LPC:
-1. In LPC `config.yml`, set your format to use `%chatcolor_message%` (e.g., `{message}: %chatcolor_message%`).
-2. In ChatColor `config.yml`, set `apply-to-message: false` and `late-bind: true`.
+LPC builds its format from placeholders and discards the rendered message, so it needs the
+placeholder route:
+1. In LPC `config.yml`, set your format to use `%chatcolor_message%` (e.g. `{prefix}{name}&r: %chatcolor_message%`).
+2. In ChatColor `config.yml`, set `late-bind: true`.
 
 ### DiscordSRV
-- ChatColor automatically works with DiscordSRV. 
+- ChatColor automatically works with DiscordSRV.
 - For the best experience on Paper, ensure `UseModernPaperChatEvent: true` is set in DiscordSRV's config.
+
+### Something not working?
+Run `/color debug`, say something, and read the console. It prints the full chat listener order,
+ChatColor's permission resolution for that player, and whether its renderer survived to the end of
+the event. See [docs/advanced/chat-compatibility.md](docs/advanced/chat-compatibility.md).

@@ -11,7 +11,7 @@ description: Advanced chat color plugin with gradient and pattern support.
 commands:
   color:
     description: Open the color selector GUI or manage your chat color.
-    usage: /color [set <type> <key> | reset | list | reload | create | delete | gui]
+    usage: /color [set <type> <key> | reset | list | reload | create | delete | gui | debug]
     permission: chatcolor.use
     aliases:
       - chatcolor
@@ -39,6 +39,9 @@ permissions:
     default: op
   chatcolor.admin:
     description: Allows setting or resetting another player's color.
+    default: op
+  chatcolor.debug:
+    description: Allows running /color debug to trace the chat pipeline in the console.
     default: op
 
   # The wildcards below are filled in at runtime. Every color, gradient, pattern and
