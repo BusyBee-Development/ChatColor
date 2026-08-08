@@ -29,8 +29,12 @@ public class IntegrationChecker {
                 plugin.getLogger().info("Compatibility Tip:");
                 plugin.getLogger().info("1. Use the standard {MESSAGE} tag in Essentials config.");
                 plugin.getLogger().info("2. No placeholder is needed. ChatColor colours the message");
-                plugin.getLogger().info("   before Essentials formats it.");
-                plugin.getLogger().info("3. Hex colors and gradients will work automatically.");
+                plugin.getLogger().info("   after Essentials has formatted it.");
+                plugin.getLogger().info("3. On Paper, hex colors and gradients work automatically.");
+                plugin.getLogger().info("4. On Spigot, Essentials strips colours from the chat of any");
+                plugin.getLogger().info("   player without 'essentials.chat.color', ChatColor's");
+                plugin.getLogger().info("   included. Grant that node, or run Paper so ChatColor can");
+                plugin.getLogger().info("   colour at render time where nothing can strip it.");
                 plugin.getLogger().info("======================================================");
             }
 

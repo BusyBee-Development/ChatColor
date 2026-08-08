@@ -72,6 +72,13 @@ public class ColorCommand implements CommandExecutor, TabCompleter {
                     plugin.getMessageManager().send(sender, "color-reset-other", "player", target.getName());
                 }
             }
+            case "debug" -> {
+                if (!sender.hasPermission("chatcolor.debug")) {
+                    plugin.getMessageManager().send(sender, "no-permission-command");
+                    return true;
+                }
+                handleDebug(sender, args);
+            }
             case "reload" -> {
                 if (!sender.hasPermission("chatcolor.reload")) {
                     plugin.getMessageManager().send(sender, "no-permission-command");
@@ -175,6 +182,44 @@ public class ColorCommand implements CommandExecutor, TabCompleter {
         }
 
         return true;
+    }
+
+    private void handleDebug(CommandSender sender, String[] args) {
+        net.busybee.chatcolor.utils.ChatDebugger debug = plugin.getChatDebugger();
+        if (debug == null) {
+            sender.sendMessage("ChatColor debug is not available yet, the chat hook is still binding.");
+            return;
+        }
+
+        String mode = args.length > 1 ? args[1].toLowerCase() : "";
+        switch (mode) {
+            case "off" -> {
+                debug.stop();
+                sender.sendMessage("ChatColor debug off.");
+                return;
+            }
+            case "pipeline" -> {
+                debug.dumpPipeline();
+                sender.sendMessage("ChatColor pipeline dumped to console.");
+                return;
+            }
+            case "all" -> {
+                boolean on = debug.toggleAll();
+                sender.sendMessage("ChatColor debug for everyone: " + (on ? "ON" : "OFF"));
+                if (on) debug.dumpPipeline();
+                return;
+            }
+            default -> {
+                if (!(sender instanceof Player player)) {
+                    sender.sendMessage("Console cannot chat. Use /color debug all, or /color debug pipeline.");
+                    return;
+                }
+                boolean on = debug.togglePlayer(player.getUniqueId());
+                sender.sendMessage("ChatColor debug for you: " + (on ? "ON" : "OFF")
+                        + (on ? " - say something and check the console." : ""));
+                if (on) debug.dumpPipeline();
+            }
+        }
     }
 
     private void sendUsage(CommandSender sender, String usageKey) {
@@ -355,6 +400,9 @@ public class ColorCommand implements CommandExecutor, TabCompleter {
 
         if (args.length == 1) {
             completions.addAll(Arrays.asList("set", "reset", "gui", "list", "reload", "create", "delete"));
+            if (sender.hasPermission("chatcolor.debug")) {
+                completions.add("debug");
+            }
             return filter(completions, args[0]);
         }
 
@@ -365,6 +413,10 @@ public class ColorCommand implements CommandExecutor, TabCompleter {
                 }
             } else if (args[0].equalsIgnoreCase("set")) {
                 completions.addAll(Arrays.asList("color", "gradient", "pattern"));
+            } else if (args[0].equalsIgnoreCase("debug")) {
+                if (sender.hasPermission("chatcolor.debug")) {
+                    completions.addAll(Arrays.asList("all", "off", "pipeline"));
+                }
             } else if (args[0].equalsIgnoreCase("list")) {
                 completions.addAll(Arrays.asList("colors", "gradients", "patterns", "custom"));
             } else if (args[0].equalsIgnoreCase("delete") || args[0].equalsIgnoreCase("remove")) {
@@ -375,7 +427,6 @@ public class ColorCommand implements CommandExecutor, TabCompleter {
 
         if (args.length == 3 && args[0].equalsIgnoreCase("set")) {
             switch (args[1].toLowerCase()) {
-                // getColorList covers the custom colours too, which getColors would miss.
                 case "color", "solid" -> plugin.getColorManager().getColorList()
                         .forEach(entry -> completions.add(entry.getKey()));
                 case "gradient" -> completions.addAll(plugin.getColorManager().getGradients().keySet());

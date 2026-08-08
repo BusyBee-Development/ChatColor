@@ -14,6 +14,7 @@ import net.busybee.chatcolor.listeners.ChatListener;
 import net.busybee.chatcolor.listeners.PlayerListener;
 import net.busybee.chatcolor.utils.Warning;
 import net.busybee.chatcolor.utils.BStatsManager;
+import net.busybee.chatcolor.utils.ChatDebugger;
 import net.busybee.chatcolor.utils.ColorUtil;
 import net.busybee.chatcolor.utils.DisplayNameService;
 import net.busybee.chatcolor.utils.FastStatsManager;
@@ -22,8 +23,6 @@ import net.busybee.chatcolor.utils.SchedulerUtil;
 import net.busybee.chatcolor.utils.VersionCheck;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.HandlerList;
-import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.plugin.java.JavaPlugin;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
@@ -47,7 +46,9 @@ public class ChatColor extends JavaPlugin {
     private DisplayNameService displayNameService;
     private PermissionRegistrar permissionRegistrar;
     private ChatListener chatListener;
-    private EventPriority activePriority;
+    private ChatDebugger chatDebugger;
+    private EventPriority activePriority = EventPriority.NORMAL;
+    private volatile boolean legacyHook;
     private BStatsManager bStatsManager;
     private FastStatsManager fastStatsManager;
 
@@ -61,6 +62,8 @@ public class ChatColor extends JavaPlugin {
     public DisplayNameService getDisplayNameService() { return displayNameService; }
     public PermissionRegistrar getPermissionRegistrar() { return permissionRegistrar; }
     public EventPriority getActivePriority() { return activePriority; }
+    public ChatDebugger getChatDebugger() { return chatDebugger; }
+    public boolean isLegacyHook() { return legacyHook; }
     public BStatsManager getBStatsManager() { return bStatsManager; }
     public FastStatsManager getFastStatsManager() { return fastStatsManager; }
 
@@ -119,6 +122,9 @@ public class ChatColor extends JavaPlugin {
             System.setErr(originalErr);
             originalErr = null;
         }
+        if (this.chatDebugger != null) {
+            this.chatDebugger.stop();
+        }
         if (this.fastStatsManager != null) {
             this.fastStatsManager.onDisable();
         }
@@ -135,9 +141,8 @@ public class ChatColor extends JavaPlugin {
     }
 
     private void registerListeners() {
-        resolveActivePriority();
-
         this.chatListener = new ChatListener(this);
+        this.chatDebugger = new ChatDebugger(this);
 
         Bukkit.getPluginManager().registerEvents(new VersionCheck(this), this);
         Bukkit.getPluginManager().registerEvents(new PlayerListener(this), this);
@@ -152,6 +157,8 @@ public class ChatColor extends JavaPlugin {
         unbindChatListener();
 
         boolean legacy = resolveLegacyChatHook();
+        this.legacyHook = legacy;
+        resolveActivePriority(legacy);
 
         if (legacy) {
             Bukkit.getPluginManager().registerEvent(AsyncPlayerChatEvent.class, chatListener, activePriority, (listener, event) -> {
@@ -169,6 +176,13 @@ public class ChatColor extends JavaPlugin {
 
         getLogger().info("Chat hook: " + (legacy ? "LEGACY (AsyncPlayerChatEvent)" : "MODERN (AsyncChatEvent)")
                 + ", priority " + activePriority.name());
+
+        if (chatDebugger != null) {
+            chatDebugger.rebind();
+            if (chatDebugger.isActive()) {
+                chatDebugger.dumpPipeline();
+            }
+        }
 
         if (legacy && isPaper() && !ColorUtil.platformLegacySupportsHex()) {
             getLogger().warning("======================================================");
@@ -202,25 +216,15 @@ public class ChatColor extends JavaPlugin {
         if (configured != null && !"AUTO".equalsIgnoreCase(configured)) {
             getLogger().warning("Invalid chat-hook in config.yml: " + configured + ", using AUTO.");
         }
-        return hasForeignLegacyChatListener();
-    }
 
-    @SuppressWarnings("deprecation") // PlayerChatEvent: we only read its handler list
-    private boolean hasForeignLegacyChatListener() {
-        return hasForeignListener(AsyncPlayerChatEvent.getHandlerList())
-                || hasForeignListener(org.bukkit.event.player.PlayerChatEvent.getHandlerList());
-    }
-
-    private boolean hasForeignListener(HandlerList handlers) {
-        for (RegisteredListener registered : handlers.getRegisteredListeners()) {
-            if (registered.getPlugin() != this) {
-                return true;
-            }
-        }
         return false;
     }
 
-    private EventPriority autoDetectPriority() {
+    private EventPriority autoDetectPriority(boolean legacy) {
+        if (!legacy) {
+            return EventPriority.HIGHEST;
+        }
+
         if (Bukkit.getPluginManager().isPluginEnabled("LPC") ||
             Bukkit.getPluginManager().isPluginEnabled("DeluxeChat") ||
             Bukkit.getPluginManager().isPluginEnabled("EssentialsChat")) {
@@ -298,11 +302,10 @@ public class ChatColor extends JavaPlugin {
     }
 
     private void registerListenersOnReload() {
-        resolveActivePriority();
         SchedulerUtil.runSync(this, this::bindChatListener);
     }
 
-    private void resolveActivePriority() {
+    private void resolveActivePriority(boolean legacy) {
         String configPriority = configManager.getEventPriority();
         if (configPriority != null && !configPriority.equalsIgnoreCase("DEFAULT")) {
             try {
@@ -312,7 +315,7 @@ public class ChatColor extends JavaPlugin {
                 getLogger().warning("Invalid event-priority in config.yml: " + configPriority + ", using auto-detection.");
             }
         }
-        activePriority = autoDetectPriority();
+        activePriority = autoDetectPriority(legacy);
     }
 
     public boolean isPaper() {

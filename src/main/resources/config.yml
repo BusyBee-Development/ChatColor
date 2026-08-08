@@ -24,23 +24,31 @@ settings:
 
   # The priority of the chat listener.
   # Options: LOWEST, LOW, NORMAL, HIGH, HIGHEST, MONITOR, or DEFAULT (auto-detect)
-  # Default is DEFAULT (auto-detects based on other plugins like EssentialsChat).
+  #
+  # DEFAULT resolves to HIGHEST whenever the modern chat hook is in use, because that hook
+  # colours from a chat renderer and the last plugin to install one wins. On the legacy hook
+  # it resolves to HIGHEST only when a known formatter (EssentialsChat, LPC, DeluxeChat) is
+  # running, and NORMAL otherwise.
+  #
+  # Only override this if another plugin is fighting ChatColor for the renderer. Run
+  # "/color debug" and check ourRendererStillInstalled before changing it.
   event-priority: "DEFAULT"
 
   # Which chat event ChatColor hooks into. Paper only; Spigot always uses LEGACY.
   #
-  #   AUTO   - Recommended. Uses MODERN unless another plugin (EssentialsChat, LPC,
-  #            DiscordSRV in legacy mode) has already put the server on Paper's
-  #            legacy chat pipeline, in which case it joins them there.
-  #   MODERN - Always use Paper's AsyncChatEvent. Best colour fidelity, and keeps the
-  #            server off the deprecated pipeline. Colours may be lost if another
-  #            plugin owns the chat format.
-  #   LEGACY - Always use AsyncPlayerChatEvent. Maximum compatibility with older chat
-  #            plugins, but it forces the whole server onto Paper's legacy pipeline.
+  #   AUTO   - Recommended. MODERN on Paper, LEGACY on Spigot.
+  #   MODERN - Always use Paper's AsyncChatEvent. ChatColor colours the message from a
+  #            chat renderer, which runs after every listener has finished, so plugins
+  #            that strip colour codes out of chat cannot eat ours.
+  #   LEGACY - Always use AsyncPlayerChatEvent. Only needed if a plugin cancels chat on
+  #            the legacy event and you need ChatColor to run before it. Colours written
+  #            here can still be stripped by anything reading the modern event later,
+  #            EssentialsChat included.
   #
-  # Only ONE chat listener is ever registered. Paper switches the entire server to its
-  # legacy chat pipeline as soon as any plugin listens to AsyncPlayerChatEvent, so
-  # registering both would degrade chat for everyone.
+  # Only ONE chat listener is ever registered. AsyncChatEvent fires for every message on
+  # Paper regardless: with no legacy listeners Paper fires it directly, and with legacy
+  # listeners Paper runs AsyncPlayerChatEvent first and feeds the result into it. That
+  # makes MODERN both safe and always last in the chain.
   chat-hook: "AUTO"
 
   # Whether to use late-binding for placeholders.
