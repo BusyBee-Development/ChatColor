@@ -53,6 +53,20 @@ public class ChatListener implements Listener {
         if (watched) {
             debug.beforeWrap(event.renderer());
         }
+
+        // Some formatters build their output from a copy of the message they took earlier and
+        // never look at what the renderer chain hands them, so wrapping their renderer would
+        // colour nothing. Colour the event message instead and let them format the coloured
+        // copy. See ChatColor#isDirectWrite.
+        if (plugin.isDirectWrite()) {
+            Component colored = plugin.getChatColorAPI().applyColorToComponent(player, event.message());
+            if (watched) {
+                debug.wroteMessage(event.message(), colored);
+            }
+            event.message(colored);
+            return;
+        }
+
         event.renderer(new ColorRenderer(event.renderer(), watched ? debug : null));
     }
 

@@ -119,12 +119,14 @@ public final class ChatDebugger implements Listener {
         log("===== chat pipeline =====");
         log("paper=" + plugin.isPaper()
                 + " hook=" + (plugin.isLegacyHook() ? "LEGACY (AsyncPlayerChatEvent)" : "MODERN (AsyncChatEvent)")
-                + " priority=" + plugin.getActivePriority().name());
+                + " priority=" + plugin.getActivePriority().name()
+                + " mode=" + colourMode());
         log("config: apply-to-message=" + plugin.getConfigManager().isApplyToMessage()
                 + " apply-to-name=" + plugin.getConfigManager().isApplyToName()
                 + " late-bind=" + plugin.getConfigManager().isLateBind()
                 + " chat-hook=" + plugin.getConfigManager().getChatHook()
-                + " event-priority=" + plugin.getConfigManager().getEventPriority());
+                + " event-priority=" + plugin.getConfigManager().getEventPriority()
+                + " message-mode=" + plugin.getConfigManager().getMessageMode());
 
         if (plugin.isPaper()) {
             dumpHandlers("AsyncChatEvent", AsyncChatEvent.getHandlerList());
@@ -199,6 +201,13 @@ public final class ChatDebugger implements Listener {
         log("  renderer in place before us: " + current.getClass().getName());
     }
 
+    /** Called on the modern hook in direct mode, where we colour the message instead of rendering. */
+    public void wroteMessage(Component in, Component out) {
+        log("  WROTE message (direct mode, we do not render)");
+        log("    in : " + safe(ColorUtil.toMiniMessage(in)));
+        log("    out: " + safe(ColorUtil.toMiniMessage(out)));
+    }
+
     /** Called from inside the renderer, once per message rather than once per viewer. */
     public void rendered(Component in, Component out) {
         log("  RENDERER RAN");
@@ -214,12 +223,19 @@ public final class ChatDebugger implements Listener {
         if (!isWatched(event.getPlayer())) return;
 
         ChatRenderer renderer = event.renderer();
+        boolean direct = plugin.isDirectWrite();
+
         log("  MONITOR:  cancelled=" + event.isCancelled()
                 + " viewers=" + event.viewers().size()
-                + " ourRendererStillInstalled=" + ChatListener.isOurRenderer(renderer));
+                + (direct ? "" : " ourRendererStillInstalled=" + ChatListener.isOurRenderer(renderer)));
         log("    renderer: " + renderer.getClass().getName());
         log("    message : " + safe(ColorUtil.toMiniMessage(event.message())));
-        log("    (if no RENDERER RAN line follows, something delivered the message itself)");
+        if (direct) {
+            log("    (the colour must be visible in 'message' above; if it is not, something after");
+            log("     us overwrote the message)");
+        } else {
+            log("    (if no RENDERER RAN line follows, something delivered the message itself)");
+        }
     }
 
     private void monitorLegacy(AsyncPlayerChatEvent event) {
@@ -242,6 +258,11 @@ public final class ChatDebugger implements Listener {
         return text.replace("§", "(S)")
                 .replace('<', '{')
                 .replace('>', '}');
+    }
+
+    private String colourMode() {
+        if (plugin.isLegacyHook()) return "LEGACY (event.setMessage)";
+        return plugin.isDirectWrite() ? "DIRECT (event.message)" : "RENDERER";
     }
 
     private static String pad(String priority) {

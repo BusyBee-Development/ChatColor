@@ -24,7 +24,7 @@ public class PatternManager {
     }
 
     public void load() {
-        FileConfiguration config = new net.busybee.chatcolor.utils.ConfigMigrator(plugin).setReaddMissingKeys(false).migrate("colors/patterns.yml");
+        FileConfiguration config = new net.busybee.chatcolor.utils.ConfigMigrator(plugin).migrate("colors/patterns.yml");
 
         Map<String, PatternEntry> loaded = new LinkedHashMap<>();
         ConfigurationSection section = plugin.getConfigManager().isShowStandardPatterns()

@@ -1,8 +1,10 @@
 package net.busybee.chatcolor.data;
 
 import net.busybee.chatcolor.ChatColor;
+import net.busybee.chatcolor.utils.ConfigMigrator;
 import net.busybee.chatcolor.utils.SchedulerUtil;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.IllegalPluginAccessException;
 
 import java.io.File;
@@ -30,8 +32,14 @@ public class PlayerDataManager {
     }
 
     public void load() {
-        FileConfiguration loaded = new net.busybee.chatcolor.utils.ConfigMigrator(plugin).migrate("data/players.yml");
         File file = new File(plugin.getDataFolder(), "data/players.yml");
+
+        // Player data is records, not settings: there are no defaults to merge in and no
+        // documentation to refresh, so it is loaded directly rather than through
+        // ConfigMigrator. The one thing it still needs is the relocation an older layout left
+        // behind, which is why that lives in a static helper.
+        ConfigMigrator.relocateLegacyFile(plugin, "data/players.yml", file);
+        FileConfiguration loaded = YamlConfiguration.loadConfiguration(file);
 
         Map<UUID, PlayerColorData> parsed = new HashMap<>();
         for (String uuidStr : loaded.getKeys(false)) {

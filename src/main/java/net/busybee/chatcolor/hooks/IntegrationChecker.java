@@ -28,13 +28,16 @@ public class IntegrationChecker {
                 plugin.getLogger().info("------------------------------------------------------");
                 plugin.getLogger().info("Compatibility Tip:");
                 plugin.getLogger().info("1. Use the standard {MESSAGE} tag in Essentials config.");
-                plugin.getLogger().info("2. No placeholder is needed. ChatColor colours the message");
-                plugin.getLogger().info("   after Essentials has formatted it.");
-                plugin.getLogger().info("3. On Paper, hex colors and gradients work automatically.");
-                plugin.getLogger().info("4. On Spigot, Essentials strips colours from the chat of any");
-                plugin.getLogger().info("   player without 'essentials.chat.color', ChatColor's");
-                plugin.getLogger().info("   included. Grant that node, or run Paper so ChatColor can");
-                plugin.getLogger().info("   colour at render time where nothing can strip it.");
+                plugin.getLogger().info("2. No placeholder is needed. Essentials formats a message");
+                plugin.getLogger().info("   ChatColor has already coloured.");
+                plugin.getLogger().info("3. Essentials' chat renderer ignores whatever the renderer");
+                plugin.getLogger().info("   chain hands it, so ChatColor colours the message itself");
+                plugin.getLogger().info("   from in front of Essentials instead of rendering. Leave");
+                plugin.getLogger().info("   event-priority and message-mode on their defaults.");
+                plugin.getLogger().info("4. Essentials strips colours from the chat of any player");
+                plugin.getLogger().info("   without 'essentials.chat.color' and 'essentials.chat.rgb',");
+                plugin.getLogger().info("   but it does that before ChatColor runs, so ours survive.");
+                plugin.getLogger().info("   Those nodes only govern codes players type themselves.");
                 plugin.getLogger().info("======================================================");
             }
 

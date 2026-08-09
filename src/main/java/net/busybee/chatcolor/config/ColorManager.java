@@ -61,7 +61,6 @@ public class ColorManager {
 
     public void load() {
         FileConfiguration loaded = new net.busybee.chatcolor.utils.ConfigMigrator(plugin)
-                .setReaddMissingKeys(false)
                 .migrate("colors/colors.yml");
 
         synchronized (ioLock) {

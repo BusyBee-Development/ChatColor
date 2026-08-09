@@ -49,6 +49,7 @@ public class ChatColor extends JavaPlugin {
     private ChatDebugger chatDebugger;
     private EventPriority activePriority = EventPriority.NORMAL;
     private volatile boolean legacyHook;
+    private volatile boolean directWrite;
     private BStatsManager bStatsManager;
     private FastStatsManager fastStatsManager;
 
@@ -64,6 +65,7 @@ public class ChatColor extends JavaPlugin {
     public EventPriority getActivePriority() { return activePriority; }
     public ChatDebugger getChatDebugger() { return chatDebugger; }
     public boolean isLegacyHook() { return legacyHook; }
+    public boolean isDirectWrite() { return directWrite; }
     public BStatsManager getBStatsManager() { return bStatsManager; }
     public FastStatsManager getFastStatsManager() { return fastStatsManager; }
 
@@ -159,6 +161,7 @@ public class ChatColor extends JavaPlugin {
         boolean legacy = resolveLegacyChatHook();
         this.legacyHook = legacy;
         resolveActivePriority(legacy);
+        resolveDirectWrite(legacy);
 
         if (legacy) {
             Bukkit.getPluginManager().registerEvent(AsyncPlayerChatEvent.class, chatListener, activePriority, (listener, event) -> {
@@ -175,7 +178,10 @@ public class ChatColor extends JavaPlugin {
         }
 
         getLogger().info("Chat hook: " + (legacy ? "LEGACY (AsyncPlayerChatEvent)" : "MODERN (AsyncChatEvent)")
-                + ", priority " + activePriority.name());
+                + ", priority " + activePriority.name()
+                + (legacy ? "" : ", message mode " + (directWrite ? "DIRECT" : "RENDERER")));
+
+        warnIfDirectWriteIsTooLate();
 
         if (chatDebugger != null) {
             chatDebugger.rebind();
@@ -222,7 +228,9 @@ public class ChatColor extends JavaPlugin {
 
     private EventPriority autoDetectPriority(boolean legacy) {
         if (!legacy) {
-            return EventPriority.HIGHEST;
+            // Normally the renderer wins by going last. A message-discarding formatter breaks
+            // that, and we have to beat it to the message instead - see isDirectWrite().
+            return hasMessageDiscardingFormatter() ? EventPriority.HIGH : EventPriority.HIGHEST;
         }
 
         if (Bukkit.getPluginManager().isPluginEnabled("LPC") ||
@@ -231,6 +239,54 @@ public class ChatColor extends JavaPlugin {
             return EventPriority.HIGHEST;
         }
         return EventPriority.NORMAL;
+    }
+
+    private static final String[] MESSAGE_DISCARDING_FORMATTERS = { "EssentialsChat" };
+
+    private boolean hasMessageDiscardingFormatter() {
+        for (String name : MESSAGE_DISCARDING_FORMATTERS) {
+            if (Bukkit.getPluginManager().isPluginEnabled(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void resolveDirectWrite(boolean legacy) {
+        if (legacy) {
+            this.directWrite = false;
+            return;
+        }
+
+        String configured = configManager.getMessageMode();
+        if ("RENDERER".equalsIgnoreCase(configured)) {
+            this.directWrite = false;
+            return;
+        }
+        if ("DIRECT".equalsIgnoreCase(configured)) {
+            this.directWrite = true;
+            return;
+        }
+        if (configured != null && !"AUTO".equalsIgnoreCase(configured)) {
+            getLogger().warning("Invalid message-mode in config.yml: " + configured + ", using AUTO.");
+        }
+
+        this.directWrite = hasMessageDiscardingFormatter();
+    }
+
+    private void warnIfDirectWriteIsTooLate() {
+        if (!directWrite || activePriority.getSlot() < EventPriority.HIGHEST.getSlot()) {
+            return;
+        }
+
+        getLogger().warning("======================================================");
+        getLogger().warning("[ChatColor] Chat colours will not show up.");
+        getLogger().warning("EssentialsChat reads the chat message at HIGHEST and formats");
+        getLogger().warning("from its own copy, so ChatColor has to run in front of it. Your");
+        getLogger().warning("event-priority is " + activePriority.name() + ", which runs after.");
+        getLogger().warning("Set settings.event-priority back to DEFAULT (or to HIGH) in");
+        getLogger().warning("ChatColor's config.yml.");
+        getLogger().warning("======================================================");
     }
 
     private void registerCommands() {

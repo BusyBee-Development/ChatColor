@@ -25,13 +25,15 @@ settings:
   # The priority of the chat listener.
   # Options: LOWEST, LOW, NORMAL, HIGH, HIGHEST, MONITOR, or DEFAULT (auto-detect)
   #
-  # DEFAULT resolves to HIGHEST whenever the modern chat hook is in use, because that hook
-  # colours from a chat renderer and the last plugin to install one wins. On the legacy hook
-  # it resolves to HIGHEST only when a known formatter (EssentialsChat, LPC, DeluxeChat) is
-  # running, and NORMAL otherwise.
+  # DEFAULT resolves to HIGHEST on the modern chat hook, because that hook colours from a
+  # chat renderer and the last plugin to install one wins. The exception is EssentialsChat:
+  # it reads the message at HIGHEST and formats from its own copy, so DEFAULT drops to HIGH
+  # to get in front of it. On the legacy hook DEFAULT resolves to HIGHEST only when a known
+  # formatter (EssentialsChat, LPC, DeluxeChat) is running, and NORMAL otherwise.
   #
   # Only override this if another plugin is fighting ChatColor for the renderer. Run
-  # "/color debug" and check ourRendererStillInstalled before changing it.
+  # "/color debug" and check ourRendererStillInstalled before changing it. Forcing HIGHEST
+  # or MONITOR while EssentialsChat is installed will stop colours from showing up.
   event-priority: "DEFAULT"
 
   # Which chat event ChatColor hooks into. Paper only; Spigot always uses LEGACY.
@@ -50,6 +52,21 @@ settings:
   # listeners Paper runs AsyncPlayerChatEvent first and feeds the result into it. That
   # makes MODERN both safe and always last in the chain.
   chat-hook: "AUTO"
+
+  # How ChatColor applies colour on the modern hook. Ignored on the legacy hook, which
+  # always writes the message.
+  #
+  #   AUTO     - Recommended. DIRECT when a formatter that ignores the renderer's message is
+  #              installed (currently EssentialsChat), RENDERER otherwise.
+  #   RENDERER - Colour from a chat renderer that runs after every listener, so nothing can
+  #              strip it. Fails against formatters that discard what the renderer hands them.
+  #   DIRECT   - Colour event.message() in place and let the formatter format the coloured
+  #              message. Works with those formatters, but anything running after ChatColor
+  #              that strips colour codes will strip ours too.
+  #
+  # If your colours stopped showing up after adding a chat plugin, run "/color debug", say
+  # something, and check whether the plugin below ChatColor rendered the message we produced.
+  message-mode: "AUTO"
 
   # Whether to use late-binding for placeholders.
   # Enable this if you use %chatcolor_message% in other plugin formats

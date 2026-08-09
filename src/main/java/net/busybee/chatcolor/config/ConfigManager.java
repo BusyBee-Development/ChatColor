@@ -17,6 +17,7 @@ public class ConfigManager {
     private volatile boolean applyToName;
     private volatile String eventPriority;
     private volatile String chatHook;
+    private volatile String messageMode;
     private volatile String defaultColor;
     private volatile Map<String, String> groupDefaults = Collections.emptyMap();
     private volatile boolean lateBind;
@@ -53,6 +54,7 @@ public class ConfigManager {
 
         this.eventPriority = config.getString("settings.event-priority", "DEFAULT");
         this.chatHook = config.getString("settings.chat-hook", "AUTO");
+        this.messageMode = config.getString("settings.message-mode", "AUTO");
         this.lateBind = config.getBoolean("settings.late-bind", false);
         this.cleanConsole = config.getBoolean("settings.clean-console", true);
         this.showStandardColors = config.getBoolean("settings.show-standard-colors", true);
@@ -93,6 +95,9 @@ public class ConfigManager {
     }
     public String getChatHook() {
         return this.chatHook;
+    }
+    public String getMessageMode() {
+        return this.messageMode;
     }
     public String getDefaultColor() {
         return this.defaultColor;
