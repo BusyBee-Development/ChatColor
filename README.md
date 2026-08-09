@@ -93,6 +93,12 @@ genuinely expand over them. Entries with no `permission:` set are public.
 
 ## ⚙️ Configuration
 
+> **Updating never means deleting a config.** Drop in the new jar and restart: new settings and
+> colours arrive, documentation is refreshed, and everything you edited — including your
+> `custom-colors` — is kept. Keys you deleted stay deleted, a backup is written to `backups/`
+> before any change, and a restart that changes nothing rewrites nothing. Details, and the one
+> first-run exception, in [docs/advanced/config-updates.md](docs/advanced/config-updates.md).
+
 ### `config.yml`
 Controls general plugin settings and behavior.
 
@@ -106,6 +112,7 @@ settings:
     vip: "<aqua>"
   event-priority: "DEFAULT" # Options: HIGHEST, LOWEST, etc. or DEFAULT (auto-detect)
   chat-hook: "AUTO"        # Chat event to hook: AUTO / MODERN / LEGACY
+  message-mode: "AUTO"     # How colour is applied: AUTO / RENDERER / DIRECT
   late-bind: false         # Only for placeholder-driven formats like LPC
   clean-console: true      # Strip colors from console logs
   show-standard-colors: true # Toggle visibility of standard colors
@@ -177,10 +184,16 @@ When PlaceholderAPI is installed, the following placeholders are available. All 
 
 Most setups need **no configuration at all**. On Paper, ChatColor applies color from a chat
 renderer that runs after every other listener, so plugins that format or strip chat can't
-interfere with it.
+interfere with it. Where a formatter ignores renderers outright, ChatColor detects it and
+switches to colouring the message in front of that plugin instead — also automatically.
 
 ### EssentialsChat
 - Works out of the box. Use the standard `{MESSAGE}` tag in your Essentials format.
+- EssentialsChat's renderer ignores the message it is handed, so ChatColor detects it and colours
+  the message from in front of it instead of rendering. This is automatic — leave
+  `event-priority` and `message-mode` on their defaults, and in particular **do not force
+  `event-priority: "HIGHEST"`**, which puts ChatColor behind the point where Essentials reads the
+  message.
 - **No `essentials.chat.color` / `essentials.chat.rgb` grants required** — those only control
   whether players may type their own `&` codes.
 
