@@ -330,6 +330,24 @@ public class ColorCommand implements CommandExecutor, TabCompleter {
             case "color", "solid" -> {
                 ColorEntry entry = plugin.getConfigManager().getColor(key);
                 if (entry == null) {
+                    // Check if it's a hex code
+                    if (key.matches("^#?[0-9a-fA-F]{6}$")) {
+                        if (target == sender && !sender.hasPermission("chatcolor.set.hex")) {
+                            plugin.getMessageManager().send(sender, "no-permission");
+                            return;
+                        }
+                        plugin.getChatColorAPI().setCustomColor(target, key);
+                        String hex = key.startsWith("#") ? key : "#" + key;
+                        if (target == sender) {
+                            plugin.getMessageManager().send(target, "hex-color-applied", "color", "<" + hex + ">" + hex + "<reset>");
+                        } else {
+                            plugin.getMessageManager().send(sender, "hex-color-applied-other", java.util.Map.of(
+                                "color", "<" + hex + ">" + hex + "<reset>",
+                                "player", target.getName()
+                            ));
+                        }
+                        return;
+                    }
                     plugin.getMessageManager().send(sender, "unknown-color", "key", key);
                     return;
                 }
@@ -427,8 +445,13 @@ public class ColorCommand implements CommandExecutor, TabCompleter {
 
         if (args.length == 3 && args[0].equalsIgnoreCase("set")) {
             switch (args[1].toLowerCase()) {
-                case "color", "solid" -> plugin.getColorManager().getColorList()
-                        .forEach(entry -> completions.add(entry.getKey()));
+                case "color", "solid" -> {
+                    plugin.getColorManager().getColorList()
+                            .forEach(entry -> completions.add(entry.getKey()));
+                    if (sender.hasPermission("chatcolor.set.hex")) {
+                        completions.add("#");
+                    }
+                }
                 case "gradient" -> completions.addAll(plugin.getColorManager().getGradients().keySet());
                 case "pattern" -> completions.addAll(plugin.getPatternManager().getPatterns().keySet());
             }

@@ -61,6 +61,9 @@ permissions:
   chatcolor.custom.*:
     description: Access to all custom colors defined in colors.yml.
     default: op
+  chatcolor.set.hex:
+    description: Allows choosing any hex color via /chatcolor set color <hexcode>.
+    default: false
 
   chatcolor.minimessage:
     description: Allows using MiniMessage tags and legacy color codes in chat.

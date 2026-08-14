@@ -76,6 +76,23 @@ public class ChatColorAPI {
     }
 
     /**
+     * Sets a player's color to a custom hex color.
+     *
+     * @param player  The player whose color should be set.
+     * @param hexCode The hex code to set (e.g., "#ABCDEF" or "ABCDEF").
+     */
+    public void setCustomColor(Player player, String hexCode) {
+        if (!hexCode.startsWith("#")) {
+            hexCode = "#" + hexCode;
+        }
+        PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
+        data.setColorType("CUSTOM");
+        data.setColorKey(hexCode);
+        data.setColorTag("<" + hexCode + ">");
+        plugin.getPlayerDataManager().save(player.getUniqueId());
+    }
+
+    /**
      * Resets a player's color to the default.
      *
      * @param player The player whose color should be reset.
@@ -151,6 +168,10 @@ public class ChatColorAPI {
             PatternEntry pattern = plugin.getPatternManager().getPattern(key);
             if (pattern != null && pattern.isAllowed(player)) return null;
             return defaultTagFor(player);
+        }
+
+        if ("CUSTOM".equals(type)) {
+            return player.hasPermission("chatcolor.set.hex") ? data.getColorTag() : defaultTagFor(player);
         }
 
         SelectableEntry entry = "GRADIENT".equals(type)
