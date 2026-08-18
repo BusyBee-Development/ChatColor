@@ -54,7 +54,7 @@
 
 *\*Using `[player]` argument (or running from console) requires `chatcolor.admin`.*
 
-**Aliases:** `/chatcolor`, `/cc`
+**Aliases:** `/chatcolor`, `/colors`
 
 **Note for Console:** Console usage requires specifying a target player for `gui`, `reset`, and `set`.
 

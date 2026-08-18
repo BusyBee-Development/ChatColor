@@ -3,6 +3,7 @@ package net.busybee.chatcolor.listeners;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import net.busybee.chatcolor.ChatColor;
 import net.busybee.chatcolor.utils.ChatDebugger;
 import net.busybee.chatcolor.utils.ColorUtil;
@@ -20,6 +21,7 @@ public class ChatListener implements Listener {
 
     private final ChatColor plugin;
     private static final Map<UUID, String> lastMessages = new ConcurrentHashMap<>();
+    private static final AtomicBoolean warnedPapiFailure = new AtomicBoolean(false);
     public ChatListener(ChatColor plugin) {
         this.plugin = plugin;
     }
@@ -152,10 +154,19 @@ public class ChatListener implements Listener {
             changed = true;
         }
         if (format.contains("%")) {
-            String papped = PlaceholderAPI.setPlaceholders(player, format);
-            if (!papped.equals(format)) {
-                format = papped;
-                changed = true;
+            try {
+                String papped = PlaceholderAPI.setPlaceholders(player, format);
+                if (!papped.equals(format)) {
+                    format = papped;
+                    changed = true;
+                }
+            } catch (Exception e) {
+                if (warnedPapiFailure.compareAndSet(false, true)) {
+                    plugin.getLogger().warning("PlaceholderAPI.setPlaceholders() threw " + e.getClass().getSimpleName()
+                            + " - skipping placeholder replacement in chat format. This usually means two copies of"
+                            + " PlaceholderAPI are loaded (check your plugins folder for a duplicate jar, e.g."
+                            + " \"PlaceholderAPI-x.y.z (1).jar\"). Further occurrences will be suppressed.");
+                }
             }
         }
         if (changed) {

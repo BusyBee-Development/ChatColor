@@ -15,7 +15,7 @@ commands:
     permission: chatcolor.use
     aliases:
       - chatcolor
-      - cc
+      - colors
 
 permissions:
   chatcolor.use:
