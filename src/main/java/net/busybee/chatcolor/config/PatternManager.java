@@ -35,6 +35,7 @@ public class PatternManager {
             for (String key : section.getKeys(false)) {
                 String displayName = section.getString(key + ".display-name", key);
                 String icon = section.getString(key + ".icon", "YELLOW_WOOL");
+                String hdbId = section.getString(key + ".hdb-id", null);
                 List<String> colors = section.getStringList(key + ".colors");
                 if (colors.isEmpty()) continue;
                 String permission = section.getString(key + ".permission", "chatcolor.pattern." + key);
@@ -45,7 +46,7 @@ public class PatternManager {
                 PermissionDefault permissionDefault = parsePermissionDefault(
                         section.getString(key + ".default"), "patterns." + key);
 
-                loaded.put(key, new PatternEntry(key, displayName, permission, icon, colors, permissionDefault));
+                loaded.put(key, new PatternEntry(key, displayName, permission, icon, colors, permissionDefault, hdbId));
             }
         }
 

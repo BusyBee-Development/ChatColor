@@ -10,6 +10,7 @@ public interface SelectableEntry {
     String getPermission();
     PermissionDefault getPermissionDefault();
     String getIconMaterial();
+    String getHdbId();
     String getTag();
     String getEntryType();
 

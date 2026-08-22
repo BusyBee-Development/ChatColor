@@ -9,6 +9,7 @@ import net.busybee.chatcolor.config.GuiManager;
 import net.busybee.chatcolor.config.PatternManager;
 import net.busybee.chatcolor.data.PlayerDataManager;
 import net.busybee.chatcolor.hooks.PlaceholderAPIHook;
+import net.busybee.chatcolor.hooks.HeadDatabaseHook;
 import fr.mrmicky.fastinv.FastInvManager;
 import net.busybee.chatcolor.listeners.ChatListener;
 import net.busybee.chatcolor.listeners.PlayerListener;
@@ -52,6 +53,7 @@ public class ChatColor extends JavaPlugin {
     private volatile boolean directWrite;
     private BStatsManager bStatsManager;
     private FastStatsManager fastStatsManager;
+    private HeadDatabaseHook headDatabaseHook;
 
     public ConfigManager getConfigManager() { return configManager; }
     public ColorManager getColorManager() { return colorManager; }
@@ -68,6 +70,7 @@ public class ChatColor extends JavaPlugin {
     public boolean isDirectWrite() { return directWrite; }
     public BStatsManager getBStatsManager() { return bStatsManager; }
     public FastStatsManager getFastStatsManager() { return fastStatsManager; }
+    public HeadDatabaseHook getHeadDatabaseHook() { return headDatabaseHook; }
 
     @Override
     public void onEnable() {
@@ -298,6 +301,9 @@ public class ChatColor extends JavaPlugin {
     private void registerHooks() {
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new PlaceholderAPIHook(this).register();
+        }
+        if (Bukkit.getPluginManager().getPlugin("HeadDatabase") != null) {
+            this.headDatabaseHook = new HeadDatabaseHook(this);
         }
         new net.busybee.chatcolor.hooks.IntegrationChecker(this).check();
     }

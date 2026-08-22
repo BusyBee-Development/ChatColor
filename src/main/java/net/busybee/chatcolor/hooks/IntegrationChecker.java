@@ -18,6 +18,16 @@ public class IntegrationChecker {
             boolean hasLPC = Bukkit.getPluginManager().getPlugin("LPC") != null;
             boolean hasEssentialsChat = Bukkit.getPluginManager().getPlugin("EssentialsChat") != null;
             boolean hasEssentialsC = Bukkit.getPluginManager().getPlugin("EssentialsC") != null;
+            boolean hasHeadDatabase = Bukkit.getPluginManager().getPlugin("HeadDatabase") != null;
+
+            if (!hasHeadDatabase) {
+                long hdbEntries = countHdbEntries();
+                if (hdbEntries > 0) {
+                    plugin.getLogger().info("[ChatColor] " + hdbEntries + " color/pattern entr"
+                            + (hdbEntries == 1 ? "y uses" : "ies use")
+                            + " an hdb-id icon, but HeadDatabase isn't installed. Falling back to each entry's configured icon material.");
+                }
+            }
 
             if (hasEssentialsChat || hasEssentialsC) {
                 plugin.getLogger().info("======================================================");
@@ -64,5 +74,12 @@ public class IntegrationChecker {
                 plugin.getLogger().warning("======================================================");
             }
         }, 20L);
+    }
+
+    private long countHdbEntries() {
+        long count = plugin.getColorManager().getColorList().stream().filter(e -> e.getHdbId() != null).count();
+        count += plugin.getColorManager().getGradientList().stream().filter(e -> e.getHdbId() != null).count();
+        count += plugin.getPatternManager().getPatternList().stream().filter(e -> e.getHdbId() != null).count();
+        return count;
     }
 }

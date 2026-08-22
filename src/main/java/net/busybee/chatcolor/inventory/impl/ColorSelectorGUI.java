@@ -201,9 +201,15 @@ public class ColorSelectorGUI extends FastInv {
     }
 
     private ItemStack createEntryIcon(SelectableEntry entry, boolean hasPermission, boolean isSelected) {
-        Material mat = Material.matchMaterial(entry.getIconMaterial());
-        if (mat == null) mat = Material.PAPER;
-        ItemStack item = new ItemStack(mat);
+        ItemStack item = null;
+        if (entry.getHdbId() != null && plugin.getHeadDatabaseHook() != null) {
+            item = plugin.getHeadDatabaseHook().resolveHead(entry.getHdbId());
+        }
+        if (item == null) {
+            Material mat = Material.matchMaterial(entry.getIconMaterial());
+            if (mat == null) mat = Material.PAPER;
+            item = new ItemStack(mat);
+        }
 
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return item;

@@ -12,25 +12,33 @@ public class PatternEntry implements SelectableEntry {
     private final String iconMaterial;
     private final List<String> colors;
     private final PermissionDefault permissionDefault;
+    private final String hdbId;
 
     public PatternEntry(String key, String displayName, String permission, String iconMaterial, List<String> colors) {
-        this(key, displayName, permission, iconMaterial, colors, PermissionDefault.OP);
+        this(key, displayName, permission, iconMaterial, colors, PermissionDefault.OP, null);
     }
 
     public PatternEntry(String key, String displayName, String permission, String iconMaterial, List<String> colors,
                         PermissionDefault permissionDefault) {
+        this(key, displayName, permission, iconMaterial, colors, permissionDefault, null);
+    }
+
+    public PatternEntry(String key, String displayName, String permission, String iconMaterial, List<String> colors,
+                        PermissionDefault permissionDefault, String hdbId) {
         this.key = key;
         this.displayName = displayName;
         this.permission = (permission == null || permission.isBlank()) ? null : permission;
         this.iconMaterial = iconMaterial;
         this.colors = colors;
         this.permissionDefault = permissionDefault == null ? PermissionDefault.OP : permissionDefault;
+        this.hdbId = (hdbId == null || hdbId.isBlank()) ? null : hdbId.trim();
     }
 
     public String getKey() { return key; }
     public String getDisplayName() { return displayName; }
     public String getPermission() { return permission; }
     public String getIconMaterial() { return iconMaterial; }
+    public String getHdbId() { return hdbId; }
     public List<String> getColors() { return colors; }
     public PermissionDefault getPermissionDefault() { return permissionDefault; }
 

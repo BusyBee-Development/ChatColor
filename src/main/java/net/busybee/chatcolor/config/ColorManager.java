@@ -106,7 +106,7 @@ public class ColorManager {
 
     @FunctionalInterface
     private interface EntryFactory<T> {
-        T create(String key, String displayName, String tag, String permission, String icon, PermissionDefault def);
+        T create(String key, String displayName, String tag, String permission, String icon, PermissionDefault def, String hdbId);
     }
 
     private <T> void loadSection(ConfigurationSection section, Map<String, T> map,
@@ -125,10 +125,11 @@ public class ColorManager {
             }
 
             String icon = section.getString(key + ".icon", "WHITE_WOOL");
+            String hdbId = section.getString(key + ".hdb-id", null);
             PermissionDefault permissionDefault = parsePermissionDefault(
                     section.getString(key + ".default"), section.getName() + "." + key);
 
-            map.put(key, factory.create(key, displayName, tag, permission, icon, permissionDefault));
+            map.put(key, factory.create(key, displayName, tag, permission, icon, permissionDefault, hdbId));
         }
     }
 

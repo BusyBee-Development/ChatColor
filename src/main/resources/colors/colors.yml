@@ -9,6 +9,10 @@
 #   tag          : The color itself. Any MiniMessage tag works - "<red>", "<#FF69B4>" or
 #                  "<gradient:red:gold>". Legacy codes like "&c" are accepted too.
 #   icon         : The material to show in the GUI.
+#   hdb-id       : Optional. A HeadDatabase (https://www.spigotmc.org/resources/14280/) head
+#                  ID to use as the icon instead of 'icon' - browse IDs on minecraft-heads.com.
+#                  Requires the HeadDatabase plugin; falls back to 'icon' if it's not
+#                  installed or the ID can't be resolved. Example: hdb-id: "7129"
 #   permission   : The node a player needs. Leave it empty ("") to let EVERYONE use the
 #                  entry with no permission at all. It does not have to start with
 #                  "chatcolor." - "vip.colors.royal" works just as well.

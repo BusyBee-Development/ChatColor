@@ -10,19 +10,26 @@ public class GradientEntry implements SelectableEntry {
     private final String permission;
     private final String iconMaterial;
     private final PermissionDefault permissionDefault;
+    private final String hdbId;
 
     public GradientEntry(String key, String displayName, String tag, String permission, String iconMaterial) {
-        this(key, displayName, tag, permission, iconMaterial, PermissionDefault.OP);
+        this(key, displayName, tag, permission, iconMaterial, PermissionDefault.OP, null);
     }
 
     public GradientEntry(String key, String displayName, String tag, String permission, String iconMaterial,
                          PermissionDefault permissionDefault) {
+        this(key, displayName, tag, permission, iconMaterial, permissionDefault, null);
+    }
+
+    public GradientEntry(String key, String displayName, String tag, String permission, String iconMaterial,
+                         PermissionDefault permissionDefault, String hdbId) {
         this.key = key;
         this.displayName = displayName;
         this.tag = tag;
         this.permission = (permission == null || permission.isBlank()) ? null : permission;
         this.iconMaterial = iconMaterial;
         this.permissionDefault = permissionDefault == null ? PermissionDefault.OP : permissionDefault;
+        this.hdbId = (hdbId == null || hdbId.isBlank()) ? null : hdbId.trim();
     }
 
     public String getKey() { return key; }
@@ -30,6 +37,7 @@ public class GradientEntry implements SelectableEntry {
     public String getTag() { return tag; }
     public String getPermission() { return permission; }
     public String getIconMaterial() { return iconMaterial; }
+    public String getHdbId() { return hdbId; }
     public PermissionDefault getPermissionDefault() { return permissionDefault; }
 
     @Override

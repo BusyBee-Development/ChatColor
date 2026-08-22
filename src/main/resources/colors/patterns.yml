@@ -8,6 +8,10 @@
 # Like colors.yml, each entry takes an optional 'permission' (leave it empty to let
 # everyone use the pattern) and an optional 'default' of true, op or false. Every node
 # is registered with the server on startup so "chatcolor.pattern.*" works in LuckPerms.
+#
+# Each entry also accepts an optional 'hdb-id' - a HeadDatabase head ID to use as the
+# icon instead of 'icon'. Requires the HeadDatabase plugin; falls back to 'icon' if it's
+# not installed or the ID can't be resolved. Example: hdb-id: "7129"
 
 patterns:
   rainbow:

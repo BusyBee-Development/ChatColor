@@ -4,8 +4,8 @@ main: net.busybee.chatcolor.ChatColor
 api-version: '1.21'
 folia-supported: true
 canvas-supported: true
-author: BusyBee
-softdepend: [PlaceholderAPI, Essentials, EssentialsChat, EssentialsC]
+author: djtmk
+softdepend: [PlaceholderAPI, Essentials, EssentialsChat, EssentialsC, HeadDatabase]
 description: Advanced chat color plugin with gradient and pattern support.
 
 commands:
