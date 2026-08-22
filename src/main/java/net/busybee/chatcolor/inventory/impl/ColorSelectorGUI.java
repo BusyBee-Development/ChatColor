@@ -228,10 +228,12 @@ public class ColorSelectorGUI extends FastInv {
             lore.add(plugin.getGuiManager().get("status.click-to-apply"));
             lore.add(Component.empty());
             lore.add(plugin.getGuiManager().get("status.has-access"));
-        } else {
+        } else if (plugin.getGuiManager().getBoolean("settings.show-permission-node", true)) {
             lore.add(plugin.getGuiManager().get("status.no-access"));
             String permColor = plugin.getGuiManager().getRaw("settings.permission-color");
             lore.add(ColorUtil.colorize(permColor + entry.getPermission()));
+        } else {
+            lore.add(plugin.getGuiManager().get("status.no-access-locked"));
         }
 
         meta.lore(lore);

@@ -69,6 +69,9 @@ public class GuiManager {
     public int getInt(String key, int def) {
         return this.guiConfig.getInt(key, def);
     }
+    public boolean getBoolean(String key, boolean def) {
+        return this.guiConfig.getBoolean(key, def);
+    }
     public List<Integer> getIntList(String key) {
         return this.guiConfig.getIntegerList(key);
     }

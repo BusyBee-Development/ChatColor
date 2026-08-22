@@ -9,6 +9,10 @@ settings:
   reset-tag: "<reset>"
   # Color used for permission requirement text
   permission-color: "<red>"
+  # Whether to show the raw permission node (e.g. "chatcolor.color.green") in the
+  # lore of colors a player doesn't have access to. Set to false to hide it while
+  # still showing the "You need permission:" line (status.no-access).
+  show-permission-node: true
 
 # Background filler item
 filler:
@@ -45,7 +49,11 @@ status:
   selected: "<green><bold>SELECTED"
   click-to-apply: "<gray>Click to apply this color."
   has-access: "<green>? <gray>You have access."
+  # Shown above the permission node when settings.show-permission-node is true
   no-access: "<gray>You need permission:"
+  # Shown instead of no-access when settings.show-permission-node is false
+  # (no node follows it, so this should read as a complete sentence)
+  no-access-locked: "<gray>You don't have permission to use this."
 
 # Definitions for navigation and category items
 items:
