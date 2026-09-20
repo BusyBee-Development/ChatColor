@@ -138,7 +138,7 @@ public class ChatListener implements Listener {
         if (player.hasPermission("chatcolor.minimessage")) {
             return ColorUtil.colorizeUserInput(raw);
         }
-        return Component.text(raw);
+        return Component.text(ColorUtil.stripSection(raw));
     }
 
     private void rewriteFormatPlaceholders(Player player, AsyncPlayerChatEvent event) {

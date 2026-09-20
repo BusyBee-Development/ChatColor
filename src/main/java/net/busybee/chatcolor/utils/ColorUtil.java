@@ -33,11 +33,17 @@ public class ColorUtil {
 
     public static Component colorizeUserInput(String text) {
         if (text == null) return Component.empty();
+        String clean = stripSection(text);
         try {
-            return MINI_MESSAGE.deserialize(text);
+            return MINI_MESSAGE.deserialize(clean);
         } catch (Exception e) {
-            return Component.text(text);
+            return Component.text(clean);
         }
+    }
+
+    /** Players can send raw section signs from modified clients; MiniMessage rejects them outright. */
+    public static String stripSection(String text) {
+        return text == null ? "" : text.replace(String.valueOf(SECTION), "");
     }
 
     public static Component applyTagToText(String tag, String rawText) {
