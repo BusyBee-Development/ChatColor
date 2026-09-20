@@ -45,7 +45,6 @@ Thumbs.db
 .env
 .env.*
 lib/
-docs/
 src/main/resources/faststats.properties
 src/main/resources/bstats.properties
 test/
