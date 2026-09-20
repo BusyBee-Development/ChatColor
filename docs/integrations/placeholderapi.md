@@ -6,7 +6,7 @@ sidebar_position: 1
 
 # PlaceholderAPI
 
-ChatColor provides a simplified and powerful PlaceholderAPI expansion. All placeholders are designed to be high-performance, thread-safe, and universally compatible by returning results in **Legacy Hex format** (`§x§r§r§g§g§b§b`).
+ChatColor provides a simplified and powerful PlaceholderAPI expansion. All placeholders are designed to be high-performance and thread-safe. By default they return **Legacy Hex format** (`§x§r§r§g§g§b§b`), and switch to MiniMessage automatically for formatters that need it — see [Output format](#output-format-papi-output).
 
 ---
 
@@ -47,13 +47,26 @@ ChatColor provides a simplified and powerful PlaceholderAPI expansion. All place
 
 ---
 
+## Output format (`papi-output`)
+
+The example outputs above are the `LEGACY` form (`§` codes). Some formatters parse their whole chat format as MiniMessage, and MiniMessage rejects `§` codes outright — the chat message is dropped and the console shows `Legacy formatting codes have been detected in a MiniMessage string`. `papi-output` in `config.yml` controls which form the placeholders return:
+
+| Value         | Returns                                                                                    |
+|:--------------|:-------------------------------------------------------------------------------------------|
+| `AUTO`        | `MINIMESSAGE` when LPC 4.x or newer is installed on Paper, `LEGACY` otherwise. Recommended. |
+| `LEGACY`      | `§` codes. For scoreboards, tablists, and formatters that use `setFormat()`.                |
+| `MINIMESSAGE` | MiniMessage tags. Player-typed text is escaped, so it can't inject tags.                    |
+
+`/color debug` prints the resolved value on its `config:` line.
+
+---
+
 ## Plugin Integration Guide
 
 > **Placeholders are optional.** ChatColor colors the message itself, on whichever chat
-> pipeline your server is actually using. You only need `%chatcolor_message%` for
-> plugins that build their format from placeholders and would otherwise discard the
-> colored message — LPC is the main one. Plain servers, and servers running
-> EssentialsChat, need no placeholder at all.
+> pipeline your server is actually using — that includes EssentialsChat and LPC. You only need
+> `%chatcolor_message%` if you specifically want a formatter to place the colored message
+> inside its own format.
 
 ### 1. EssentialsChat — no placeholder needed
 
@@ -72,19 +85,33 @@ EssentialsChat formats chat with legacy `&` codes and does not support Placehold
 *   **You do not need to grant `essentials.chat.color` or `essentials.chat.rgb`.** Those govern
     whether players can type their own `&` codes and have no bearing on ChatColor.
 
-### 2. LPC (LuckPermsChat) — placeholder required
+### 2. LPC (LuckPermsChat) — placeholder optional
 
-LPC builds its format from PlaceholderAPI and discards the rendered message, so the placeholder
-route is required here.
+LPC installs a Paper chat renderer, and ChatColor wraps it and colors the message before LPC
+formats it. The defaults work with no placeholder.
 
-*   **Recommended setup:** use `%chatcolor_message%` to display the colored message.
-*   **Example format:**
+**Recommended — defaults, no placeholder:**
+
+*   Keep `{message}` in LPC's format.
+*   In ChatColor's `config.yml`, leave `apply-to-message: true` and `late-bind: false`.
+
+**Alternative — LPC places the color via the placeholder.** Use this only if you want the colored
+message inside LPC's own format:
+
+*   In LPC's format, use `%chatcolor_message%` in place of `{message}`:
     ```yaml
     chat-format: "{prefix}{name}&r: %chatcolor_message%"
     ```
-*   **Required:** set `late-bind: true` in ChatColor's `config.yml`. This stops ChatColor coloring
-    the message itself so it isn't colored twice. Leaving `late-bind: false` here double-processes;
-    setting it `true` *without* an LPC-style format leaves chat uncolored entirely.
+*   In ChatColor's `config.yml`, set `apply-to-message: false` and `late-bind: true`. This stops
+    ChatColor coloring the message itself so it isn't colored twice.
+*   Leave `papi-output: "AUTO"`. LPC 4.x parses its whole format as MiniMessage, and `AUTO` returns
+    MiniMessage for it. Without that, LPC throws `Legacy formatting codes have been detected in a
+    MiniMessage string` and no chat is sent. Set `papi-output: "MINIMESSAGE"` if LPC isn't detected.
+
+> `late-bind: true` only works when LPC's renderer is the one that ends up delivering the message.
+> If another chat plugin installs its own renderer after LPC (a chat-hover or chat-format plugin),
+> `%chatcolor_message%` is never used and chat comes out uncolored, with no error. The default
+> setup doesn't have this problem.
 
 ### 3. DiscordSRV
 
@@ -95,7 +122,7 @@ config so it reads the same event ChatColor renders on.
 
 ## Technical Details
 
-- **Universal Compatibility:** By returning legacy hex strings, our placeholders work in scoreboards, tab-lists, and almost any plugin that supports PAPI, regardless of whether they support MiniMessage.
+- **Universal Compatibility:** By default our placeholders return legacy hex strings, so they work in scoreboards, tab-lists, and almost any plugin that supports PAPI, regardless of whether they support MiniMessage. `papi-output` switches them to MiniMessage for formatters that need it.
 - **Folia & Paper Ready:** All lookups are performed against a thread-safe cache (`ConcurrentHashMap`), ensuring zero impact on server performance and full compatibility with Folia's regional threading.
 - **Gradient Fidelity:** Complex gradients are serialized character-by-character into legacy hex codes, allowing them to render perfectly even in plugins that only understand legacy colors.
 

@@ -21,6 +21,7 @@ public class ConfigManager {
     private volatile String defaultColor;
     private volatile Map<String, String> groupDefaults = Collections.emptyMap();
     private volatile boolean lateBind;
+    private volatile String papiOutput;
     private volatile boolean cleanConsole;
     private volatile boolean showStandardColors;
     private volatile boolean showStandardGradients;
@@ -56,6 +57,7 @@ public class ConfigManager {
         this.chatHook = config.getString("settings.chat-hook", "AUTO");
         this.messageMode = config.getString("settings.message-mode", "AUTO");
         this.lateBind = config.getBoolean("settings.late-bind", false);
+        this.papiOutput = config.getString("settings.papi-output", "AUTO");
         this.cleanConsole = config.getBoolean("settings.clean-console", true);
         this.showStandardColors = config.getBoolean("settings.show-standard-colors", true);
         this.showStandardGradients = config.getBoolean("settings.show-standard-gradients", true);
@@ -104,6 +106,9 @@ public class ConfigManager {
     }
     public boolean isLateBind() {
         return this.lateBind;
+    }
+    public String getPapiOutput() {
+        return this.papiOutput;
     }
     public boolean isCleanConsole() {
         return this.cleanConsole;

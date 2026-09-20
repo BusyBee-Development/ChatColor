@@ -19,8 +19,20 @@ Work through this in order:
    HIGHEST` on Paper. If it says `LEGACY` and you are on Paper, something set `chat-hook`
    explicitly — set it back to `AUTO` in `config.yml`.
 2. **Confirm `apply-to-message: true`** and `late-bind: false` in `config.yml`. Either one turns
-   message coloring off, by design — `late-bind: true` is only for placeholder-driven formatters
-   like LPC, see [PlaceholderAPI](../integrations/placeholderapi.md).
+   message coloring off, by design — `late-bind: true` is only for setups where a formatter like
+   LPC places the color through `%chatcolor_message%`, see
+   [PlaceholderAPI](../integrations/placeholderapi.md). If another chat plugin (chat-hover,
+   chat-format) is installed, that setup can leave chat uncolored — switch back to the defaults.
+
+## Chat stops sending with LPC ("Legacy formatting codes have been detected")
+
+The console shows `Legacy formatting codes have been detected in a MiniMessage string` and no
+messages go through. LPC 4.x parses its whole format as MiniMessage, and `%chatcolor_message%`
+returned `§` codes. Fix it with either:
+
+- **Use the defaults** — `{message}` in LPC's format, `apply-to-message: true`, `late-bind: false`.
+- **Keep the placeholder** and set `papi-output: "MINIMESSAGE"` in ChatColor's `config.yml` (the
+  default `AUTO` does this for LPC 4.x on 26.9.1 and newer).
 3. **Run `/color debug`** as the affected player, say something, and read the console. See
    [Chat Compatibility](../integrations/chat-compatibility.md) for how to interpret it.
 

@@ -23,6 +23,7 @@ settings:
   event-priority: "DEFAULT" # The listener priority for the chat event (LOWEST to MONITOR)
   chat-hook: "AUTO"        # Which chat event to hook (AUTO / MODERN / LEGACY)
   late-bind: false         # Use if you use %chatcolor_message% in other plugin formats
+  papi-output: "AUTO"      # Form our placeholders return (AUTO / LEGACY / MINIMESSAGE)
   clean-console: true      # Strips color codes from console output
   show-standard-colors: true     # Toggle standard colors in GUI
   show-standard-gradients: true  # Toggle standard gradients in GUI
@@ -40,7 +41,8 @@ settings:
 | `event-priority`   | Set to `DEFAULT` to auto-detect, or set one manually (e.g. `HIGHEST`). See [below](#listener-priority-event-priority) — you should rarely need to change this.                  |
 | `chat-hook`        | Which chat event to hook. `AUTO` (recommended), `MODERN`, or `LEGACY`. Paper only — Spigot always uses `LEGACY`. See below.                                                     |
 | `message-mode`     | How the color is applied to the message. `AUTO` (recommended) picks for you, `RENDERER` colors it as chat is rendered, `DIRECT` colors the event message itself — use `DIRECT` when a formatter (e.g. EssentialsChat) ignores what the renderer hands it. Invalid values fall back to `AUTO` with a warning. |
-| `late-bind`        | Stops ChatColor coloring the message itself, so another plugin can place it via `%chatcolor_message%`. Enable this **only** when a chat plugin builds its format from placeholders (LPC), otherwise chat comes out uncolored. |
+| `late-bind`        | Stops ChatColor coloring the message itself, so another plugin can place it via `%chatcolor_message%`. Enable this **only** when a chat plugin places the message from `%chatcolor_message%` in its own format (e.g. LPC set up that way) — with LPC's normal `{message}` format, leave it `false`. Otherwise chat comes out uncolored. |
+| `papi-output`      | What our PlaceholderAPI placeholders return. `AUTO` (recommended) uses MiniMessage for LPC 4.x or newer on Paper and `§` legacy codes otherwise. Force `MINIMESSAGE` if the console shows "Legacy formatting codes have been detected in a MiniMessage string" and chat stops sending, or `LEGACY` for formatters that use `setFormat()`. |
 | `clean-console`    | If true, the plugin strips color codes from its own console output to keep logs readable. `/color debug` output is escaped so this cannot hide it.                              |
 | `show-standard-*`  | Set to `false` to skip loading the bundled colors, gradients, or patterns entirely — they disappear from the GUI **and** from `/color set` and the API. Custom colors are unaffected. |
 

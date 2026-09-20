@@ -380,6 +380,29 @@ public class ChatColor extends JavaPlugin {
         activePriority = autoDetectPriority(legacy);
     }
 
+    /**
+     * True when our PlaceholderAPI placeholders should return MiniMessage instead of section-sign
+     * codes. LPC 4.x deserializes its whole format as MiniMessage, which rejects section signs and
+     * drops the chat message.
+     */
+    public boolean isPapiMiniMessage() {
+        String configured = configManager.getPapiOutput();
+        if ("MINIMESSAGE".equalsIgnoreCase(configured)) return true;
+        if ("LEGACY".equalsIgnoreCase(configured)) return false;
+        if (configured != null && !"AUTO".equalsIgnoreCase(configured)) {
+            getLogger().warning("Invalid papi-output in config.yml: " + configured + ", using AUTO.");
+        }
+
+        org.bukkit.plugin.Plugin lpc = Bukkit.getPluginManager().getPlugin("LPC");
+        if (lpc == null || !lpc.isEnabled() || !isPaper()) return false;
+        try {
+            String version = lpc.getDescription().getVersion();
+            return Integer.parseInt(version.split("[^0-9]", 2)[0]) >= 4;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
     public boolean isPaper() {
         try {
             Class.forName("io.papermc.paper.event.player.AsyncChatEvent");

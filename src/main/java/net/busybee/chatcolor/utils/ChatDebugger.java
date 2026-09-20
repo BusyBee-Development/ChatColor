@@ -126,7 +126,9 @@ public final class ChatDebugger implements Listener {
                 + " late-bind=" + plugin.getConfigManager().isLateBind()
                 + " chat-hook=" + plugin.getConfigManager().getChatHook()
                 + " event-priority=" + plugin.getConfigManager().getEventPriority()
-                + " message-mode=" + plugin.getConfigManager().getMessageMode());
+                + " message-mode=" + plugin.getConfigManager().getMessageMode()
+                + " papi-output=" + plugin.getConfigManager().getPapiOutput()
+                + " (" + (plugin.isPapiMiniMessage() ? "MINIMESSAGE" : "LEGACY") + ")");
 
         if (plugin.isPaper()) {
             dumpHandlers("AsyncChatEvent", AsyncChatEvent.getHandlerList());

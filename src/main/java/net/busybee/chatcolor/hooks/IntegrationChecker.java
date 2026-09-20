@@ -65,12 +65,18 @@ public class IntegrationChecker {
             if (hasLPC) {
                 plugin.getLogger().warning("======================================================");
                 plugin.getLogger().warning("[ChatColor] LPC (LuckPermsChat) detected!");
-                plugin.getLogger().warning("To make ChatColor gradients work correctly with LPC:");
-                plugin.getLogger().warning("1. Open LPC's config.yml.");
-                plugin.getLogger().warning("2. Replace the standard {message} variable with %chatcolor_message%");
-                plugin.getLogger().warning("   in your chat formats.");
-                plugin.getLogger().warning("3. In ChatColor's config.yml, set 'apply-to-message: false'");
-                plugin.getLogger().warning("   to avoid double-coloring, and set 'late-bind: true'.");
+                plugin.getLogger().warning("Recommended: keep {message} in LPC's format and leave ChatColor on its");
+                plugin.getLogger().warning("defaults ('apply-to-message: true', 'late-bind: false'). ChatColor");
+                plugin.getLogger().warning("colours the message itself, no placeholder needed.");
+                plugin.getLogger().warning("Only if you want the colour placed by LPC's own format instead:");
+                plugin.getLogger().warning("1. Use %chatcolor_message% in place of {message} in LPC's format.");
+                plugin.getLogger().warning("2. In ChatColor's config.yml set 'apply-to-message: false' and");
+                plugin.getLogger().warning("   'late-bind: true'.");
+                plugin.getLogger().warning("LPC 4.x reads its format as MiniMessage; 'papi-output: AUTO' returns");
+                plugin.getLogger().warning("MiniMessage for it (now: "
+                        + (plugin.isPapiMiniMessage() ? "MINIMESSAGE" : "LEGACY")
+                        + "). If chat stops");
+                plugin.getLogger().warning("sending, set 'papi-output: MINIMESSAGE'.");
                 plugin.getLogger().warning("======================================================");
             }
         }, 20L);

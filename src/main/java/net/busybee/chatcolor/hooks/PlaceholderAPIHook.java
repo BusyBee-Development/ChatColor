@@ -8,6 +8,7 @@ import net.busybee.chatcolor.utils.PatternApplier;
 import net.busybee.chatcolor.listeners.ChatListener;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 
@@ -67,7 +68,7 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
             }
             if (tag == null || tag.equalsIgnoreCase("NONE")) return "";
             
-            if (tag.startsWith("<") && tag.endsWith(">")) {
+            if (tag.startsWith("<") && tag.endsWith(">") && !plugin.isPapiMiniMessage()) {
                 Component comp = ColorUtil.applyTagToText(tag, "\u200B");
                 result = ColorUtil.toLegacy(comp).replace("\u200B", "");
                 if (result.isEmpty()) result = tag;
@@ -76,16 +77,16 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
             }
         } else if (action.equalsIgnoreCase("message")) {
             String msg = ChatListener.getLastMessage(player.getUniqueId());
-            result = (msg != null && !msg.isEmpty()) ? ColorUtil.toLegacy(buildColored(player, data, msg)) : "";
+            result = (msg != null && !msg.isEmpty()) ? output(buildColored(player, data, msg)) : "";
         } else if (action.equalsIgnoreCase("name")) {
             String name = player.getName();
-            result = (name != null) ? ColorUtil.toLegacy(buildColored(player, data, name)) : "";
+            result = (name != null) ? output(buildColored(player, data, name)) : "";
         } else if (action.startsWith("apply_")) {
             String text = action.substring(6);
-            result = ColorUtil.toLegacy(buildColored(player, data, text));
+            result = output(buildColored(player, data, text));
         } else if (action.startsWith("apply:")) {
             String text = action.substring(6);
-            result = ColorUtil.toLegacy(buildColored(player, data, text));
+            result = output(buildColored(player, data, text));
         } else if (action.equalsIgnoreCase("key")) {
             result = (data != null && data.getColorKey() != null) ? data.getColorKey() : "";
         } else if (action.equalsIgnoreCase("type")) {
@@ -93,6 +94,16 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
         }
 
         return result;
+    }
+
+    /**
+     * MiniMessage rejects section signs outright, so formatters that parse their whole format as
+     * MiniMessage (LPC 4.x) need tags here. Serializing also escapes player-typed text.
+     */
+    private String output(Component component) {
+        return plugin.isPapiMiniMessage()
+                ? MiniMessage.miniMessage().serialize(component)
+                : ColorUtil.toLegacy(component);
     }
 
     private Component buildColored(OfflinePlayer player, PlayerColorData data, String text) {

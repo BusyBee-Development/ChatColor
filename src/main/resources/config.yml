@@ -72,7 +72,20 @@ settings:
   # Enable this if you use %chatcolor_message% in other plugin formats
   # and want to avoid double-processing.
   late-bind: false
-    
+
+  # What form our PlaceholderAPI placeholders (%chatcolor_message%, %chatcolor_name%,
+  # %chatcolor_color%, %chatcolor_apply_...%) return.
+  #
+  #   AUTO        - Recommended. MINIMESSAGE when LPC 4.x or newer is installed on Paper,
+  #                 LEGACY otherwise.
+  #   LEGACY      - Section-sign codes (§x§f§f...). For formatters that use setFormat().
+  #   MINIMESSAGE - MiniMessage tags. For formatters that run the whole format through
+  #                 MiniMessage, which rejects section signs and drops the chat message.
+  #
+  # If chat stops sending with "Legacy formatting codes have been detected in a MiniMessage
+  # string" in the console, set this to MINIMESSAGE.
+  papi-output: "AUTO"
+
   # Strips color codes from console output to keep it readable.
   clean-console: true
 

@@ -189,13 +189,22 @@ off unless you *want* players hand-coloring their own chat.
 
 ### LPC (LuckPermsChat)
 
-LPC builds its format from PlaceholderAPI and discards the rendered message, so it needs the
-placeholder route instead:
+LPC installs a Paper chat renderer, and ChatColor wraps it. **The defaults work — no placeholder
+needed.** Keep `{message}` in LPC's format and leave `apply-to-message: true` and
+`late-bind: false`.
+
+If you want LPC to place the colored message itself, use the placeholder route instead:
 
 1. In LPC's config: `chat-format: "{prefix}{name}&r: %chatcolor_message%"`
-2. In ChatColor's `config.yml`: `late-bind: true`
+2. In ChatColor's `config.yml`: `apply-to-message: false` and `late-bind: true`
 
-`late-bind` stops ChatColor coloring the message itself, so it is not colored twice.
+`late-bind` stops ChatColor coloring the message itself, so it is not colored twice. LPC 4.x needs
+the placeholder to return MiniMessage rather than `§` codes; `papi-output: "AUTO"` handles that.
+See [PlaceholderAPI](placeholderapi.md#2-lpc-luckpermschat--placeholder-optional).
+
+> With `late-bind: true`, another chat plugin that replaces LPC's renderer (chat-hover and similar)
+> stops `%chatcolor_message%` from being used, and chat comes out uncolored with no error. Use the
+> defaults if you run one.
 
 ### DiscordSRV
 
