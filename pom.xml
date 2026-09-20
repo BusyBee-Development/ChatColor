@@ -6,7 +6,7 @@
 
     <groupId>net.busybee</groupId>
     <artifactId>ChatColor</artifactId>
-    <version>26.9.0</version>
+    <version>26.9.1</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -137,7 +137,38 @@
                                         <exclude>META-INF/*.SF</exclude>
                                         <exclude>META-INF/*.DSA</exclude>
                                         <exclude>META-INF/*.RSA</exclude>
+                                        <exclude>META-INF/versions/*/module-info.class</exclude>
                                     </excludes>
+                                </filter>
+                                <!-- Bundled libraries each ship a manifest; ours is the one that should win. -->
+                                <filter>
+                                    <artifact>org.jetbrains:annotations</artifact>
+                                    <excludes><exclude>META-INF/MANIFEST.MF</exclude></excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>org.jspecify:jspecify</artifact>
+                                    <excludes><exclude>META-INF/MANIFEST.MF</exclude></excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>com.google.code.gson:gson</artifact>
+                                    <excludes><exclude>META-INF/MANIFEST.MF</exclude></excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>org.bstats:*</artifact>
+                                    <excludes><exclude>META-INF/MANIFEST.MF</exclude></excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>dev.faststats.metrics:*</artifact>
+                                    <excludes><exclude>META-INF/MANIFEST.MF</exclude></excludes>
+                                </filter>
+                                <!-- Same file in all three; keep the copy from bukkit. -->
+                                <filter>
+                                    <artifact>dev.faststats.metrics:config</artifact>
+                                    <excludes><exclude>META-INF/faststats.properties</exclude></excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>dev.faststats.metrics:core</artifact>
+                                    <excludes><exclude>META-INF/faststats.properties</exclude></excludes>
                                 </filter>
                             </filters>
                         </configuration>
