@@ -4,8 +4,6 @@ title: Getting Help
 sidebar_position: 3
 ---
 
-# Getting Help
-
 Still stuck after checking [Common Issues](common-issues.md) and the [FAQ](faq.md)?
 
 1. **Run `/color debug`** as the affected player, reproduce the issue, and copy the console

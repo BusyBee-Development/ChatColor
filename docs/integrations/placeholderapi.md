@@ -4,8 +4,6 @@ title: PlaceholderAPI
 sidebar_position: 1
 ---
 
-# PlaceholderAPI
-
 ChatColor provides a simplified and powerful PlaceholderAPI expansion. All placeholders are designed to be high-performance and thread-safe. By default they return **Legacy Hex format** (`§x§r§r§g§g§b§b`), and switch to MiniMessage automatically for formatters that need it — see [Output format](#output-format-papi-output).
 
 ---

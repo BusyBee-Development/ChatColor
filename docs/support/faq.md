@@ -4,8 +4,6 @@ title: FAQ
 sidebar_position: 2
 ---
 
-# FAQ
-
 ## General Questions
 
 **What server software and Java version does ChatColor need?**

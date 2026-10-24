@@ -4,8 +4,6 @@ title: GUI
 sidebar_position: 2
 ---
 
-# GUI
-
 The graphical interface of **ChatColor** is fully customizable via the `gui/gui.yml` file. This allows you to change everything from titles and item materials to the exact layout of the menus.
 
 ---

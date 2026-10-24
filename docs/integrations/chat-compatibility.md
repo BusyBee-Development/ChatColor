@@ -4,8 +4,6 @@ title: Chat Compatibility
 sidebar_position: 2
 ---
 
-# Chat Compatibility
-
 Almost every "my colors don't show up" report comes down to the same question: **where in the
 chat pipeline does ChatColor sit relative to the plugin that formats your chat?** This page
 explains the pipeline and how to inspect it on a live server.

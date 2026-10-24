@@ -3,8 +3,6 @@ id: intro
 title: ChatColor
 ---
 
-# 🌈 ChatColor
-
 **ChatColor** is an advanced Minecraft chat color plugin built for **Paper 1.21+** (with full
 **Folia** and **Canvas** support) that lets players personalize their chat messages with solid
 colors, multi-stop gradients, and character-cycling patterns — all through a sleek GUI or simple

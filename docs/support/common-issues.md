@@ -4,8 +4,6 @@ title: Common Issues
 sidebar_position: 1
 ---
 
-# Common Issues
-
 A checklist for the most frequent reports. For a full technical trace of the chat pipeline, see
 [Chat Compatibility](../integrations/chat-compatibility.md).
 
