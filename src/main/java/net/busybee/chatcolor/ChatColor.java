@@ -178,6 +178,13 @@ public class ChatColor extends JavaPlugin {
                     ((ChatListener) listener).onChat(chatEvent);
                 }
             }, this, true);
+            // Keep %chatcolor_message% current for formatters that run on the legacy event.
+            // HIGH: after ChatManager's caps and mention filters, before any HIGHEST formatter.
+            Bukkit.getPluginManager().registerEvent(AsyncPlayerChatEvent.class, chatListener, EventPriority.HIGH, (listener, event) -> {
+                if (event instanceof AsyncPlayerChatEvent chatEvent) {
+                    ((ChatListener) listener).recordLegacy(chatEvent);
+                }
+            }, this, true);
         }
 
         getLogger().info("Chat hook: " + (legacy ? "LEGACY (AsyncPlayerChatEvent)" : "MODERN (AsyncChatEvent)")
@@ -185,6 +192,7 @@ public class ChatColor extends JavaPlugin {
                 + (legacy ? "" : ", message mode " + (directWrite ? "DIRECT" : "RENDERER")));
 
         warnIfDirectWriteIsTooLate();
+        warnIfTooLateForChatManager(legacy);
 
         if (chatDebugger != null) {
             chatDebugger.rebind();
@@ -226,7 +234,13 @@ public class ChatColor extends JavaPlugin {
             getLogger().warning("Invalid chat-hook in config.yml: " + configured + ", using AUTO.");
         }
 
-        return false;
+        // ChatManager pastes the message text into its format on the legacy event, so a modern
+        // renderer has nothing left to colour. Colour the legacy message before it formats.
+        return hasChatManager();
+    }
+
+    public boolean hasChatManager() {
+        return Bukkit.getPluginManager().isPluginEnabled("ChatManager");
     }
 
     private EventPriority autoDetectPriority(boolean legacy) {
@@ -236,6 +250,10 @@ public class ChatColor extends JavaPlugin {
             return hasMessageDiscardingFormatter() ? EventPriority.HIGH : EventPriority.HIGHEST;
         }
 
+        // ChatManager formats at HIGHEST and bakes the message in, so we have to go first.
+        if (hasChatManager()) {
+            return EventPriority.HIGH;
+        }
         if (Bukkit.getPluginManager().isPluginEnabled("LPC") ||
             Bukkit.getPluginManager().isPluginEnabled("DeluxeChat") ||
             Bukkit.getPluginManager().isPluginEnabled("EssentialsChat")) {
@@ -287,6 +305,21 @@ public class ChatColor extends JavaPlugin {
         getLogger().warning("EssentialsChat reads the chat message at HIGHEST and formats");
         getLogger().warning("from its own copy, so ChatColor has to run in front of it. Your");
         getLogger().warning("event-priority is " + activePriority.name() + ", which runs after.");
+        getLogger().warning("Set settings.event-priority back to DEFAULT (or to HIGH) in");
+        getLogger().warning("ChatColor's config.yml.");
+        getLogger().warning("======================================================");
+    }
+
+    private void warnIfTooLateForChatManager(boolean legacy) {
+        if (!legacy || !hasChatManager() || activePriority.getSlot() < EventPriority.HIGHEST.getSlot()) {
+            return;
+        }
+
+        getLogger().warning("======================================================");
+        getLogger().warning("[ChatColor] Chat colours may not show up.");
+        getLogger().warning("ChatManager builds its chat format at HIGHEST and pastes the");
+        getLogger().warning("message into it, so ChatColor has to colour the message first.");
+        getLogger().warning("Your event-priority is " + activePriority.name() + ", which runs after.");
         getLogger().warning("Set settings.event-priority back to DEFAULT (or to HIGH) in");
         getLogger().warning("ChatColor's config.yml.");
         getLogger().warning("======================================================");

@@ -106,6 +106,15 @@ public class ChatListener implements Listener {
         }
     }
 
+    /**
+     * Paper fires the legacy chat event before the modern one, and formatters on the legacy event
+     * (ChatManager, DeluxeChat) resolve %chatcolor_message% there. Without this the placeholder
+     * would still hold the previous message when they read it.
+     */
+    public void recordLegacy(AsyncPlayerChatEvent event) {
+        lastMessages.put(event.getPlayer().getUniqueId(), event.getMessage());
+    }
+
     public void onLegacyChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
         String rawMessage = event.getMessage();

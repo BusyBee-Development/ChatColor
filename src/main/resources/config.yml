@@ -28,17 +28,20 @@ settings:
   # DEFAULT resolves to HIGHEST on the modern chat hook, because that hook colours from a
   # chat renderer and the last plugin to install one wins. The exception is EssentialsChat:
   # it reads the message at HIGHEST and formats from its own copy, so DEFAULT drops to HIGH
-  # to get in front of it. On the legacy hook DEFAULT resolves to HIGHEST only when a known
-  # formatter (EssentialsChat, LPC, DeluxeChat) is running, and NORMAL otherwise.
+  # to get in front of it. On the legacy hook DEFAULT resolves to HIGH when ChatManager is
+  # running (it formats at HIGHEST from its own copy of the message), to HIGHEST when another
+  # known formatter (EssentialsChat, LPC, DeluxeChat) is running, and NORMAL otherwise.
   #
   # Only override this if another plugin is fighting ChatColor for the renderer. Run
   # "/color debug" and check ourRendererStillInstalled before changing it. Forcing HIGHEST
-  # or MONITOR while EssentialsChat is installed will stop colours from showing up.
+  # or MONITOR while EssentialsChat or ChatManager is installed will stop colours from showing up.
   event-priority: "DEFAULT"
 
   # Which chat event ChatColor hooks into. Paper only; Spigot always uses LEGACY.
   #
-  #   AUTO   - Recommended. MODERN on Paper, LEGACY on Spigot.
+  #   AUTO   - Recommended. MODERN on Paper, LEGACY on Spigot. LEGACY on Paper too when
+  #            ChatManager is installed, because it pastes the message into its format on
+  #            the legacy event and leaves nothing for a renderer to colour.
   #   MODERN - Always use Paper's AsyncChatEvent. ChatColor colours the message from a
   #            chat renderer, which runs after every listener has finished, so plugins
   #            that strip colour codes out of chat cannot eat ours.

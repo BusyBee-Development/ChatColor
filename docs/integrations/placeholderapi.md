@@ -62,7 +62,7 @@ The example outputs above are the `LEGACY` form (`§` codes). Some formatters pa
 ## Plugin Integration Guide
 
 > **Placeholders are optional.** ChatColor colors the message itself, on whichever chat
-> pipeline your server is actually using — that includes EssentialsChat and LPC. You only need
+> pipeline your server is actually using — that includes EssentialsChat, LPC and ChatManager. You only need
 > `%chatcolor_message%` if you specifically want a formatter to place the colored message
 > inside its own format.
 
@@ -111,7 +111,25 @@ message inside LPC's own format:
 > `%chatcolor_message%` is never used and chat comes out uncolored, with no error. The default
 > setup doesn't have this problem.
 
-### 3. DiscordSRV
+### 3. ChatManager — placeholder optional
+
+ChatManager runs PlaceholderAPI over its `Chat_Format`, so `%chatcolor_message%` works there, but you
+don't need it.
+
+*   **Recommended:** keep `{message}` in ChatManager's format and leave ChatColor on its defaults.
+    ChatColor detects ChatManager and colors the message before ChatManager pastes it in.
+*   **Alternative:** use `%chatcolor_message%` in place of `{message}` and set
+    `apply-to-message: false` in ChatColor's `config.yml`:
+    ```yaml
+    Chat_Format:
+      Enable: true
+      Default_Format: "%luckperms_prefix%%player_name% &7⏵ %chatcolor_message%"
+    ```
+
+> Before 26.11.0, `%chatcolor_message%` in ChatManager (or any formatter that reads it on the legacy
+> chat event) showed the player's *previous* message. Update ChatColor to fix it.
+
+### 4. DiscordSRV
 
 Works automatically, no placeholder needed. Set `UseModernPaperChatEvent: true` in DiscordSRV's
 config so it reads the same event ChatColor renders on.

@@ -51,6 +51,21 @@ public class IntegrationChecker {
                 plugin.getLogger().info("======================================================");
             }
 
+            if (plugin.hasChatManager()) {
+                plugin.getLogger().info("======================================================");
+                plugin.getLogger().info("[ChatColor] ChatManager detected!");
+                plugin.getLogger().info("Active chat hook: " + (plugin.isLegacyHook() ? "LEGACY" : "MODERN")
+                        + ", priority " + plugin.getActivePriority().name());
+                plugin.getLogger().info("------------------------------------------------------");
+                plugin.getLogger().info("Recommended: keep {message} in ChatManager's Chat_Format and leave");
+                plugin.getLogger().info("ChatColor on its defaults. ChatColor colours the message before");
+                plugin.getLogger().info("ChatManager formats it, no placeholder needed.");
+                plugin.getLogger().info("If you use %chatcolor_message% in place of {message} instead, set");
+                plugin.getLogger().info("'apply-to-message: false' in ChatColor's config.yml.");
+                plugin.getLogger().info("ChatManager's colour permissions only govern codes players type.");
+                plugin.getLogger().info("======================================================");
+            }
+
             if (hasDiscordSRV) {
                 plugin.getLogger().warning("======================================================");
                 plugin.getLogger().warning("[ChatColor] DiscordSRV detected!");

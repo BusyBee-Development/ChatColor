@@ -15,7 +15,8 @@ Work through this in order:
 
 1. **Check the startup line.** It should read `Chat hook: MODERN (AsyncChatEvent), priority
    HIGHEST` on Paper. If it says `LEGACY` and you are on Paper, something set `chat-hook`
-   explicitly — set it back to `AUTO` in `config.yml`.
+   explicitly — set it back to `AUTO` in `config.yml`. The exception is ChatManager: with it
+   installed, `AUTO` picks `LEGACY` at priority `HIGH` on purpose.
 2. **Confirm `apply-to-message: true`** and `late-bind: false` in `config.yml`. Either one turns
    message coloring off, by design — `late-bind: true` is only for setups where a formatter like
    LPC places the color through `%chatcolor_message%`, see
@@ -33,6 +34,16 @@ returned `§` codes. Fix it with either:
   default `AUTO` does this for LPC 4.x on 26.9.1 and newer).
 3. **Run `/color debug`** as the affected player, say something, and read the console. See
    [Chat Compatibility](../integrations/chat-compatibility.md) for how to interpret it.
+
+## `%chatcolor_message%` shows the previous message
+
+Every chat line shows what the player said the time before, and the first line after joining is
+empty. Formatters that build chat on the legacy chat event (ChatManager, for one) read the
+placeholder before ChatColor had seen the new message. Fixed in 26.11.0: update ChatColor.
+
+With ChatManager you don't need the placeholder at all: keep `{message}` in its `Chat_Format`. If you
+keep `%chatcolor_message%`, set `apply-to-message: false`. See
+[Chat Compatibility](../integrations/chat-compatibility.md#chatmanager).
 
 ## Orphaned `§x` markers in chat or console
 

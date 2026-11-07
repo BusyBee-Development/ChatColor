@@ -204,6 +204,37 @@ See [PlaceholderAPI](placeholderapi.md#2-lpc-luckpermschat--placeholder-optional
 > stops `%chatcolor_message%` from being used, and chat comes out uncolored with no error. Use the
 > defaults if you run one.
 
+### ChatManager
+
+Works out of the box on `AUTO`. Keep `{message}` in ChatManager's `Chat_Format`:
+
+```yaml
+Chat_Format:
+  Enable: true
+  Default_Format: "%luckperms_prefix% &7{player} &9> {message}"
+```
+
+ChatManager builds its chat line on the legacy `AsyncPlayerChatEvent` at `HIGHEST`: it runs
+PlaceholderAPI over the format, pastes the message text into `{message}` and sets the result as the
+format. The message is baked in as plain text, so a chat renderer has nothing left to color.
+
+So on `AUTO`, ChatColor detects ChatManager and:
+
+- binds the **legacy** chat event instead of the modern one, at `HIGH`, in front of ChatManager's
+  `HIGHEST` handler, and
+- writes the colored message into the event, which ChatManager then pastes into `{message}`.
+
+The startup line reads `Chat hook: LEGACY (AsyncPlayerChatEvent), priority HIGH`.
+
+**Placeholder route.** To place the color with `%chatcolor_message%` in ChatManager's format instead
+of `{message}`, set `apply-to-message: false` in ChatColor's `config.yml`. `late-bind` stays `false`.
+
+> **Do not force `event-priority: "HIGHEST"` or `"MONITOR"` with ChatManager installed.** ChatColor
+> would color the message after ChatManager has already pasted it in. ChatColor logs a warning at
+> startup if you do.
+
+ChatManager's own color permissions and `Formatted_Messages` only govern `&` codes players type.
+
 ### DiscordSRV
 
 Works automatically. For best results set `UseModernPaperChatEvent: true` in DiscordSRV's config
