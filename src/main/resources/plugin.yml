@@ -3,10 +3,18 @@ version: ${project.version}
 main: net.busybee.chatcolor.ChatColor
 api-version: '1.21'
 folia-supported: true
-canvas-supported: true
 author: djtmk
-softdepend: [PlaceholderAPI, Essentials, EssentialsChat, EssentialsC, HeadDatabase, ChatManager]
-description: Advanced chat color plugin with gradient and pattern support.
+# Every plugin ChatColor hooks into or detects, so they load first.
+softdepend:
+  - PlaceholderAPI
+  - HeadDatabase
+  - Essentials
+  - EssentialsChat
+  - EssentialsC
+  - LPC
+  - DeluxeChat
+  - ChatManager
+description: A chat color plugin for Minecraft Paper and Folia servers.
 
 commands:
   color:
@@ -43,12 +51,6 @@ permissions:
   chatcolor.debug:
     description: Allows running /color debug to trace the chat pipeline in the console.
     default: op
-
-  # The wildcards below are filled in at runtime. Every color, gradient, pattern and
-  # custom color defined in colors/colors.yml and colors/patterns.yml is registered as a
-  # real permission on startup and added as a child of its wildcard, so owners can define
-  # their own colors without touching this file and "chatcolor.custom.*" still works in
-  # LuckPerms.
   chatcolor.color.*:
     description: Access to all standard solid colors.
     default: op

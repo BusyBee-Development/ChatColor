@@ -1,37 +1,28 @@
 ---
 id: intro
-title: ChatColor
+title: Introduction
+sidebar_position: 1
 ---
 
-**ChatColor** is an advanced Minecraft chat color plugin built for **Paper 1.21+** (with full
-**Folia** and **Canvas** support) that lets players personalize their chat messages with solid
-colors, multi-stop gradients, and character-cycling patterns — all through a sleek GUI or simple
-commands.
+ChatColor is a chat color plugin for **Paper**, **Purpur** and **Folia** servers on 1.21 and newer.
+Players pick a solid color, a multi-stop gradient or a character-cycling pattern for their chat
+from an in-game GUI or a command, and ChatColor applies it to every message, whichever chat
+formatter the server runs.
 
----
+## What's in this guide
 
-## 📚 Table of Contents
+- **[Getting Started](getting-started/quick-start.md)** — install the plugin and give players their first color.
+- **[Core Reference](core-reference/commands-and-permissions.md)** — every command and permission node, and the color selector GUI.
+- **[Configuration](configuration/configuration.md)** — `config.yml`, the color and pattern files, and how updates keep your edits.
+- **[Integrations](integrations/placeholderapi.md)** — PlaceholderAPI, and how ChatColor works alongside EssentialsChat, LPC, ChatManager and DiscordSRV.
+- **[Advanced](advanced/developer-api.md)** — the `ChatColorAPI` for other plugins.
+- **[Support](support/faq.md)** — FAQ, common issues, and how to get help.
 
-### Getting Started
-- [Quick Start](getting-started/quick-start.md)
-- [Installation](getting-started/installation.md)
-- [Requirements](getting-started/requirements.md)
+## Key features
 
-### Core Reference
-- [Commands & Permissions](core-reference/commands-and-permissions.md)
-- [GUI](core-reference/gui.md)
-
-### Configuration
-- [Configuration](configuration/configuration.md)
-
-### Integrations
-- [PlaceholderAPI](integrations/placeholderapi.md)
-- [Chat Compatibility](integrations/chat-compatibility.md)
-
-### Advanced
-- [Developer API](advanced/developer-api.md)
-
-### Support
-- [FAQ](support/faq.md)
-- [Common Issues](support/common-issues.md)
-- [Getting Help](support/getting-help.md)
+- **Solid colors, gradients and patterns**, each with its own permission node, plus custom colors you add from a command.
+- **Color selector GUI** with a main menu and a page per category, fully configurable in `gui/gui.yml`.
+- **Works with the chat formatter you already run**: EssentialsChat, LPC and ChatManager are detected and set up automatically.
+- **PlaceholderAPI placeholders** for the player's color, colored name and colored message.
+- **`/color debug`** traces the whole chat pipeline into the console when something doesn't show up.
+- **Folia support**, region-thread safe throughout.

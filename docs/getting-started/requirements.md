@@ -9,9 +9,9 @@ sidebar_position: 3
 - **Server Software:** Paper (recommended) or Spigot **1.21+**
 - **Java Version:** **Java 21** or newer.
 - **Optional Dependencies:** [PlaceholderAPI](https://modrinth.com/plugin/placeholderapi/versions)
-  for additional placeholder support. Essentials, EssentialsChat, and HeadDatabase are also
-  soft-dependencies — ChatColor auto-detects and integrates with them if present, and runs fine
-  without any of them installed.
+  for additional placeholder support. HeadDatabase, Essentials, EssentialsChat, LPC, DeluxeChat
+  and ChatManager are also soft-dependencies — ChatColor auto-detects and integrates with them if
+  present, and runs fine without any of them installed.
 
 ### Platform support
 
@@ -19,7 +19,7 @@ sidebar_position: 3
 |:-----------------|:-------------|:-------------------------------------------------------------------------------------------|
 | Paper 1.21+      | ✅ Full      | Recommended. Uses the modern chat pipeline for exact gradient rendering.                   |
 | Folia            | ✅ Full      | Region-thread safe. See [Chat Compatibility](../integrations/chat-compatibility.md#folia). |
-| Canvas           | ✅ Full      | Declared supported in `plugin.yml`.                                                        |
+| Canvas           | ✅ Full      | Canvas loads any plugin marked `folia-supported`, which ChatColor is.                      |
 | Spigot 1.21+     | ⚠️ Limited   | No modern chat event, so gradients are approximated to the nearest of the 16 named colors. |
 
 ---

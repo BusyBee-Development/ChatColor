@@ -15,7 +15,7 @@ Yes — full support, region-thread safe throughout. See
 [Chat Compatibility](../integrations/chat-compatibility.md#folia).
 
 **Does ChatColor support Canvas?**
-Yes, it's declared supported in `plugin.yml`.
+Yes. Canvas loads any plugin marked `folia-supported` in `plugin.yml`, and ChatColor is.
 
 **How do players open the color selector?**
 Run `/color` (aliases `/chatcolor`, `/colors`). See

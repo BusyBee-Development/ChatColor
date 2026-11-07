@@ -8,7 +8,7 @@ The graphical interface of **ChatColor** is fully customizable via the `gui/gui.
 
 ---
 
-## 📂 Configuration File: `gui/gui.yml`
+## Configuration file: `gui/gui.yml`
 
 The file is divided into several main sections:
 
@@ -61,7 +61,7 @@ These messages are appended to the lore of color items based on the player's sta
 
 ---
 
-## 🛠️ Tips for Customization
+## Tips for customization
 
 1. **Filler Items**: Change `filler.material` and `filler.name` to match your server's theme.
 2. **Navigation**: You can change the materials for `next-page`, `previous-page`, and `back-menu` items in the `items` section.

@@ -30,7 +30,8 @@ On startup, ChatColor logs which chat pipeline it hooked:
 ```
 
 `MODERN` is what you want on Paper and Folia. If it says `LEGACY` on those platforms, check
-`chat-hook` in `config.yml` — it should be `"AUTO"`.
+`chat-hook` in `config.yml` — it should be `"AUTO"`. The exception is ChatManager: with it
+installed, `AUTO` picks `LEGACY` at priority `HIGH` on purpose.
 
 The plugin also reports how many color permissions it registered:
 

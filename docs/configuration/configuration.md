@@ -50,15 +50,17 @@ settings:
 
 ## Chat Hook (`chat-hook`)
 
-ChatColor registers **exactly one** chat listener. This matters more than it sounds.
+ChatColor colors chat from **exactly one** chat listener. This matters more than it sounds.
 
 Paper has two chat pipelines: the modern one built on `AsyncChatEvent`, and a legacy one built on
-the deprecated `AsyncPlayerChatEvent`. A plugin that registers on both would color the same
-message twice on the way through, so ChatColor picks one.
+the deprecated `AsyncPlayerChatEvent`. A plugin that colored on both would color the same message
+twice on the way through, so ChatColor picks one. (On `MODERN` it also listens on the legacy event
+at `HIGH`, only to note the message for `%chatcolor_message%`; Paper fires the legacy event first,
+and formatters that read the placeholder there would otherwise get the previous message.)
 
 | Value    | Behaviour                                                                                                                                                    |
 |:-----------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `AUTO`   | **Recommended.** `MODERN` on Paper (and Folia), `LEGACY` on Spigot.                                                                                          |
+| `AUTO`   | **Recommended.** `MODERN` on Paper (and Folia), `LEGACY` on Spigot. `LEGACY` on Paper too when ChatManager is installed, because it pastes the message into its format on the legacy event. |
 | `MODERN` | Always use `AsyncChatEvent`. ChatColor colors from a **chat renderer**, which runs after every listener has finished, so nothing downstream can strip it.     |
 | `LEGACY` | Always use `AsyncPlayerChatEvent`. Only needed if a plugin cancels chat on the legacy event and you need ChatColor to run before it. See the warning below.   |
 
@@ -112,13 +114,15 @@ act before that happens. Be aware of two costs:
 
 | Hook     | `DEFAULT` resolves to                                                                     |
 |:-----------|:----------------------------------------------------------------------------------------------|
-| `MODERN` | Always `HIGHEST`.                                                                         |
-| `LEGACY` | `HIGHEST` when EssentialsChat, LPC, or DeluxeChat is running, otherwise `NORMAL`.         |
+| `MODERN` | `HIGHEST`, or `HIGH` when EssentialsChat is running.                                      |
+| `LEGACY` | `HIGH` when ChatManager is running, `HIGHEST` when EssentialsChat, LPC or DeluxeChat is running, otherwise `NORMAL`. |
 
 The two rules differ because the hooks work differently. On `MODERN`, ChatColor installs a chat
-renderer and **the last plugin to install one wins**, so being late is correct no matter what else
-is installed — there is nothing to detect. On `LEGACY`, ChatColor writes color codes into the
-message, so it genuinely matters whether a known formatter is going to run before it.
+renderer and **the last plugin to install one wins**, so being late is correct — except against
+EssentialsChat, which formats from its own copy of the message and so has to be beaten to it (see
+[Chat Compatibility](../integrations/chat-compatibility.md#essentialschat)). On `LEGACY`, ChatColor
+writes color codes into the message, so it matters whether a known formatter runs before it.
+ChatManager pastes the message into its format at `HIGHEST`, so ChatColor goes first at `HIGH`.
 
 > Earlier versions used the plugin-name check on both hooks. That only ever worked for the three
 > plugins named above and missed everything else — including every chat plugin on Folia, since
