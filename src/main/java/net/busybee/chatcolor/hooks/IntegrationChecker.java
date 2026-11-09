@@ -88,24 +88,82 @@ public class IntegrationChecker {
                 plugin.getLogger().warning("======================================================");
             }
 
-            if (hasLPC) {
+            boolean hasLPCPro = Bukkit.getPluginManager().getPlugin("LPC-Pro") != null;
+            if (hasLPC || hasLPCPro) {
+                String name = hasLPCPro ? "LPC-Pro" : "LPC";
                 plugin.getLogger().warning("======================================================");
-                plugin.getLogger().warning("[ChatColor] LPC (LuckPermsChat) detected!");
-                plugin.getLogger().warning("Recommended: keep {message} in LPC's format and leave ChatColor on its");
-                plugin.getLogger().warning("defaults ('apply-to-message: true', 'late-bind: false'). ChatColor");
-                plugin.getLogger().warning("colours the message itself, no placeholder needed.");
-                plugin.getLogger().warning("Only if you want the colour placed by LPC's own format instead:");
-                plugin.getLogger().warning("1. Use %chatcolor_message% in place of {message} in LPC's format.");
+                plugin.getLogger().warning("[ChatColor] " + name + " detected!");
+                plugin.getLogger().warning(name + " builds chat from its own copy of the message, so ChatColor can't");
+                plugin.getLogger().warning("colour {message}. Use the placeholder instead:");
+                plugin.getLogger().warning("1. Put %chatcolor_message% where {message} is in " + name + "'s format"
+                        + (hasLPCPro ? " (formats/groups/<group>.yml, the message text)." : " (chat-format)."));
                 plugin.getLogger().warning("2. In ChatColor's config.yml set 'apply-to-message: false' and");
                 plugin.getLogger().warning("   'late-bind: true'.");
-                plugin.getLogger().warning("LPC 4.x reads its format as MiniMessage; 'papi-output: AUTO' returns");
-                plugin.getLogger().warning("MiniMessage for it (now: "
-                        + (plugin.isPapiMiniMessage() ? "MINIMESSAGE" : "LEGACY")
-                        + "). If chat stops");
-                plugin.getLogger().warning("sending, set 'papi-output: MINIMESSAGE'.");
+                if (hasLPCPro) {
+                    plugin.getLogger().warning("3. Turn off LPC-Pro's own /color command, which takes /color, /chatcolor");
+                    plugin.getLogger().warning("   and /colors: 'commands.color.enabled: false' in LPC-Pro's");
+                    plugin.getLogger().warning("   advanced/command-settings.yml.");
+                } else {
+                    plugin.getLogger().warning("LPC 4.x reads its format as MiniMessage; 'papi-output: AUTO' returns");
+                    plugin.getLogger().warning("MiniMessage for it (now: "
+                            + (plugin.isPapiMiniMessage() ? "MINIMESSAGE" : "LEGACY")
+                            + "). If chat stops sending, set 'papi-output: MINIMESSAGE'.");
+                }
                 plugin.getLogger().warning("======================================================");
             }
+
+            warnAboutTakenCommands();
         }, 20L);
+    }
+
+    /**
+     * Warns when another plugin owns /color, /chatcolor or /colors. LPC-Pro does this with its own
+     * colour shop, and players then never reach ChatColor's menu or commands.
+     */
+    private void warnAboutTakenCommands() {
+        org.bukkit.command.PluginCommand ours = plugin.getCommand("color");
+        if (ours == null) return;
+
+        org.bukkit.command.CommandMap map;
+        try {
+            map = Bukkit.getCommandMap();
+        } catch (NoSuchMethodError e) {
+            return; // Spigot has no public command map
+        }
+
+        java.util.Map<String, java.util.List<String>> takenBy = new java.util.LinkedHashMap<>();
+        for (String label : java.util.List.of("color", "chatcolor", "colors")) {
+            org.bukkit.command.Command command = map.getCommand(label);
+            if (command == null || command == ours) continue;
+            String owner = ownerOf(command);
+            takenBy.computeIfAbsent(owner, k -> new java.util.ArrayList<>()).add("/" + label);
+        }
+
+        for (java.util.Map.Entry<String, java.util.List<String>> entry : takenBy.entrySet()) {
+            plugin.getLogger().warning("======================================================");
+            plugin.getLogger().warning("[ChatColor] " + entry.getKey() + " has taken " + String.join(", ", entry.getValue())
+                    + " from ChatColor.");
+            plugin.getLogger().warning("Players typing those reach " + entry.getKey() + ", not ChatColor.");
+            plugin.getLogger().warning("/chatcolor:color always reaches ChatColor. To get the short commands back,");
+            plugin.getLogger().warning("turn that command off in " + entry.getKey() + "'s config"
+                    + ("LPC-Pro".equals(entry.getKey())
+                    ? " ('commands.color.enabled: false' in advanced/command-settings.yml)." : "."));
+            plugin.getLogger().warning("======================================================");
+        }
+    }
+
+    /** The plugin behind a command. Some (LPC-Pro) register plain commands, so fall back to the class loader. */
+    private static String ownerOf(org.bukkit.command.Command command) {
+        if (command instanceof org.bukkit.command.PluginIdentifiableCommand identifiable) {
+            return identifiable.getPlugin().getName();
+        }
+        ClassLoader loader = command.getClass().getClassLoader();
+        for (org.bukkit.plugin.Plugin other : Bukkit.getPluginManager().getPlugins()) {
+            if (other.getClass().getClassLoader() == loader) {
+                return other.getName();
+            }
+        }
+        return "another plugin (" + command.getClass().getName() + ")";
     }
 
     private long countHdbEntries() {

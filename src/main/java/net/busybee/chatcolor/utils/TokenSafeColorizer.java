@@ -54,10 +54,22 @@ public final class TokenSafeColorizer {
         }
 
         // Tokens are left out of what gets styled, so a gradient or pattern runs across the text
-        // around them as if they weren't there and its end colors stay visible.
+        // around them as if they weren't there. Blanks at either end of what's left are skipped
+        // too: in "hi [item]" the space before the token would otherwise take the gradient's end
+        // color, where nobody can see it.
+        boolean[] styledPiece = new boolean[pieces.size()];
+        for (int i = 0; i < pieces.size(); i++) {
+            styledPiece[i] = !tokenSet.contains(pieces.get(i));
+        }
+        for (int i = 0; i < pieces.size() && (!styledPiece[i] || pieces.get(i).isBlank()); i++) {
+            styledPiece[i] = false;
+        }
+        for (int i = pieces.size() - 1; i >= 0 && (!styledPiece[i] || pieces.get(i).isBlank()); i--) {
+            styledPiece[i] = false;
+        }
         StringBuilder text = new StringBuilder();
-        for (String piece : pieces) {
-            if (!tokenSet.contains(piece)) text.append(piece);
+        for (int i = 0; i < pieces.size(); i++) {
+            if (styledPiece[i]) text.append(pieces.get(i));
         }
         if (text.isEmpty()) {
             return message;
@@ -74,11 +86,12 @@ public final class TokenSafeColorizer {
         }
 
         int[] offset = {0};
+        int[] index = {0};
         return message.replaceText(TextReplacementConfig.builder()
                 .match(pattern)
                 .replacement((match, builder) -> {
                     String piece = match.group();
-                    if (tokenSet.contains(piece)) {
+                    if (!styledPiece[index[0]++]) {
                         return Component.text(piece);
                     }
                     int at = offset[0];

@@ -83,33 +83,26 @@ EssentialsChat formats chat with legacy `&` codes and does not support Placehold
 *   **You do not need to grant `essentials.chat.color` or `essentials.chat.rgb`.** Those govern
     whether players can type their own `&` codes and have no bearing on ChatColor.
 
-### 2. LPC (LuckPermsChat) — placeholder optional
+### 2. LPC and LPC-Pro — placeholder required
 
-LPC installs a Paper chat renderer, and ChatColor wraps it and colors the message before LPC
-formats it. The defaults work with no placeholder.
+LPC 4.x rebuilds the message from its plain text, and LPC-Pro cancels the chat event and sends the
+message itself, so neither shows a color ChatColor puts on `{message}`. Use the placeholder:
 
-**Recommended — defaults, no placeholder:**
-
-*   Keep `{message}` in LPC's format.
-*   In ChatColor's `config.yml`, leave `apply-to-message: true` and `late-bind: false`.
-
-**Alternative — LPC places the color via the placeholder.** Use this only if you want the colored
-message inside LPC's own format:
-
-*   In LPC's format, use `%chatcolor_message%` in place of `{message}`:
+*   In LPC's `chat-format` (and any `group-formats`), use `%chatcolor_message%` in place of
+    `{message}`:
     ```yaml
-    chat-format: "{prefix}{name}&r: %chatcolor_message%"
+    chat-format: "{prefix}{name}<dark_gray> »<reset> %chatcolor_message%"
     ```
+    In LPC-Pro, set the `message:` part of each `formats/groups/<group>.yml` to
+    `text: "&f%chatcolor_message%"`.
 *   In ChatColor's `config.yml`, set `apply-to-message: false` and `late-bind: true`. This stops
-    ChatColor coloring the message itself so it isn't colored twice.
+    ChatColor coloring the chat event, which LPC would throw away anyway.
 *   Leave `papi-output: "AUTO"`. LPC 4.x parses its whole format as MiniMessage, and `AUTO` returns
     MiniMessage for it. Without that, LPC throws `Legacy formatting codes have been detected in a
     MiniMessage string` and no chat is sent. Set `papi-output: "MINIMESSAGE"` if LPC isn't detected.
-
-> `late-bind: true` only works when LPC's renderer is the one that ends up delivering the message.
-> If another chat plugin installs its own renderer after LPC (a chat-hover or chat-format plugin),
-> `%chatcolor_message%` is never used and chat comes out uncolored, with no error. The default
-> setup doesn't have this problem.
+*   LPC-Pro only: disable its `/color` command (`commands.color.enabled: false` in
+    `advanced/command-settings.yml`). It otherwise takes `/color`, `/chatcolor` and `/colors` from
+    ChatColor. See [Chat Compatibility](chat-compatibility.md#lpc-luckpermschat-and-lpc-pro).
 
 ### 3. ChatManager — placeholder optional
 

@@ -13,7 +13,8 @@ A chat color plugin for Minecraft Paper, Purpur and Folia servers. Players pick 
 - Solid colors, hex colors, multi-stop gradients and rainbow patterns for chat
 - Color selector GUI, plus commands to set, reset and create custom colors
 - Per-color permissions that work with LuckPerms wildcards
-- Works alongside EssentialsChat, LPC and ChatManager with no extra setup
+- Works alongside EssentialsChat, ChatManager and ZelChat with no extra setup, and with LPC and
+  LPC-Pro through `%chatcolor_message%`
 - PlaceholderAPI placeholders and a developer API
 - Native Folia support
 

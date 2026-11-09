@@ -143,7 +143,8 @@ Section signs are printed as `(S)` and MiniMessage angle brackets as `{`/`}` so 
 
 ### EssentialsChat
 
-Works out of the box on `AUTO`. Use the standard `{MESSAGE}` tag in the Essentials format:
+Works out of the box on `AUTO`. Paper only: EssentialsX doesn't support Folia, and Folia refuses to
+load it. Use the standard `{MESSAGE}` tag in the Essentials format:
 
 ```yaml
 group-formats:
@@ -186,24 +187,52 @@ off unless you *want* players hand-coloring their own chat.
 > codes out of a legacy-pipeline message. Its strip pattern removes `§0`-`§9`/`§a`-`§f` but not
 > the leading `§x`, which is what leaves the debris. Set `chat-hook: "AUTO"` to fix it.
 
-### LPC (LuckPermsChat)
+### LPC (LuckPermsChat) and LPC-Pro
 
-LPC installs a Paper chat renderer, and ChatColor wraps it. **The defaults work — no placeholder
-needed.** Keep `{message}` in LPC's format and leave `apply-to-message: true` and
-`late-bind: false`.
+Both need the placeholder. **Put `%chatcolor_message%` where `{message}` was** and set
+`apply-to-message: false` and `late-bind: true` in ChatColor's `config.yml`.
 
-If you want LPC to place the colored message itself, use the placeholder route instead:
+Neither one formats the message it is handed, so ChatColor can't color `{message}`:
 
-1. In LPC's config: `chat-format: "{prefix}{name}&r: %chatcolor_message%"`
-2. In ChatColor's `config.yml`: `apply-to-message: false` and `late-bind: true`
+- **LPC 4.x** reads the chat message as plain text and rebuilds it (adding its own mentions,
+  links, emoji and `[item]`), so any color on the chat event is lost.
+- **LPC-Pro** cancels the chat event and sends every message itself, so ChatColor's renderer
+  never runs.
 
-`late-bind` stops ChatColor coloring the message itself, so it is not colored twice. LPC 4.x needs
-the placeholder to return MiniMessage rather than `§` codes; `papi-output: "AUTO"` handles that.
-See [PlaceholderAPI](placeholderapi.md#2-lpc-luckpermschat--placeholder-optional).
+**LPC 4.x**, in `plugins/LPC/config.yml` (and any `group-formats` you use):
 
-> With `late-bind: true`, another chat plugin that replaces LPC's renderer (chat-hover and similar)
-> stops `%chatcolor_message%` from being used, and chat comes out uncolored with no error. Use the
-> defaults if you run one.
+```yaml
+chat-format: "{prefix}{name}<dark_gray> »<reset> %chatcolor_message%"
+```
+
+Leave `papi-output: "AUTO"`. LPC 4.x reads its whole format as MiniMessage, and `AUTO` returns
+MiniMessage for it. See [PlaceholderAPI](placeholderapi.md#2-lpc-and-lpc-pro--placeholder-required).
+
+**LPC-Pro**, in each `plugins/LPC-Pro/formats/groups/<group>.yml`:
+
+```yaml
+message:
+  text: "&f%chatcolor_message%"
+```
+
+> **LPC-Pro takes over ChatColor's commands.** Its own color shop registers `/color` with the
+> aliases `/chatcolor` and `/colors`, which are all three of ChatColor's commands. Turn it off in
+> `plugins/LPC-Pro/advanced/command-settings.yml` and restart:
+>
+> ```yaml
+> commands:
+>   color:
+>     enabled: false
+> ```
+>
+> Until you do, players reach ChatColor only through `/chatcolor:color`, and ChatColor warns about
+> the clash at startup. LPC-Pro's shop colors also paint over ChatColor's for anyone holding its
+> `lpcpro.color.*` permissions, so use one color system, not both.
+
+Because LPC builds the line from the placeholder, LPC's own mentions, links and `[item]` don't
+apply inside the message.
+
+Tested with LPC 4.4.0 and LPC-Pro 2.5.1 on Paper and Folia 26.3.
 
 ### ChatManager
 

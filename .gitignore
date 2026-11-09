@@ -48,3 +48,4 @@ lib/
 src/main/resources/faststats.properties
 src/main/resources/bstats.properties
 test/
+CHANGELOG.md

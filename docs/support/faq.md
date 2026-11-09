@@ -40,8 +40,10 @@ rebind after other chat plugins load. See
 
 ## Compatibility
 
-**Will ChatColor conflict with EssentialsChat, LPC, or DiscordSRV?**
-No — all three are handled automatically or via a documented one-time setting. See
+**Will ChatColor conflict with EssentialsChat, LPC, LPC-Pro, ChatManager, ZelChat or DiscordSRV?**
+No. EssentialsChat, ChatManager, ZelChat and DiscordSRV work automatically. LPC and LPC-Pro need
+`%chatcolor_message%` in their format and two settings, and LPC-Pro's own `/color` command turned
+off. See
 [Chat Compatibility](../integrations/chat-compatibility.md) and
 [PlaceholderAPI](../integrations/placeholderapi.md).
 

@@ -29,9 +29,19 @@ The console shows `Legacy formatting codes have been detected in a MiniMessage s
 messages go through. LPC 4.x parses its whole format as MiniMessage, and `%chatcolor_message%`
 returned `§` codes. Fix it with either:
 
-- **Use the defaults** — `{message}` in LPC's format, `apply-to-message: true`, `late-bind: false`.
-- **Keep the placeholder** and set `papi-output: "MINIMESSAGE"` in ChatColor's `config.yml` (the
-  default `AUTO` does this for LPC 4.x on 26.9.1 and newer).
+- Set `papi-output: "AUTO"` (the default) or `"MINIMESSAGE"` in ChatColor's `config.yml`. `AUTO`
+  returns MiniMessage for LPC 4.x on 26.9.1 and newer.
+
+LPC needs the placeholder, so don't switch back to `{message}`: LPC rebuilds the message from its
+plain text and the color would be lost. See
+[Chat Compatibility](../integrations/chat-compatibility.md#lpc-luckpermschat-and-lpc-pro).
+
+## `/color` opens another plugin's menu
+
+Another plugin registered `/color`, `/chatcolor` or `/colors` and took it from ChatColor. ChatColor
+names the plugin in a startup warning. `/chatcolor:color` always reaches ChatColor. To get the short
+commands back, turn the other plugin's command off. For LPC-Pro that is
+`commands.color.enabled: false` in `plugins/LPC-Pro/advanced/command-settings.yml`.
 3. **Run `/color debug`** as the affected player, say something, and read the console. See
    [Chat Compatibility](../integrations/chat-compatibility.md) for how to interpret it.
 

@@ -12,6 +12,7 @@ softdepend:
   - EssentialsChat
   - EssentialsC
   - LPC
+  - LPC-Pro
   - DeluxeChat
   - ChatManager
   - ZelChat

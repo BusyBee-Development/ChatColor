@@ -22,7 +22,7 @@ formatter the server runs.
 
 - **Solid colors, gradients and patterns**, each with its own permission node, plus custom colors you add from a command.
 - **Color selector GUI** with a main menu and a page per category, fully configurable in `gui/gui.yml`.
-- **Works with the chat formatter you already run**: EssentialsChat, LPC and ChatManager are detected and set up automatically.
+- **Works with the chat formatter you already run**: EssentialsChat, ChatManager and ZelChat are detected and set up automatically; LPC and LPC-Pro work through `%chatcolor_message%`.
 - **PlaceholderAPI placeholders** for the player's color, colored name and colored message.
 - **`/color debug`** traces the whole chat pipeline into the console when something doesn't show up.
 - **Folia support**, region-thread safe throughout.
