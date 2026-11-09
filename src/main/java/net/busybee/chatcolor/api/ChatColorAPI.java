@@ -9,6 +9,7 @@ import net.busybee.chatcolor.models.SelectableEntry;
 import net.kyori.adventure.text.Component;
 import net.busybee.chatcolor.utils.ColorUtil;
 import net.busybee.chatcolor.utils.PatternApplier;
+import net.busybee.chatcolor.utils.TokenSafeColorizer;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
@@ -142,6 +143,30 @@ public class ChatColorAPI {
             return component;
         }
         return ColorUtil.applyTagToComponent(tag, component);
+    }
+
+    /**
+     * Applies a player's current color to a Component, keeping every string in {@code keepIntact}
+     * as one uncolored run of text. Use this when another plugin will later look for those
+     * strings with {@code replaceText} (for example ZelChat's {@code [item]} or mentioned names),
+     * since a per-character gradient or pattern would otherwise split them apart.
+     *
+     * @param player     The player whose color should be used.
+     * @param component  The component to colorize.
+     * @param keepIntact Text to leave whole and uncolored.
+     * @return A colorized Component.
+     */
+    public Component applyColorToComponent(Player player, Component component, Collection<String> keepIntact) {
+        PatternEntry pattern = resolveActivePattern(player);
+        String tag = pattern == null ? resolveActiveTag(player) : null;
+        if (pattern == null && tag == null) {
+            return component;
+        }
+
+        Component colored = TokenSafeColorizer.apply(component, keepIntact, text -> pattern != null
+                ? PatternApplier.apply(text, pattern.getColors())
+                : ColorUtil.styleLiteral(tag, text));
+        return colored != null ? colored : applyColorToComponent(player, component);
     }
 
     /**

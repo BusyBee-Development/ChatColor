@@ -106,6 +106,7 @@ What to look for:
 | `ourRendererStillInstalled`     | **`false` means a plugin replaced our renderer after us** — raise ChatColor's `event-priority`. `RENDERER` mode only. |
 | `RENDERER RAN`                  | The renderer actually executed. If this is missing, a plugin delivered the message itself and bypassed rendering.     |
 | `WROTE message (direct mode)`   | `DIRECT` mode equivalent of `RENDERER RAN`. The colored message is now on the event for the formatter to pick up.    |
+| `ZELCHAT module coloured`       | ZelChat is installed and ChatColor colored the message inside it. See [ZelChat](#zelchat).                           |
 
 In `DIRECT` mode the trace looks like this instead, and the color should still be visible on the
 `MONITOR` line — that is the proof it survived the formatter:
@@ -234,6 +235,37 @@ of `{message}`, set `apply-to-message: false` in ChatColor's `config.yml`. `late
 > startup if you do.
 
 ChatManager's own color permissions and `Formatted_Messages` only govern `&` codes players type.
+
+### ZelChat
+
+Works out of the box. Keep `{message}` in ZelChat's formats (`formatting/format-components.yml`):
+
+```yaml
+default_format:
+  '2':
+    message: '&7{message}'
+```
+
+Solid colors, gradients and patterns all apply, and ZelChat's `[item]`, `[inv]`, `[ec]` and
+mentions keep working.
+
+ZelChat works differently from the other formatters. It rebuilds every message from its plain
+text, so anything written to the chat event is thrown away, and its renderer ignores the message
+it is handed. So ChatColor doesn't color the chat event when ZelChat is installed. It registers a
+ZelChat **chat module** instead, which colors the message inside ZelChat after ZelChat's own
+modules have run and before ZelChat swaps `[item]` and mentioned names for their interactive
+components. While coloring, ChatColor keeps those tokens whole. A gradient or pattern colors one
+letter at a time, and splitting `[item]` into six letters would hide it from ZelChat.
+
+ChatColor reads the `[item]`/`[inv]`/`[ec]` prefixes from ZelChat's `settings.yml`, and
+`/color reload` picks up changes to them.
+
+> **Don't use `%chatcolor_message%` in a ZelChat format.** ZelChat only looks for `[item]` inside
+> `{message}`. A placeholder's text is pasted in after that, so `[item]` stays as plain text.
+> `%chatcolor_color%{message}` shows the item, but it can't do patterns.
+
+`/color debug` prints a `ZELCHAT module coloured the message` line for each message, and the
+pipeline dump reports `zelchat: hooked`.
 
 ### DiscordSRV
 

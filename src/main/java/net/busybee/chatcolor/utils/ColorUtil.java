@@ -116,11 +116,26 @@ public class ColorUtil {
 
         String processedTag = normalizeTag(tag);
 
-        String mm = toMiniMessage(component);
+        // Serializing throws on some item hovers (e.g. removed data components), so keep it
+        // inside the try and leave the component alone.
         try {
+            String mm = toMiniMessage(component);
             return MINI_MESSAGE.deserialize(processedTag + mm);
         } catch (Exception e) {
             return component;
+        }
+    }
+
+    /**
+     * Styles {@code text} with {@code tag}, taking the text literally: no legacy codes or tags in
+     * it are parsed, so the result reads exactly as {@code text}.
+     */
+    public static Component styleLiteral(String tag, String text) {
+        if (tag == null || tag.isBlank() || text == null) return Component.text(text != null ? text : "");
+        try {
+            return MINI_MESSAGE.deserialize(normalizeTag(tag) + escape(text));
+        } catch (Exception e) {
+            return Component.text(text);
         }
     }
 

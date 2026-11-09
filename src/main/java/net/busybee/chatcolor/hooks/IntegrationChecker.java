@@ -66,6 +66,17 @@ public class IntegrationChecker {
                 plugin.getLogger().info("======================================================");
             }
 
+            if (Bukkit.getPluginManager().isPluginEnabled("ZelChat")) {
+                plugin.getLogger().info("======================================================");
+                plugin.getLogger().info("[ChatColor] ZelChat detected! "
+                        + (plugin.getZelChatHook() != null ? "Hooked into its chat modules." : "Hook FAILED, see above."));
+                plugin.getLogger().info("Recommended: use {message} in ZelChat's formats, not %chatcolor_message%.");
+                plugin.getLogger().info("ChatColor colours {message} inside ZelChat, so colours, gradients and");
+                plugin.getLogger().info("patterns all work alongside [item], [inv], [ec] and mentions.");
+                plugin.getLogger().info("%chatcolor_message% is plain text to ZelChat, so [item] stays literal.");
+                plugin.getLogger().info("======================================================");
+            }
+
             if (hasDiscordSRV) {
                 plugin.getLogger().warning("======================================================");
                 plugin.getLogger().warning("[ChatColor] DiscordSRV detected!");

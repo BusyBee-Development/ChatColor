@@ -43,6 +43,13 @@ public class ChatListener implements Listener {
             return;
         }
 
+        // ZelChat rebuilds the message from plain text and renders it itself, so anything we do
+        // to the event is lost. ChatColor colours it from inside ZelChat instead.
+        if (plugin.getZelChatHook() != null) {
+            if (watched) debug.log("  ZelChat formats this message, ChatColor colours it inside ZelChat (see ZELCHAT line)");
+            return;
+        }
+
         if (player.hasPermission("chatcolor.minimessage")) {
             event.message(ColorUtil.colorizeUserInput(plain));
         }

@@ -6,7 +6,7 @@
 
     <groupId>net.busybee.chatcolor</groupId>
     <artifactId>ChatColor</artifactId>
-    <version>26.11.0</version>
+    <version>26.11.1</version>
     <packaging>jar</packaging>
 
     <name>ChatColor</name>
@@ -135,6 +135,10 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.5.1</version>
                 <configuration>
+                    <excludes>
+                        <!-- ZelChat API stubs: compile-only, ZelChat provides the real classes at runtime. -->
+                        <exclude>it/pino/zelchat/**</exclude>
+                    </excludes>
                     <archive>
                         <manifest>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>

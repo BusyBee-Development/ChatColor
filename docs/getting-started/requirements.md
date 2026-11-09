@@ -9,8 +9,8 @@ sidebar_position: 3
 - **Server Software:** Paper (recommended) or Spigot **1.21+**
 - **Java Version:** **Java 21** or newer.
 - **Optional Dependencies:** [PlaceholderAPI](https://modrinth.com/plugin/placeholderapi/versions)
-  for additional placeholder support. HeadDatabase, Essentials, EssentialsChat, LPC, DeluxeChat
-  and ChatManager are also soft-dependencies — ChatColor auto-detects and integrates with them if
+  for additional placeholder support. HeadDatabase, Essentials, EssentialsChat, LPC, DeluxeChat,
+  ChatManager and ZelChat are also soft-dependencies — ChatColor auto-detects and integrates with them if
   present, and runs fine without any of them installed.
 
 ### Platform support

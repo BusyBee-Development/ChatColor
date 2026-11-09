@@ -8,6 +8,7 @@ import net.busybee.chatcolor.listeners.ChatListener;
 import net.busybee.chatcolor.models.PatternEntry;
 import net.busybee.chatcolor.models.SelectableEntry;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
@@ -129,6 +130,9 @@ public final class ChatDebugger implements Listener {
                 + " message-mode=" + plugin.getConfigManager().getMessageMode()
                 + " papi-output=" + plugin.getConfigManager().getPapiOutput()
                 + " (" + (plugin.isPapiMiniMessage() ? "MINIMESSAGE" : "LEGACY") + ")");
+        log("zelchat: " + (plugin.getZelChatHook() != null
+                ? "hooked, colouring {message} inside ZelChat"
+                : (Bukkit.getPluginManager().isPluginEnabled("ZelChat") ? "installed but NOT hooked" : "not installed")));
 
         if (plugin.isPaper()) {
             dumpHandlers("AsyncChatEvent", AsyncChatEvent.getHandlerList());
@@ -206,15 +210,22 @@ public final class ChatDebugger implements Listener {
     /** Called on the modern hook in direct mode, where we colour the message instead of rendering. */
     public void wroteMessage(Component in, Component out) {
         log("  WROTE message (direct mode, we do not render)");
-        log("    in : " + safe(ColorUtil.toMiniMessage(in)));
-        log("    out: " + safe(ColorUtil.toMiniMessage(out)));
+        log("    in : " + safe(mini(in)));
+        log("    out: " + safe(mini(out)));
     }
 
     /** Called from inside the renderer, once per message rather than once per viewer. */
     public void rendered(Component in, Component out) {
         log("  RENDERER RAN");
-        log("    in : " + safe(ColorUtil.toMiniMessage(in)));
-        log("    out: " + safe(ColorUtil.toMiniMessage(out)));
+        log("    in : " + safe(mini(in)));
+        log("    out: " + safe(mini(out)));
+    }
+
+    /** Called from ChatColor's ZelChat module, before ZelChat swaps in [item] and mentions. */
+    public void zelChatColoured(Component in, Component out, java.util.Collection<String> keptWhole) {
+        log("  ZELCHAT module coloured the message (kept whole: " + safe(String.join(", ", keptWhole)) + ")");
+        log("    in : " + safe(mini(in)));
+        log("    out: " + safe(mini(out)));
     }
 
     public void wroteLegacyMessage(String serialized) {
@@ -231,7 +242,7 @@ public final class ChatDebugger implements Listener {
                 + " viewers=" + event.viewers().size()
                 + (direct ? "" : " ourRendererStillInstalled=" + ChatListener.isOurRenderer(renderer)));
         log("    renderer: " + renderer.getClass().getName());
-        log("    message : " + safe(ColorUtil.toMiniMessage(event.message())));
+        log("    message : " + safe(mini(event.message())));
         if (direct) {
             log("    (the colour must be visible in 'message' above; if it is not, something after");
             log("     us overwrote the message)");
@@ -253,6 +264,20 @@ public final class ChatDebugger implements Listener {
 
     public void log(String message) {
         plugin.getLogger().info("[DEBUG] " + message);
+    }
+
+    /**
+     * MiniMessage can't serialize every item hover (it throws on removed data components such as
+     * minecraft:equippable), and ZelChat puts one on the message for [item]. Fall back to the
+     * plain text rather than failing the chat event.
+     */
+    private static String mini(Component component) {
+        try {
+            return ColorUtil.toMiniMessage(component);
+        } catch (RuntimeException e) {
+            return PlainTextComponentSerializer.plainText().serialize(component)
+                    + "  (styling not shown: " + e.getClass().getSimpleName() + ")";
+        }
     }
 
     private static String safe(String text) {

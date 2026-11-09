@@ -10,6 +10,7 @@ import net.busybee.chatcolor.config.PatternManager;
 import net.busybee.chatcolor.data.PlayerDataManager;
 import net.busybee.chatcolor.hooks.PlaceholderAPIHook;
 import net.busybee.chatcolor.hooks.HeadDatabaseHook;
+import net.busybee.chatcolor.hooks.ZelChatHook;
 import fr.mrmicky.fastinv.FastInvManager;
 import net.busybee.chatcolor.listeners.ChatListener;
 import net.busybee.chatcolor.listeners.PlayerListener;
@@ -54,6 +55,7 @@ public class ChatColor extends JavaPlugin {
     private BStatsManager bStatsManager;
     private FastStatsManager fastStatsManager;
     private HeadDatabaseHook headDatabaseHook;
+    private ZelChatHook zelChatHook;
 
     public ConfigManager getConfigManager() { return configManager; }
     public ColorManager getColorManager() { return colorManager; }
@@ -71,6 +73,8 @@ public class ChatColor extends JavaPlugin {
     public BStatsManager getBStatsManager() { return bStatsManager; }
     public FastStatsManager getFastStatsManager() { return fastStatsManager; }
     public HeadDatabaseHook getHeadDatabaseHook() { return headDatabaseHook; }
+    /** Non-null while ChatColor colours chat from inside ZelChat; see {@link ZelChatHook}. */
+    public ZelChatHook getZelChatHook() { return zelChatHook; }
 
     @Override
     public void onEnable() {
@@ -129,6 +133,10 @@ public class ChatColor extends JavaPlugin {
         }
         if (this.chatDebugger != null) {
             this.chatDebugger.stop();
+        }
+        if (this.zelChatHook != null) {
+            this.zelChatHook.unregister();
+            this.zelChatHook = null;
         }
         if (this.fastStatsManager != null) {
             this.fastStatsManager.onDisable();
@@ -338,6 +346,13 @@ public class ChatColor extends JavaPlugin {
         if (Bukkit.getPluginManager().getPlugin("HeadDatabase") != null) {
             this.headDatabaseHook = new HeadDatabaseHook(this);
         }
+        // Check by name: touching ZelChatHook at all loads ZelChat's API, which isn't there without it.
+        if (Bukkit.getPluginManager().isPluginEnabled("ZelChat")) {
+            ZelChatHook hook = new ZelChatHook(this);
+            if (hook.register()) {
+                this.zelChatHook = hook;
+            }
+        }
         new net.busybee.chatcolor.hooks.IntegrationChecker(this).check();
     }
 
@@ -386,6 +401,9 @@ public class ChatColor extends JavaPlugin {
         setupConsoleFilter();
 
         refreshPermissions();
+        if (this.zelChatHook != null) {
+            this.zelChatHook.loadRenderPrefixes();
+        }
         registerListenersOnReload();
         this.displayNameService.refreshAll();
     }
