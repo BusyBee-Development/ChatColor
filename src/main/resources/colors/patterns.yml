@@ -3,7 +3,17 @@
 ############################################################
 
 # Define multi-color patterns here.
-# Colors are applied character-by-character.
+# Colors are applied character-by-character. Spaces never take a color.
+#
+# 'mode' (optional) sets how the colors are handed out:
+#   CYCLE           - Each letter takes the next color in the list, looping. The default.
+#   RANDOM          - Each letter takes a random color from the list, never the same one
+#                     twice in a row. Changes on every chat message.
+#   RANDOM_GRADIENT - Each chat message fades between two colors picked at random from
+#                     the list. Needs at least two plain colors (e.g. "<red>", "<#FF0000>").
+# The random modes only ever use the colors you list, so keep them readable on chat.
+# Display names and placeholders other than %chatcolor_message% keep one fixed look per
+# player instead of changing, so names don't flicker in the tab list.
 #
 # Like colors.yml, each entry takes an optional 'permission' (leave it empty to let
 # everyone use the pattern) and an optional 'default' of true, op or false. Every node
@@ -76,3 +86,26 @@ patterns:
       - "<#DB7093>"
       - "<#FFB6C1>"
       - "<#FF69B4>"
+  confetti:
+    display-name: "Confetti"
+    permission: "chatcolor.pattern.confetti"
+    icon: "FIREWORK_ROCKET"
+    mode: "RANDOM"
+    colors:
+      - "<#FF5555>"
+      - "<#FFAA00>"
+      - "<#FFFF55>"
+      - "<#55FF55>"
+      - "<#55FFFF>"
+      - "<#FF55FF>"
+  mood:
+    display-name: "Mood"
+    permission: "chatcolor.pattern.mood"
+    icon: "AMETHYST_SHARD"
+    mode: "RANDOM_GRADIENT"
+    colors:
+      - "<#FF6B6B>"
+      - "<#FFD93D>"
+      - "<#6BCB77>"
+      - "<#4D96FF>"
+      - "<#C77DFF>"

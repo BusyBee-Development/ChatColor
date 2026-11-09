@@ -8,6 +8,7 @@ import it.pino.zelchat.api.module.ChatModule;
 import it.pino.zelchat.api.module.annotation.ChatModuleSettings;
 import it.pino.zelchat.api.module.priority.ModulePriority;
 import net.busybee.chatcolor.ChatColor;
+import net.busybee.chatcolor.listeners.ChatListener;
 import net.busybee.chatcolor.utils.ChatDebugger;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -117,7 +118,9 @@ public final class ZelChatHook {
         }
 
         Component in = message.getMessage();
-        Component out = plugin.getChatColorAPI().applyColorToComponent(player, in, keep);
+        // Same seed the chat event got for this message, so %chatcolor_message% matches.
+        long seed = ChatListener.record(player.getUniqueId(), message.getRawMessage());
+        Component out = plugin.getChatColorAPI().applyColorToComponent(player, in, keep, seed);
         message.setMessage(out);
 
         ChatDebugger debug = plugin.getChatDebugger();

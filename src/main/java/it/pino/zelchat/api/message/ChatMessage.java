@@ -15,6 +15,8 @@ public interface ChatMessage {
 
     MessageState getState();
 
+    String getRawMessage();
+
     Component getMessage();
 
     void setMessage(Component message);

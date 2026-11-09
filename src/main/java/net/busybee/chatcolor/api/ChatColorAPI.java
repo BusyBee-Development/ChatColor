@@ -128,14 +128,31 @@ public class ChatColorAPI {
     /**
      * Applies a player's current color to a Component.
      *
+     * <p>A RANDOM or RANDOM_GRADIENT pattern uses the player's fixed seed here, so the same text
+     * always comes out the same (names don't flicker). Chat passes a fresh seed per message with
+     * {@link #applyColorToComponent(Player, Component, long)}.
+     *
      * @param player    The player whose color should be used.
      * @param component The component to colorize.
      * @return A colorized Component.
      */
     public Component applyColorToComponent(Player player, Component component) {
+        return applyColorToComponent(player, component, fixedSeed(player.getUniqueId()));
+    }
+
+    /**
+     * Applies a player's current color to a Component, using {@code seed} for random patterns.
+     * The same seed always gives the same colors.
+     *
+     * @param player    The player whose color should be used.
+     * @param component The component to colorize.
+     * @param seed      Seed for RANDOM and RANDOM_GRADIENT patterns; ignored otherwise.
+     * @return A colorized Component.
+     */
+    public Component applyColorToComponent(Player player, Component component, long seed) {
         PatternEntry pattern = resolveActivePattern(player);
         if (pattern != null) {
-            return PatternApplier.apply(component, pattern.getColors());
+            return PatternApplier.apply(component, pattern, seed);
         }
 
         String tag = resolveActiveTag(player);
@@ -157,6 +174,15 @@ public class ChatColorAPI {
      * @return A colorized Component.
      */
     public Component applyColorToComponent(Player player, Component component, Collection<String> keepIntact) {
+        return applyColorToComponent(player, component, keepIntact, fixedSeed(player.getUniqueId()));
+    }
+
+    /**
+     * Same as {@link #applyColorToComponent(Player, Component, Collection)}, with a seed for
+     * random patterns.
+     */
+    public Component applyColorToComponent(Player player, Component component, Collection<String> keepIntact,
+                                           long seed) {
         PatternEntry pattern = resolveActivePattern(player);
         String tag = pattern == null ? resolveActiveTag(player) : null;
         if (pattern == null && tag == null) {
@@ -164,9 +190,17 @@ public class ChatColorAPI {
         }
 
         Component colored = TokenSafeColorizer.apply(component, keepIntact, text -> pattern != null
-                ? PatternApplier.apply(text, pattern.getColors())
+                ? PatternApplier.apply(text, pattern, seed)
                 : ColorUtil.styleLiteral(tag, text));
-        return colored != null ? colored : applyColorToComponent(player, component);
+        return colored != null ? colored : applyColorToComponent(player, component, seed);
+    }
+
+    /**
+     * The seed a player's random pattern uses outside chat (names, placeholders, the API): the
+     * same for that player every time, so their name keeps one look.
+     */
+    public static long fixedSeed(UUID uuid) {
+        return uuid.getMostSignificantBits() ^ Long.rotateLeft(uuid.getLeastSignificantBits(), 17);
     }
 
     /**

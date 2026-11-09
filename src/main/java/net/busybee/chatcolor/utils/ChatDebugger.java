@@ -165,7 +165,9 @@ public final class ChatDebugger implements Listener {
 
         PatternEntry pattern = plugin.getChatColorAPI().resolveActivePattern(player);
         String tag = plugin.getChatColorAPI().resolveActiveTag(player);
-        log("  resolved: pattern=" + (pattern == null ? "none" : pattern.getKey())
+        log("  resolved: pattern=" + (pattern == null ? "none" : pattern.getKey()
+                        + (pattern.isRandom() ? " (" + pattern.getMode() + ", seed "
+                        + ChatListener.getMessageSeed(player.getUniqueId()) + ")" : ""))
                 + " tag=" + (tag == null ? "NONE <- nothing will be coloured" : safe(tag)));
 
         logEntryPermission(player, data);

@@ -223,7 +223,7 @@ they immediately fall back to their group default (or to no color) without needi
 
 ## `colors/patterns.yml`
 
-Patterns cycle colors character-by-character throughout the message.
+Patterns color a message one letter at a time. Spaces never take a color.
 
 ```yaml
 patterns:
@@ -239,7 +239,34 @@ patterns:
       - "<aqua>"
       - "<blue>"
       - "<light_purple>"
+  confetti:
+    display-name: "Confetti"
+    permission: "chatcolor.pattern.confetti"
+    icon: "FIREWORK_ROCKET"
+    mode: "RANDOM"
+    colors:
+      - "<#FF5555>"
+      - "<#FFAA00>"
+      - "<#FFFF55>"
 ```
+
+`mode` is optional and sets how the colors are handed out:
+
+| Mode              | What it does                                                                                              |
+|:------------------|:----------------------------------------------------------------------------------------------------------|
+| `CYCLE`           | **Default.** Each letter takes the next color in the list, looping.                                       |
+| `RANDOM`          | Each letter takes a random color from the list, never the same one twice in a row. New colors every message. |
+| `RANDOM_GRADIENT` | Each message fades between two colors picked at random from the list. Needs at least two plain colors.     |
+
+The random modes only use the colors you list, so keep the list readable on chat.
+
+Each chat message gets its own random colors, and everyone sees the same ones, including
+`%chatcolor_message%`. Display names, `%chatcolor_name%`, `%chatcolor_apply_...%` and the GUI keep
+one fixed look per player, so a name doesn't change color every time the tab list refreshes.
+
+ChatColor ships two examples, `confetti` (`RANDOM`) and `mood` (`RANDOM_GRADIENT`). Existing
+installs get them added on update like any other new bundled entry. Delete them if you don't want
+them; they won't come back.
 
 ---
 

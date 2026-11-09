@@ -1,6 +1,7 @@
 package net.busybee.chatcolor.hooks;
 
 import net.busybee.chatcolor.ChatColor;
+import net.busybee.chatcolor.api.ChatColorAPI;
 import net.busybee.chatcolor.data.PlayerColorData;
 import net.busybee.chatcolor.models.PatternEntry;
 import net.busybee.chatcolor.utils.ColorUtil;
@@ -77,7 +78,8 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
             }
         } else if (action.equalsIgnoreCase("message")) {
             String msg = ChatListener.getLastMessage(player.getUniqueId());
-            result = (msg != null && !msg.isEmpty()) ? output(buildColored(player, data, msg)) : "";
+            result = (msg != null && !msg.isEmpty())
+                    ? output(buildColored(player, data, msg, ChatListener.getMessageSeed(player.getUniqueId()))) : "";
         } else if (action.equalsIgnoreCase("name")) {
             String name = player.getName();
             result = (name != null) ? output(buildColored(player, data, name)) : "";
@@ -106,10 +108,15 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
                 : ColorUtil.toLegacy(component);
     }
 
+    /** Names and %chatcolor_apply_...% use the player's fixed seed, so they look the same every refresh. */
     private Component buildColored(OfflinePlayer player, PlayerColorData data, String text) {
+        return buildColored(player, data, text, ChatColorAPI.fixedSeed(player.getUniqueId()));
+    }
+
+    private Component buildColored(OfflinePlayer player, PlayerColorData data, String text, long seed) {
         if (player instanceof org.bukkit.entity.Player online) {
             PatternEntry pattern = plugin.getChatColorAPI().resolveActivePattern(online);
-            if (pattern != null) return PatternApplier.apply(text, pattern.getColors(), false);
+            if (pattern != null) return PatternApplier.apply(text, pattern, seed, false);
 
             String tag = plugin.getChatColorAPI().resolveActiveTag(online);
             return tag == null ? Component.text(text) : ColorUtil.applyTagToText(tag, text, false);
@@ -124,7 +131,7 @@ public class PlaceholderAPIHook extends PlaceholderExpansion {
         }
         if ("PATTERN".equals(data.getColorType())) {
             PatternEntry pattern = plugin.getPatternManager().getPattern(data.getColorKey());
-            if (pattern != null) return PatternApplier.apply(text, pattern.getColors(), false);
+            if (pattern != null) return PatternApplier.apply(text, pattern, seed, false);
             return Component.text(text);
         }
         return ColorUtil.applyTagToText(data.getColorTag(), text, false);

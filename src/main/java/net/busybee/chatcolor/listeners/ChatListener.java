@@ -3,8 +3,10 @@ package net.busybee.chatcolor.listeners;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
 import net.busybee.chatcolor.ChatColor;
+import net.busybee.chatcolor.api.ChatColorAPI;
 import net.busybee.chatcolor.utils.ChatDebugger;
 import net.busybee.chatcolor.utils.ColorUtil;
 import io.papermc.paper.chat.ChatRenderer;
@@ -21,6 +23,12 @@ public class ChatListener implements Listener {
 
     private final ChatColor plugin;
     private static final Map<UUID, String> lastMessages = new ConcurrentHashMap<>();
+    private static final Map<UUID, MessageSeed> messageSeeds = new ConcurrentHashMap<>();
+    /**
+     * One chat message reaches us up to three times (legacy event, modern event, ZelChat module),
+     * so a repeat of the same text this soon is the same message and keeps its seed.
+     */
+    private static final long SAME_MESSAGE_MS = 2000;
     private static final AtomicBoolean warnedPapiFailure = new AtomicBoolean(false);
     public ChatListener(ChatColor plugin) {
         this.plugin = plugin;
@@ -30,7 +38,7 @@ public class ChatListener implements Listener {
         Player player = event.getPlayer();
 
         String plain = PlainTextComponentSerializer.plainText().serialize(event.message());
-        lastMessages.put(player.getUniqueId(), plain);
+        long seed = record(player.getUniqueId(), plain);
 
         ChatDebugger debug = plugin.getChatDebugger();
         boolean watched = debug != null && debug.isWatched(player);
@@ -68,7 +76,7 @@ public class ChatListener implements Listener {
         // colour nothing. Colour the event message instead and let them format the coloured
         // copy. See ChatColor#isDirectWrite.
         if (plugin.isDirectWrite()) {
-            Component colored = plugin.getChatColorAPI().applyColorToComponent(player, event.message());
+            Component colored = plugin.getChatColorAPI().applyColorToComponent(player, event.message(), seed);
             if (watched) {
                 debug.wroteMessage(event.message(), colored);
             }
@@ -76,7 +84,7 @@ public class ChatListener implements Listener {
             return;
         }
 
-        event.renderer(new ColorRenderer(event.renderer(), watched ? debug : null));
+        event.renderer(new ColorRenderer(event.renderer(), seed, watched ? debug : null));
     }
 
     /** True when {@code renderer} is the one ChatColor installed and nothing has replaced it. */
@@ -87,12 +95,14 @@ public class ChatListener implements Listener {
     private final class ColorRenderer implements ChatRenderer {
 
         private final ChatRenderer delegate;
+        private final long seed;
         private final ChatDebugger debug;
         private Component cachedInput;
         private Component cachedOutput;
 
-        private ColorRenderer(ChatRenderer delegate, ChatDebugger debug) {
+        private ColorRenderer(ChatRenderer delegate, long seed, ChatDebugger debug) {
             this.delegate = delegate;
+            this.seed = seed;
             this.debug = debug;
         }
 
@@ -104,7 +114,7 @@ public class ChatListener implements Listener {
         private synchronized Component colorize(Player source, Component message) {
             if (cachedInput != message) {
                 cachedInput = message;
-                cachedOutput = plugin.getChatColorAPI().applyColorToComponent(source, message);
+                cachedOutput = plugin.getChatColorAPI().applyColorToComponent(source, message, seed);
                 if (debug != null) {
                     debug.rendered(message, cachedOutput);
                 }
@@ -119,13 +129,13 @@ public class ChatListener implements Listener {
      * would still hold the previous message when they read it.
      */
     public void recordLegacy(AsyncPlayerChatEvent event) {
-        lastMessages.put(event.getPlayer().getUniqueId(), event.getMessage());
+        record(event.getPlayer().getUniqueId(), event.getMessage());
     }
 
     public void onLegacyChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
         String rawMessage = event.getMessage();
-        lastMessages.put(player.getUniqueId(), rawMessage);
+        long seed = record(player.getUniqueId(), rawMessage);
 
         ChatDebugger debug = plugin.getChatDebugger();
         boolean watched = debug != null && debug.isWatched(player);
@@ -141,7 +151,7 @@ public class ChatListener implements Listener {
         }
         Component message = prepareInput(player, rawMessage);
         if (plugin.getConfigManager().isApplyToMessage()) {
-            message = plugin.getChatColorAPI().applyColorToComponent(player, message);
+            message = plugin.getChatColorAPI().applyColorToComponent(player, message, seed);
         }
         String serialized = ColorUtil.getLegacySerializer().serialize(message);
         if (watched) {
@@ -190,10 +200,35 @@ public class ChatListener implements Listener {
         }
     }
 
+    /**
+     * Remembers {@code text} as the player's latest message and returns the seed for its random
+     * pattern colors. Called again for the same message from another event, it returns the same
+     * seed, so every path colors that message identically.
+     */
+    public static long record(UUID uuid, String text) {
+        lastMessages.put(uuid, text);
+        long now = System.currentTimeMillis();
+        MessageSeed seed = messageSeeds.compute(uuid, (id, old) ->
+                old != null && old.text.equals(text) && now - old.at < SAME_MESSAGE_MS
+                        ? old
+                        : new MessageSeed(text, ThreadLocalRandom.current().nextLong(), now));
+        return seed.seed;
+    }
+
+    /** The seed of the player's latest message, or their fixed seed when they haven't chatted. */
+    public static long getMessageSeed(UUID uuid) {
+        MessageSeed seed = messageSeeds.get(uuid);
+        return seed != null ? seed.seed : ChatColorAPI.fixedSeed(uuid);
+    }
+
+    private record MessageSeed(String text, long seed, long at) {
+    }
+
     public static String getLastMessage(UUID uuid) {
         return lastMessages.getOrDefault(uuid, "");
     }
     public static void forget(UUID uuid) {
         lastMessages.remove(uuid);
+        messageSeeds.remove(uuid);
     }
 }

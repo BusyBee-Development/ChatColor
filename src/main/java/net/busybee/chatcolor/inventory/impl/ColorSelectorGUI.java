@@ -105,7 +105,7 @@ public class ColorSelectorGUI extends FastInv {
             final PlayerColorData data = plugin.getPlayerDataManager().getData(player.getUniqueId());
             final boolean isSelected = entry.getKey().equalsIgnoreCase(data.getColorKey()) && entry.getEntryType().equalsIgnoreCase(data.getColorType());
 
-            safeSetItem(slot, createEntryIcon(entry, hasPermission, isSelected), event -> {
+            safeSetItem(slot, createEntryIcon(player, entry, hasPermission, isSelected), event -> {
                 Player clicker = (Player) event.getWhoClicked();
                 if (!entry.isAllowed(clicker)) {
                     plugin.getMessageManager().send(clicker, "no-permission");
@@ -191,7 +191,8 @@ public class ColorSelectorGUI extends FastInv {
 
         if (entry.getEntryType().equals("PATTERN")) {
             PatternEntry patternEntry = (PatternEntry) entry;
-            Component coloredDisplay = PatternApplier.apply(entry.getDisplayName(), patternEntry.getColors());
+            Component coloredDisplay = PatternApplier.apply(entry.getDisplayName(), patternEntry,
+                    net.busybee.chatcolor.api.ChatColorAPI.fixedSeed(player.getUniqueId()));
             plugin.getMessageManager().send(player, "color-applied", "color", coloredDisplay);
         } else {
             String resetTag = plugin.getGuiManager().getRaw("settings.reset-tag");
@@ -200,7 +201,7 @@ public class ColorSelectorGUI extends FastInv {
         }
     }
 
-    private ItemStack createEntryIcon(SelectableEntry entry, boolean hasPermission, boolean isSelected) {
+    private ItemStack createEntryIcon(Player player, SelectableEntry entry, boolean hasPermission, boolean isSelected) {
         ItemStack item = null;
         if (entry.getHdbId() != null && plugin.getHeadDatabaseHook() != null) {
             item = plugin.getHeadDatabaseHook().resolveHead(entry.getHdbId());
@@ -217,7 +218,8 @@ public class ColorSelectorGUI extends FastInv {
         String resetTag = plugin.getGuiManager().getRaw("settings.reset-tag");
         if (entry.getEntryType().equals("PATTERN")) {
             PatternEntry patternEntry = (PatternEntry) entry;
-            meta.displayName(PatternApplier.applyToName(entry.getDisplayName(), patternEntry.getColors()));
+            meta.displayName(PatternApplier.apply(entry.getDisplayName(), patternEntry,
+                    net.busybee.chatcolor.api.ChatColorAPI.fixedSeed(player.getUniqueId())));
         } else {
             meta.displayName(ColorUtil.colorize(entry.getTag() + entry.getDisplayName() + resetTag));
         }

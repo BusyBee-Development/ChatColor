@@ -46,11 +46,24 @@ public class PatternManager {
                 PermissionDefault permissionDefault = parsePermissionDefault(
                         section.getString(key + ".default"), "patterns." + key);
 
-                loaded.put(key, new PatternEntry(key, displayName, permission, icon, colors, permissionDefault, hdbId));
+                PatternEntry.Mode mode = parseMode(section.getString(key + ".mode"), "patterns." + key);
+
+                loaded.put(key, new PatternEntry(key, displayName, permission, icon, colors, permissionDefault, hdbId, mode));
             }
         }
 
         this.patterns = Collections.unmodifiableMap(loaded);
+    }
+
+    private PatternEntry.Mode parseMode(String raw, String path) {
+        if (raw == null || raw.isBlank()) return PatternEntry.Mode.CYCLE;
+        try {
+            return PatternEntry.Mode.valueOf(raw.trim().toUpperCase(Locale.ROOT).replace('-', '_'));
+        } catch (IllegalArgumentException e) {
+            plugin.getLogger().warning("Invalid 'mode' for " + path + ": '" + raw
+                    + "'. Expected CYCLE, RANDOM or RANDOM_GRADIENT. Using CYCLE.");
+            return PatternEntry.Mode.CYCLE;
+        }
     }
 
     private PermissionDefault parsePermissionDefault(String raw, String path) {

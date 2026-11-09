@@ -53,7 +53,16 @@ public final class TokenSafeColorizer {
             return message;
         }
 
-        String plain = String.join("", pieces);
+        // Tokens are left out of what gets styled, so a gradient or pattern runs across the text
+        // around them as if they weren't there and its end colors stay visible.
+        StringBuilder text = new StringBuilder();
+        for (String piece : pieces) {
+            if (!tokenSet.contains(piece)) text.append(piece);
+        }
+        if (text.isEmpty()) {
+            return message;
+        }
+        String plain = text.toString();
         Component styled = styler.apply(plain);
         if (styled == null) {
             return message;
@@ -69,11 +78,11 @@ public final class TokenSafeColorizer {
                 .match(pattern)
                 .replacement((match, builder) -> {
                     String piece = match.group();
-                    int at = offset[0];
-                    offset[0] += piece.length();
                     if (tokenSet.contains(piece)) {
                         return Component.text(piece);
                     }
+                    int at = offset[0];
+                    offset[0] += piece.length();
                     return Component.text(piece, styles.get(at));
                 })
                 .build());
