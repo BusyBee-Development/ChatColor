@@ -9,16 +9,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Colours a chat component one character at a time while leaving chosen tokens as a single,
  * uncoloured run of text.
  *
- * <p>Chat plugins like ZelChat swap tokens such as {@code [item]} or a mentioned player's name
+ * <p>Chat plugins like ZelChat and InteractiveChat swap tokens such as {@code [item]} or a mentioned player's name
  * for interactive components with Adventure's {@code replaceText}. That only matches inside one
  * text component, so a gradient or pattern that splits {@code [item]} into six coloured letters
  * hides it from them. Keeping each token whole lets them still find it after we colour.
@@ -37,15 +36,25 @@ public final class TokenSafeColorizer {
      *         colours cannot be lined up with the message
      */
     public static Component apply(Component message, Collection<String> tokens, Function<String, Component> styler) {
-        Pattern pattern = buildPattern(tokens);
-        Set<String> tokenSet = tokens.stream().filter(t -> t != null && !t.isBlank()).collect(Collectors.toSet());
+        return apply(message, tokens, List.of(), styler);
+    }
+
+    /**
+     * Same as {@link #apply(Component, Collection, Function)}, also keeping whole every match of
+     * {@code patterns}. For plugins like InteractiveChat whose keywords are regexes.
+     */
+    public static Component apply(Component message, Collection<String> tokens, Collection<Pattern> patterns,
+                                  Function<String, Component> styler) {
+        Pattern pattern = buildPattern(tokens, patterns);
 
         // Walk the message exactly as the colouring pass will, so offsets line up with it.
         List<String> pieces = new ArrayList<>();
+        List<Boolean> isToken = new ArrayList<>();
         message.replaceText(TextReplacementConfig.builder()
                 .match(pattern)
                 .replacement((match, builder) -> {
                     pieces.add(match.group());
+                    isToken.add(match.group(KEEP) != null);
                     return builder;
                 })
                 .build());
@@ -59,7 +68,7 @@ public final class TokenSafeColorizer {
         // color, where nobody can see it.
         boolean[] styledPiece = new boolean[pieces.size()];
         for (int i = 0; i < pieces.size(); i++) {
-            styledPiece[i] = !tokenSet.contains(pieces.get(i));
+            styledPiece[i] = !isToken.get(i);
         }
         for (int i = 0; i < pieces.size() && (!styledPiece[i] || pieces.get(i).isBlank()); i++) {
             styledPiece[i] = false;
@@ -101,15 +110,53 @@ public final class TokenSafeColorizer {
                 .build());
     }
 
-    /** Longest token first, so "[inventory]" wins over "[inv]"; otherwise one character. */
+    private static final String KEEP = "keep";
+
     static Pattern buildPattern(Collection<String> tokens) {
-        String alternatives = tokens.stream()
+        return buildPattern(tokens, List.of());
+    }
+
+    /**
+     * Matches one kept token (group {@value #KEEP}) or else one character. Literal tokens go
+     * longest first, so "[inventory]" wins over "[inv]"; regexes follow, each in its own group so
+     * inline flags like {@code (?i)} stay inside it. A regex that doesn't compile on its own or
+     * that can match empty text is skipped rather than breaking chat.
+     */
+    static Pattern buildPattern(Collection<String> tokens, Collection<Pattern> patterns) {
+        List<String> alternatives = new ArrayList<>();
+        tokens.stream()
                 .filter(t -> t != null && !t.isBlank())
                 .distinct()
                 .sorted(Comparator.comparingInt(String::length).reversed())
                 .map(Pattern::quote)
-                .collect(Collectors.joining("|"));
-        return Pattern.compile(alternatives.isEmpty() ? "." : alternatives + "|.", Pattern.DOTALL);
+                .forEach(alternatives::add);
+        for (Pattern p : patterns) {
+            if (p == null || p.pattern().isEmpty()) continue;
+            String wrapped = "(?:" + p.pattern() + ")";
+            try {
+                if (Pattern.compile(wrapped, p.flags()).matcher("").matches()) continue;
+            } catch (PatternSyntaxException e) {
+                continue;
+            }
+            alternatives.add(p.flags() == 0 ? wrapped : "(?" + inlineFlags(p.flags()) + ":" + p.pattern() + ")");
+        }
+        String body = alternatives.isEmpty() ? "" : "(?<" + KEEP + ">" + String.join("|", alternatives) + ")|";
+        try {
+            return Pattern.compile(body + ".", Pattern.DOTALL);
+        } catch (PatternSyntaxException e) {
+            // Regexes that are fine alone can still clash once joined (e.g. back-references).
+            return patterns.isEmpty() ? Pattern.compile(".", Pattern.DOTALL) : buildPattern(tokens, List.of());
+        }
+    }
+
+    private static String inlineFlags(int flags) {
+        StringBuilder sb = new StringBuilder();
+        if ((flags & Pattern.CASE_INSENSITIVE) != 0) sb.append('i');
+        if ((flags & Pattern.UNICODE_CASE) != 0) sb.append('u');
+        if ((flags & Pattern.MULTILINE) != 0) sb.append('m');
+        if ((flags & Pattern.DOTALL) != 0) sb.append('s');
+        if ((flags & Pattern.COMMENTS) != 0) sb.append('x');
+        return sb.toString();
     }
 
     /** One style per UTF-16 char of the component's text, with parent styles merged in. */

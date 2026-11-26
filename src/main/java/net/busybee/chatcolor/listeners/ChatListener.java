@@ -70,13 +70,16 @@ public class ChatListener implements Listener {
         if (watched) {
             debug.beforeWrap(event.renderer());
         }
+        if (watched && plugin.getInteractiveChatHook() != null) {
+            debug.log("  InteractiveChat is running, its keywords, mentions and tags stay whole and uncoloured");
+        }
 
         // Some formatters build their output from a copy of the message they took earlier and
         // never look at what the renderer chain hands them, so wrapping their renderer would
         // colour nothing. Colour the event message instead and let them format the coloured
         // copy. See ChatColor#isDirectWrite.
         if (plugin.isDirectWrite()) {
-            Component colored = plugin.getChatColorAPI().applyColorToComponent(player, event.message(), seed);
+            Component colored = plugin.getChatColorAPI().colorChatMessage(player, event.message(), seed);
             if (watched) {
                 debug.wroteMessage(event.message(), colored);
             }
@@ -114,7 +117,7 @@ public class ChatListener implements Listener {
         private synchronized Component colorize(Player source, Component message) {
             if (cachedInput != message) {
                 cachedInput = message;
-                cachedOutput = plugin.getChatColorAPI().applyColorToComponent(source, message, seed);
+                cachedOutput = plugin.getChatColorAPI().colorChatMessage(source, message, seed);
                 if (debug != null) {
                     debug.rendered(message, cachedOutput);
                 }
@@ -151,7 +154,7 @@ public class ChatListener implements Listener {
         }
         Component message = prepareInput(player, rawMessage);
         if (plugin.getConfigManager().isApplyToMessage()) {
-            message = plugin.getChatColorAPI().applyColorToComponent(player, message, seed);
+            message = plugin.getChatColorAPI().colorChatMessage(player, message, seed);
         }
         String serialized = ColorUtil.getLegacySerializer().serialize(message);
         if (watched) {

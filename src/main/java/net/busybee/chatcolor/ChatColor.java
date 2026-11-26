@@ -11,6 +11,7 @@ import net.busybee.chatcolor.data.PlayerDataManager;
 import net.busybee.chatcolor.hooks.PlaceholderAPIHook;
 import net.busybee.chatcolor.hooks.HeadDatabaseHook;
 import net.busybee.chatcolor.hooks.ZelChatHook;
+import net.busybee.chatcolor.hooks.InteractiveChatHook;
 import fr.mrmicky.fastinv.FastInvManager;
 import net.busybee.chatcolor.listeners.ChatListener;
 import net.busybee.chatcolor.listeners.PlayerListener;
@@ -56,6 +57,7 @@ public class ChatColor extends JavaPlugin {
     private FastStatsManager fastStatsManager;
     private HeadDatabaseHook headDatabaseHook;
     private ZelChatHook zelChatHook;
+    private InteractiveChatHook interactiveChatHook;
 
     public ConfigManager getConfigManager() { return configManager; }
     public ColorManager getColorManager() { return colorManager; }
@@ -75,6 +77,9 @@ public class ChatColor extends JavaPlugin {
     public HeadDatabaseHook getHeadDatabaseHook() { return headDatabaseHook; }
     /** Non-null while ChatColor colours chat from inside ZelChat; see {@link ZelChatHook}. */
     public ZelChatHook getZelChatHook() { return zelChatHook; }
+
+    /** Non-null while InteractiveChat is running; see {@link InteractiveChatHook}. */
+    public InteractiveChatHook getInteractiveChatHook() { return interactiveChatHook; }
 
     @Override
     public void onEnable() {
@@ -138,6 +143,7 @@ public class ChatColor extends JavaPlugin {
             this.zelChatHook.unregister();
             this.zelChatHook = null;
         }
+        this.interactiveChatHook = null;
         if (this.fastStatsManager != null) {
             this.fastStatsManager.onDisable();
         }
@@ -353,6 +359,11 @@ public class ChatColor extends JavaPlugin {
                 this.zelChatHook = hook;
             }
         }
+        if (Bukkit.getPluginManager().isPluginEnabled("InteractiveChat")) {
+            InteractiveChatHook hook = new InteractiveChatHook(this);
+            hook.register();
+            this.interactiveChatHook = hook;
+        }
         new net.busybee.chatcolor.hooks.IntegrationChecker(this).check();
     }
 
@@ -403,6 +414,9 @@ public class ChatColor extends JavaPlugin {
         refreshPermissions();
         if (this.zelChatHook != null) {
             this.zelChatHook.loadRenderPrefixes();
+        }
+        if (this.interactiveChatHook != null) {
+            this.interactiveChatHook.loadSettings();
         }
         registerListenersOnReload();
         this.displayNameService.refreshAll();

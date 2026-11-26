@@ -296,6 +296,27 @@ ChatColor reads the `[item]`/`[inv]`/`[ec]` prefixes from ZelChat's `settings.ym
 `/color debug` prints a `ZELCHAT module coloured the message` line for each message, and the
 pipeline dump reports `zelchat: hooked`.
 
+### InteractiveChat
+
+Works out of the box. Solid colors, gradients and patterns all apply, and InteractiveChat's
+`[item]`, `[inv]`, `[ender]`, your own custom keywords and `@name` mentions keep working.
+
+A gradient or pattern colors one letter at a time, and splitting `[item]` into six letters would
+hide it from InteractiveChat. So when InteractiveChat is installed, ChatColor leaves these words
+whole and uncolored, and runs the gradient across the rest of the message:
+
+- every InteractiveChat keyword, including custom ones (read from InteractiveChat itself, so
+  `/ic reload` is picked up straight away)
+- mentions: the mention prefix (`@` by default) followed by an online player's name, plus
+  `@here` and `@everyone`
+- the hidden tag InteractiveChat puts in the message to mark who sent a keyword
+
+ChatColor reads the mention prefix and the `AllowMention`, `DisableHere` and `DisableEveryone`
+settings from InteractiveChat's `config.yml`, and `/color reload` picks up changes to them.
+
+`/color debug` prints `InteractiveChat is running, its keywords, mentions and tags stay whole and
+uncoloured` for each message.
+
 ### DiscordSRV
 
 Works automatically. For best results set `UseModernPaperChatEvent: true` in DiscordSRV's config

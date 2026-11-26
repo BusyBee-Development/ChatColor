@@ -2,6 +2,7 @@ package net.busybee.chatcolor.api;
 
 import net.busybee.chatcolor.ChatColor;
 import net.busybee.chatcolor.data.PlayerColorData;
+import net.busybee.chatcolor.hooks.InteractiveChatHook;
 import net.busybee.chatcolor.models.ColorEntry;
 import net.busybee.chatcolor.models.GradientEntry;
 import net.busybee.chatcolor.models.PatternEntry;
@@ -13,8 +14,10 @@ import net.busybee.chatcolor.utils.TokenSafeColorizer;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 /**
  * API for interacting with ChatColor.
@@ -183,16 +186,37 @@ public class ChatColorAPI {
      */
     public Component applyColorToComponent(Player player, Component component, Collection<String> keepIntact,
                                            long seed) {
+        return applyColorToComponent(player, component, keepIntact, List.of(), seed);
+    }
+
+    /**
+     * Same as {@link #applyColorToComponent(Player, Component, Collection, long)}, also keeping
+     * every match of {@code keepMatching} whole and uncolored.
+     */
+    public Component applyColorToComponent(Player player, Component component, Collection<String> keepIntact,
+                                           Collection<Pattern> keepMatching, long seed) {
         PatternEntry pattern = resolveActivePattern(player);
         String tag = pattern == null ? resolveActiveTag(player) : null;
         if (pattern == null && tag == null) {
             return component;
         }
 
-        Component colored = TokenSafeColorizer.apply(component, keepIntact, text -> pattern != null
+        Component colored = TokenSafeColorizer.apply(component, keepIntact, keepMatching, text -> pattern != null
                 ? PatternApplier.apply(text, pattern, seed)
                 : ColorUtil.styleLiteral(tag, text));
         return colored != null ? colored : applyColorToComponent(player, component, seed);
+    }
+
+    /**
+     * Colors a chat message. When InteractiveChat is running, its keywords, mentions and hidden
+     * tags are kept whole so a gradient or pattern doesn't hide them from it.
+     */
+    public Component colorChatMessage(Player player, Component message, long seed) {
+        InteractiveChatHook interactiveChat = plugin.getInteractiveChatHook();
+        if (interactiveChat == null) {
+            return applyColorToComponent(player, message, seed);
+        }
+        return applyColorToComponent(player, message, List.of(), interactiveChat.keepPatterns(), seed);
     }
 
     /**

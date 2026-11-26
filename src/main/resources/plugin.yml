@@ -16,6 +16,7 @@ softdepend:
   - DeluxeChat
   - ChatManager
   - ZelChat
+  - InteractiveChat
 description: A chat color plugin for Minecraft Paper and Folia servers.
 
 commands:
